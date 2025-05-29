@@ -1,0 +1,32 @@
+{
+  "common": {
+
+  },
+  "navbar": {
+   
+  },
+  "dashboard": {
+ 
+  },
+  "login": {
+
+  },
+  "signup": {
+  
+  },
+  "forgot_password": {
+
+  },
+  "reset_password": {
+
+  },
+  "landing": {
+ 
+  },
+  "settings": {
+
+  },
+  "not_found": {
+ 
+  }
+}

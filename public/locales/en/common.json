@@ -1,0 +1,191 @@
+{
+  "common": {
+    "login": "Log in",
+    "signup": "Sign up",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "loading": "Loading..."
+  },
+  "button" : {
+    "copy_link_button" :  "Link copied"
+
+  },
+  "mylinkdiv":{
+    "linktree" : "Your Linktree is live:",
+    "copy" : "Copied!",
+    "copy_url" : "Copy URL"
+  },
+   "profile": {
+    "my_account": "My Account",
+    "sign_out": "Sign Out"
+  },
+   "share": {
+  "share_your_linktree": "Share your Linktree",
+    "get_more_visitors": "Get more visitors by sharing your Linktree everywhere.",
+    "add_to_socials": "Add to your socials",
+    "add_linktree_to_socials": "Add Linktree to your socials",
+    "add_url_to_profiles": "Add your Linktree URL to your social profiles for the world to easily find your Linktree.",
+    "share_linktree_to": "Share my Linktree to...",
+    "share_to": "Share to...",
+    "share_to_connections": "Share your Linktree to all your connections so everyone knows about it.",
+    "linktree_qr_code": "My Linktree QR code",
+    "qr_code": "QR Code",
+    "qr_code_description": "Here is your unique Linktree QR code that will direct people to your Linktree when scanned.",
+    "open_my_linktree": "Open my Linktree",
+    "share_on_snapchat": "Share on Snapchat",
+    "share_on_facebook": "Share on Facebook",
+    "share_on_linkedin": "Share on Linkedin",
+    "share_on_twitter": "Share on Twitter",
+    "share_via_whatsapp": "Share via WhatsApp",
+    "share_via_messenger": "Share via Messenger",
+    "share_via_email": "Share via Email",
+    "snapchat_description": "Add your Linktree to your Snapchat Public Profile. Simply copy your Linktree URL, open Snapchat, go to My Public Profile, tap Edit, then select Linktree or Website, then Add Your Linktree and paste your Linktree URL into the Add Linktree field.",
+    "instagram_description": "Add your Linktree to your Instagram profile. Simply copy your Linktree URL, go to Edit Profile, and paste it into the Website field.",
+    "facebook_description": "Add your Linktree to your Facebook profile. Simply copy your Linktree URL, go to the About page on your profile, click on Contact and basic info, then click on + Add a website, paste your Linktree URL into the Website address field, and click Save.",
+    "tiktok_description": "Add your Linktree to your TikTok profile. Simply copy your Linktree URL, go your TikTok profile, click on Manage Account, click on Edit profile, and paste your Linktree URL into the Website field, then click Save. (Note you may need to switch to a TikTok business account to activate this).",
+    "twitch_description": "Add your Linktree to your Twitch channel. Simply copy your Linktree URL, go your Twitch channel, click About, then click Edit about & links settings, scroll down to Social Links, add Linktree in the first text field, and paste your Linktree URL into the second text field, then click Add.",
+    "facebook_page_description": "Add your Linktree to your Facebook page. Simply copy your Linktree URL, go to the About page, scroll to Additional Contact Info, click on Enter website, and paste your Linktree URL into the Website field.",
+    "youtube_description": "Add your Linktree to your YouTube channel. Simply copy your Linktree URL, go to your YouTube channel, click on Customize Channel, then click on Basic info, and under Links, add a link title and paste your Linktree URL into the URL field, then click Publish.",
+    "linkedin_description": "Add your Linktree to your LinkedIn profile. Simply copy your Linktree URL, go your LinkedIn profile, click on pencil icon, scroll down to Contact info, paste your Linktree URL into the Website URL field, then click Apply.",
+    "pinterest_description": "Add your Linktree to your Pinterest profile. Simply copy your Linktree URL, go your Pinterest settings, paste your Linktree URL into the Website URL field, then click Save.",
+    "twitter_description": "Add your Linktree to your Twitter profile. Simply copy your Linktree URL, go to your profile, click on Edit Profile, and paste your Linktree URL into the Website field."
+  },
+  "email": {
+    "welcome": {
+      "subject": "Thanks for creating an account!",
+      "title": "Welcome to My Linktree Clone!",
+      "description": "This project is my attempt at recreating the amazing system that Linktree has developed.",
+      "disclaimer_title": "Disclaimer: ",
+      "disclaimer_text": "This is not the actual linktree, and has no affiliation to or with Linktree, it is just a personal project.",
+      "credentials_intro": "Your login credentials are provided below:",
+      "email_label": "Email:",
+      "password_label": "Password:",
+      "login_button": "Login to Your Account",
+      "footer": "Thank you for checking my project out. ❤❤❤",
+      "see_more": "see more"
+    },
+    "reset": {
+      "subject": "Password Reset Email",
+      "title": "Password Reset Email",
+      "description": "You've requested to reset your password. Please use the following link to reset your password:",
+      "button": "Reset Password",
+      "footer": "Thank you for using our service! ❤❤❤"
+    }
+  },
+  "userId": {
+    "sensitive_content": "Sensitive Content",
+    "profile.warning": "This profile may contain content that is not appropriate for all audiences",
+    "Continue": "continue",
+    "sensitiveType2": "I'm over 25",
+    "sensitiveType18": "I'm over 18",
+    "sensitiveType21": "I'm over 21",
+    "go_back": "Go Back",
+    "sensitiveType2_under": "I'm under 25",
+    "sensitiveType1_21": "I'm under 21",
+    "sensitiveType1_18": "I'm under 18",
+    "act_now": "Act now"
+  },
+  "navbar": {
+    "links": "Links",
+    "appearance": "Appearance",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "links": "Links",
+    "appearance": "Appearance",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "your_linktree": "Your Linktree is live:",
+    "copy_url": "Copy URL",
+    "copied": "Copied!"
+  },
+  "login": {
+    "title": "Log in to your Linktree",
+    "username_placeholder": "fabiconcept",
+    "password_placeholder": "Password",
+    "forgot_password": "Forgot your password?",
+    "submit": "Submit",
+    "no_account": "Don't have an account?",
+    "sign_up": "Sign up",
+    "invalid_credentials": "Invalid Login credentials!",
+    "success": "Login Successful",
+    "validating": "Validating credentials...",
+    "incorrect_password": "You entered an incorrect password!",
+    "username_not_registered": "This username is not registered to any user."
+  },
+   "signup": {
+    "title": "Create your account",
+    "username_placeholder": "fabiconcept",
+    "email_placeholder": "Email",
+    "password_placeholder": "Password",
+    "submit": "Submit",
+    "have_account": "Already have an account?",
+    "log_in": "Log in",
+    "cannot_submit": "Can't submit form yet!",
+    "something_went_wrong": "Something went wrong",
+    "setting_up_account": "Setting up your account.",
+    "could_not_complete_registration": "Couldn't complete registration",
+    "setup_complete": "Setup complete",
+    "username_taken": "This username is already taken.",
+    "username_too_short": "Username is too short.",
+    "invalid_username_format": "Invalid username format",
+    "account_exists": "You already have an account with us!",
+    "invalid_email_format": "Invalid Email format!"
+  },
+  "forgot_password": {
+    "page_title": "Link Tree | Forgot password",
+    "title": "Request password reset link",
+    "email_placeholder": "Provide your email address",
+    "submit": "Send request",
+    "remembered": "Remembered your password?",
+    "not_registered": "You don't have an account with us!",
+    "invalid_email": "Invalid Email format!",
+    "rest_link_request": "Request password reset link",
+    "reset_link_sent": "Password reset link sent",
+    "error_link_sent": "Oops! An error has occurred!",
+    "sending_request": "Sending request...",
+    "error_occurred": "Oops! An error occurred!",
+    "provide_email": "Provide your email address",
+    "remenber_password": "Remembered your password?",
+    "sign_up": " Sign up"
+  },
+  "reset_password": {
+    "title": "Enter your new password",
+    "advice": "I'll advice that your new password be different from your previous password.",
+    "password_placeholder": "Password",
+    "confirm_placeholder": "Retype password",
+    "submit": "Change password",
+    "passwords_must_match": "Both password must match!",
+    "password_setup": "Setting up your new Password...",
+    "password_error": "Oops! Something went wrong",
+    "password_succes": "Password changed! ✨✔",
+    "password_placeholder_retype": "Retype assword",
+    "password_change": "Change password ",
+    "login": "Go back to login",
+    "homepage": "Go to homepage",
+    "page": "page"
+  },
+  "landing": {
+    "headline": "The Only Link You'll Ever Need",
+    "subheadline": "Connect your audience to all of your content with one link",
+    "placeholder": "fabiconcept",
+    "submit": "Create"
+  },
+  "settings": {
+    "social_icons": "Social Icons",
+    "support_banner": "Support banner",
+    "sensitive_material": "Sensitive material",
+    "seo": "SEO",
+    "jump_to": "Jump to:"
+  },
+  "not_found": {
+    "title": "Uh oh. Page not found",
+    "description": "Sorry, the page you were looking for doesn't exist or has been hidden."
+  }
+}
