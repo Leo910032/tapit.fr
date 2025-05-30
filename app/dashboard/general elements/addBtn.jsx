@@ -6,9 +6,11 @@ import { FaAngleRight, FaPlus, FaX } from "react-icons/fa6";
 import BrandItem from "./BrandItem";
 import PickBrandModal from "../general components/PickBrandModal";
 import { ManageLinksContent } from "../general components/ManageLinks";
+import { useTranslation } from "@/lib/useTranslation";
 
 export const addBtnContext = React.createContext();
 export default function AddBtn() {
+    const { t } = useTranslation();
     const [btnState, setBtnState] = useState(0);
     const [btnStyle, setBtnStyle] = useState(`p-3 cursor-pointer active:scale-95 active:opacity-60 active:translate-y-1 hover:scale-[1.005] text-white bg-btnPrimary hover:bg-btnPrimaryAlt`)
     const [url, setUrl] = useState('');
@@ -89,12 +91,12 @@ export default function AddBtn() {
         btnState === 0 ?
             <div className="flex items-center gap-3 justify-center ">
                 <FaPlus />
-                <span>Add Link</span>
+                <span>{t('addBtn.add_link')}</span>
             </div>
             :
             <div className="w-full py-4 overflow-hidden linear">
                 <div className="flex justify-between items-center text-sm duration-0 px-6">
-                    <span className={'font-semibold'}>Enter Url</span>
+                    <span className={'font-semibold'}>{t('addBtn.enter_url')}</span>
                     <div className={'p-2 hover:bg-black hover:bg-opacity-[0.05] active:scale-90 font-light rounded-full cursor-pointer'} onClick={handleClose}><FaX /></div>
                 </div>
                 <form className={'flex items-center gap-4 py-4 px-6 border-b max-w-full'} onSubmit={handleSubmit}>
@@ -107,28 +109,28 @@ export default function AddBtn() {
                             onChange={(e) => setUrl(e.target.value)}
                         />
                         <label className="absolute px-3 pointer-events-none top-[.25rem] left-1 text-xs text-main-green peer-placeholder-shown:top-2/4 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:bg-transparent peer-placeholder-shown:text-slate-500 peer-placeholder-shown:left-0 opacity-40 transition duration-[250] ease-linear">
-                            URL
+                            {t('addBtn.url')}
                         </label>
                     </div>
                     <button type="submit" className={`rounded-3xl py-3 px-6 ${urlValid ? "bg-btnPrimary text-white cursor-pointer" : "bg-black bg-opacity-[0.1] text-black cursor-not-allowed opacity-70"}`}>
-                        Add
+                        {t('addBtn.add')}
                     </button>
                 </form>
                 <section className="pt-4">
                     <div className="flex justify-between items-center text-sm duration-0 px-6">
-                        <span className={'font-semibold opacity-40'}>Inspired by your interest</span>
+                        <span className={'font-semibold opacity-40'}>{t('addBtn.inspired_by_interest')}</span>
                         <div className={'flex gap-1 p-2 active:scale-90 font-light group text-btnPrimary cursor-pointer items-center'}>
-                            <span className="group-hover:underline" onClick={() => setModalShowing(true)}>View all</span>
+                            <span className="group-hover:underline" onClick={() => setModalShowing(true)}>{t('addBtn.view_all')}</span>
                             <FaAngleRight />
                         </div>
                     </div>
                     <div className="flex flex-wrap justify-center gap-3 px-6 py-3">
                         <div className="flex flex-wrap justify-center sm:gap-4 gap-2">
-                            <BrandItem imgAlt={'tw icon'} btnData={{ itemTitle: "Twitter Handle", itemUrl: "", uniqueType: "Twitter" }} imgSrc={"https://linktree.sirv.com/Images/brands/twitter.svg"} />
-                            <BrandItem imgAlt={'tk icon'} btnData={{ itemTitle: "Tiktok Profile", itemUrl: "", uniqueType: "TikTok Account" }} imgSrc={"https://linktree.sirv.com/Images/brands/tiktok.svg"} />
-                            <BrandItem imgAlt={'hd icon'} btnData={{ itemTitle: "Instagram Handle", itemUrl: "", uniqueType: "Instagram" }} imgSrc={"https://linktree.sirv.com/Images/brands/header.svg"} />
-                            <BrandItem imgAlt={'vd icon'} btnData={{ itemTitle: "Video Link", itemUrl: "", uniqueType: "Video" }} imgSrc={"https://linktree.sirv.com/Images/brands/video.svg"} />
-                            <BrandItem imgAlt={'mx icon'} btnData={{ itemTitle: "Music Link", itemUrl: "", uniqueType: "Music" }} imgSrc={"https://linktree.sirv.com/Images/brands/music.svg"} />
+                            <BrandItem imgAlt={'tw icon'} btnData={{ itemTitle: t('addBtn.twitter_handle'), itemUrl: "", uniqueType: "Twitter" }} imgSrc={"https://linktree.sirv.com/Images/brands/twitter.svg"} />
+                            <BrandItem imgAlt={'tk icon'} btnData={{ itemTitle: t('addBtn.tiktok_profile'), itemUrl: "", uniqueType: "TikTok Account" }} imgSrc={"https://linktree.sirv.com/Images/brands/tiktok.svg"} />
+                            <BrandItem imgAlt={'insta icon'} btnData={{ itemTitle: t('addBtn.instagram_handle'), itemUrl: "", uniqueType: "Instagram" }} imgSrc={"https://linktree.sirv.com/Images/brands/instagram.svg"} />
+                            <BrandItem imgAlt={'vd icon'} btnData={{ itemTitle: t('addBtn.video_link'), itemUrl: "", uniqueType: "Video" }} imgSrc={"https://linktree.sirv.com/Images/brands/video.svg"} />
+                            <BrandItem imgAlt={'mx icon'} btnData={{ itemTitle: t('addBtn.music_link'), itemUrl: "", uniqueType: "Music" }} imgSrc={"https://linktree.sirv.com/Images/brands/music.svg"} />
                         </div>
                     </div>
                 </section>

@@ -1,8 +1,10 @@
 "use client"
 import Image from "next/image";
 import { useState } from "react";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function MLink({myUrl}) {
+        const { t } = useTranslation();
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -22,8 +24,9 @@ export default function MLink({myUrl}) {
                 height={24}
             />
             <span className="flex-1 text-sm w-[13rem] truncate">{myUrl}</span>
+           {/*Yes i know i reused the same translation instead of making a new one */}
             <span className={`${copied ? "text-green-700" : "text-black"}`}>
-                {copied ? "Copied" : "Copy"}
+                    {copied ? t("mylinkdiv.copy") : t("mylinkdiv.copy_url") } 
             </span>
         </div>
     )

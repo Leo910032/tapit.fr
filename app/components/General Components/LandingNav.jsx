@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
-import { useTranslation } from "../../../lib/useTranslation";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function LandingNav() {
     const { t } = useTranslation();

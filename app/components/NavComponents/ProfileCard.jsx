@@ -3,8 +3,9 @@ import Image from "next/image";
 import LiElement from "./elements/LiElement";
 import Profile from "./elements/Profile";
 import { NavContext } from "../General Components/NavBar";
-
+import { useTranslation } from "@/lib/useTranslation";
 export default function ProfileCard() {
+        const { t } = useTranslation();
     const {
         showProfileCard,
         profilePicture,
@@ -28,7 +29,7 @@ export default function ProfileCard() {
                                 height={16}
                                 width={16}
                             />
-                            <span>My Account</span>
+                            <span>{t("profile.my_account")}</span>
                         </LiElement>
                         <LiElement url={"/dashboard/logout"}>
                             <Image
@@ -37,7 +38,7 @@ export default function ProfileCard() {
                                 height={16}
                                 width={16}
                             />
-                            <span>Sign Out</span>
+                            <span>{t("profile.sign_out")}</span>
                         </LiElement>
                     </ul>
                 </section>

@@ -9,9 +9,11 @@ import { updateLinks } from "@/lib/update data/updateLinks";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 import { fireApp } from "@/important/firebase";
 import { collection, doc, onSnapshot } from "firebase/firestore";
+import { useTranslation } from "@/lib/useTranslation";
 
 export const ManageLinksContent = React.createContext();
 export default function ManageLinks() {
+    const { t } = useTranslation();
     const [data, setData] = useState([]);
     const [hasLoaded, setHasLoaded] = useState(false);
 
@@ -55,7 +57,7 @@ export default function ManageLinks() {
                 <div className={`flex items-center gap-3 justify-center rounded-3xl cursor-pointer active:scale-95 active:opacity-60 active:translate-y-1 hover:scale-[1.005] border hover:bg-black hover:bg-opacity-[0.05] w-fit text-sm p-3 mt-3`} onClick={addItem}>
                         <>
                             <Image src={"https://linktree.sirv.com/Images/icons/add.svg"} alt="links" height={15} width={15} />
-                            <span>Add Header</span>
+                            <span>{t('manageLinks.add_header')}</span>
                         </>
                 </div>
 
@@ -68,8 +70,9 @@ export default function ManageLinks() {
                         className="opacity-50 sm:w-24 w-16"
                     />
                     <span className="text-center sm:text-base text-sm max-w-[15rem] font-semibold">
-                        Show the world who you are.
-                        Add a link to get started.
+                        {t('manageLinks.show_world_who_you_are')}
+                        {' '}
+                        {t('manageLinks.add_link_to_get_started')}
                     </span>
                 </div>}
 
