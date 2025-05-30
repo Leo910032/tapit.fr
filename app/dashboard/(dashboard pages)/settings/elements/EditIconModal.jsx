@@ -4,10 +4,13 @@ import { useContext, useEffect, useState } from "react";
 import { SocialContext } from "../components/SocialSetting";
 import { useDebounce } from "@/LocalHooks/useDebounce";
 import Image from "next/image";
-import { SocialsList } from "@/lib/SocialsList";
+import { useSocialsList } from "@/lib/SocialsList";
 import { isValidEmail, isValidURL, validateEmail } from "@/lib/utilities";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function EditIconModal() {
+    const { t } = useTranslation();
+    const SocialsList = useSocialsList(); // Use the translated hook
     const { setSettingIconModalOpen, settingIconModalOpen, setAddIconModalOpen, setSocialsArray } = useContext(SocialContext);
     const [defaultData, setDefaultData] = useState({});
     const [validInput, setValidInput] = useState(0);
@@ -21,8 +24,11 @@ export default function EditIconModal() {
     }
 
     useEffect(() => {
-        setDefaultData(SocialsList[settingIconModalOpen.type]);
-        setValueText(settingIconModalOpen.value);
+        const socialData = SocialsList.find(social => social.type === settingIconModalOpen.type);
+        if (socialData) {
+            setDefaultData(socialData);
+        }
+        setValueText(settingIconModalOpen.value || "");
     }, [settingIconModalOpen?.value, settingIconModalOpen?.type]);
 
     useEffect(() => {
@@ -88,7 +94,7 @@ export default function EditIconModal() {
                 setValidInput(2);
                 break;
         }
-    }, [debouceValueText]);
+    }, [debouceValueText, defaultData]);
 
     const handleBack = () =>{
         handleClose();
@@ -162,8 +168,8 @@ export default function EditIconModal() {
                     <div>
                         {settingIconModalOpen.operation === 0 && <div className="grid place-items-center h-md aspect-square rounded-lg active:border-black border border-transparent active:scale-90 hover:bg-black hover:bg-opacity-5 cursor-pointer" onClick={handleBack}><Image src={"https://linktree.sirv.com/Images/icons/arrow.svg"} className="transform rotate-90" alt="x" width={15} height={15} /></div>}
                     </div>
-                    {settingIconModalOpen.operation === 0 && <span className="text-center font-semibold">Add {defaultData.title} Icon</span>}
-                    {settingIconModalOpen.operation === 1 && <span className="text-center font-semibold">Edit {defaultData.title}</span>}
+                    {settingIconModalOpen.operation === 0 && <span className="text-center font-semibold">{t('edit_icon_modal.add_icon_title', { platform: defaultData.title || '' })}</span>}
+                    {settingIconModalOpen.operation === 1 && <span className="text-center font-semibold">{t('edit_icon_modal.edit_title', { platform: defaultData.title || '' })}</span>}
                     <div className="cursor-pointer grid place-items-center h-md aspect-square rounded-lg active:border-black border border-transparent active:scale-90 hover:bg-black hover:bg-opacity-5" onClick={handleClose}><Image src={"https://linktree.sirv.com/Images/icons/svgexport-40.svg"} alt="x" width={15} height={15} /></div>
                 </div>
                 <div className="mx-5">
@@ -192,13 +198,13 @@ export default function EditIconModal() {
 
                 {validInput == 2 && <p className="text-red-500 mx-7 my-2 text-sm">{defaultData.error}</p>}
 
-                {settingIconModalOpen.operation === 0 && <p className="mx-8 mt-5 text-xs opacity-50">Example: {defaultData.example}</p>}
+                {settingIconModalOpen.operation === 0 && <p className="mx-8 mt-5 text-xs opacity-50">{t('edit_icon_modal.example')} {defaultData.example}</p>}
 
                 {<div className={`mx-5 flex items-center gap-3 justify-center mt-5 p-3 rounded-3xl active:scale-95 active:opacity-60 active:translate-y-1 hover:scale-[1.005] border select-none ${validInput === 1 ? "bg-btnPrimary text-white cursor-pointer" : "bg-black bg-opacity-30 opacity-40"} font-semibold`} onClick={handleBtnChoice}>
-                    {settingIconModalOpen.operation === 0 ?  "Add to Linktree": "Save"}
+                    {settingIconModalOpen.operation === 0 ? t('edit_icon_modal.add_to_linktree') : t('edit_icon_modal.save')}
                 </div>}
                 {settingIconModalOpen.operation === 1 && <div className={`mx-5 mt-3 flex items-center gap-3 justify-center p-3 rounded-3xl active:scale-95 active:opacity-60 active:translate-y-1 hover:scale-[1.005] border font-semibold cursor-pointer select-none`} onClick={handleRemove}>
-                    Remove icon
+                    {t('edit_icon_modal.remove_icon')}
                 </div>}
             </div>
         </div>

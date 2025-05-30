@@ -11,10 +11,12 @@ import { testForActiveSession } from "@/lib/authentication/testForActiveSession"
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { fireApp } from "@/important/firebase";
 import { updateSocials } from "@/lib/update data/updateSocials";
+import { useTranslation } from "@/lib/useTranslation";
 
 export const SocialContext = React.createContext();
 
 export default function SocialSetting() {
+    const { t } = useTranslation();
     const [addIconModalOpen, setAddIconModalOpen] = useState(false);
     const [settingIconModalOpen, setSettingIconModalOpen] = useState({
         status: false,
@@ -60,24 +62,26 @@ export default function SocialSetting() {
                         height={24}
                         width={24}
                     />
-                    <span className="text-xl font-semibold">Social Icons</span>
+                    <span className="text-xl font-semibold">{t('social.social_icons')}</span>
                 </div>
                 <div className="p-5 bg-white rounded-lg">
                     <div className="grid gap-1">
-                        <span className="font-semibold">Be iconic</span>
-                        <span className="opacity-90 sm:text-base text-sm">Add icons linking to your social profiles, email and more.</span>
+                        <span className="font-semibold">{t('social.be_iconic')}</span>
+                        <span className="opacity-90 sm:text-base text-sm">{t('social.add_icons_description')}</span>
                     </div>
-                    <div className="w-fit rounded-3xl bg-btnPrimary hover:bg-btnPrimaryAlt text-white py-3 px-4 my-7 cursor-pointer active:scale-90 select-none" onClick={()=>setAddIconModalOpen(true)}>Add Icon</div>
+                    <div className="w-fit rounded-3xl bg-btnPrimary hover:bg-btnPrimaryAlt text-white py-3 px-4 my-7 cursor-pointer active:scale-90 select-none" onClick={()=>setAddIconModalOpen(true)}>
+                        {t('social.add_icon')}
+                    </div>
                     {socialsArray.length > 0 && <div>
                         <SocialCard array={socialsArray} />
-                        <p className="my-4 opacity-60 text-sm">Drag and drop the icons above to reorder them.</p>
+                        <p className="my-4 opacity-60 text-sm">{t('social.drag_drop_reorder')}</p>
                         <div className="grid gap-1 text-sm mt-5">
-                            <span className="font-semibold">Position</span>
-                            <span className="opacity-90">Display icons at the:</span>
+                            <span className="font-semibold">{t('social.position')}</span>
+                            <span className="opacity-90">{t('social.display_icons_at')}</span>
                         </div>
                         <Position />
                     </div>}
-                    {/* <Link className="text-btnPrimary active:text-btnPrimaryAlt underline mt-3" href={"/dashboard/analytics"}>See analytics</Link> */}
+                    {/* <Link className="text-btnPrimary active:text-btnPrimaryAlt underline mt-3" href={"/dashboard/analytics"}>{t('social.see_analytics')}</Link> */}
                 </div>
                 {addIconModalOpen && <AddIconModal />}
                 {settingIconModalOpen.status && <EditIconModal />}

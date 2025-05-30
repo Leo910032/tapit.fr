@@ -1,10 +1,13 @@
 "use client"
-import { LinkTabs } from "@/lib/LinkTabs";
+import { getLinkTabs } from "@/lib/LinkTabs";
+import { useTranslation } from "@/lib/useTranslation";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function DropDown() {
+    const { t } = useTranslation();
+    const LinkTabs = getLinkTabs(t);
     const [currentTab, setCurrentTab] = useState(0);
     const [dropDownOpen, setDropDownOpen] = useState(false);
     const dropCardRef = useRef(null);
@@ -31,7 +34,6 @@ export default function DropDown() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [dropDownOpen, setDropDownOpen]);
-
 
     const handleNavigation = (id, tab) => {
         router.push(`${tab}`);

@@ -1,343 +1,273 @@
-export const SocialsList = [
+// lib/SocialsList.jsx
+import { useTranslation } from "@/lib/useTranslation";
+import { useMemo } from "react";
+
+// Static data that doesn't need translation
+const baseSocialsList = [
     {
         id: "8f0033b8-ccd7-5762-a26b-666536f93ff8",
         icon: "https://linktree.sirv.com/Images/icons/threads.svg",
-        title: "Threads",
         type: 0,
-        placeholder: "Username*",
-        example: "@threaduser",
         valueType: "text",
-        error: "Please enter a valid username.",
-        baseUrl: "https://threads.net/@"
+        baseUrl: "https://threads.net/@",
+        translationKey: "threads"
     },
     {
         id: "59e6a60e-a396-566a-8d22-22ccb3b6431e",
         icon: "https://linktree.sirv.com/Images/icons/instagram.svg",
-        title: "Instagram",
         type: 1,
-        placeholder: "Enter Instagram URL*",
-        example: "https://www.instagram.com/yourusername/",
         valueType: "url",
-        error: "Please enter a valid Instagram URL.",
-        baseUrl: "https://www.instagram.com/"
+        baseUrl: "https://www.instagram.com/",
+        translationKey: "instagram"
     },
     {
         id: "f0ece57e-b838-58db-977d-2e61c4567199",
         icon: "https://linktree.sirv.com/Images/icons/email.svg",
-        title: "Email",
         type: 2,
-        placeholder: "Address*",
-        example: "youremail@example.com",
         valueType: "email",
-        error: "Please enter a valid email address.",
-        baseUrl: "mailto:"
+        baseUrl: "mailto:",
+        translationKey: "email"
     },
     {
         id: "12d69e1b-fd47-5f00-9d1e-a441a50c1180",
         icon: "https://linktree.sirv.com/Images/icons/youtube.svg",
-        title: "Youtube",
         type: 3,
-        placeholder: "Enter YouTube URL*",
-        example: "https://www.youtube.com/user/yourchannel",
         valueType: "url",
-        error: "Please enter a valid YouTube URL.",
-        baseUrl: "https://www.youtube.com/"
+        baseUrl: "https://www.youtube.com/",
+        translationKey: "youtube"
     },
     {
         id: "2c975301-8517-5ffe-8f98-3c999d2f9587",
         icon: "https://linktree.sirv.com/Images/icons/twitterJ.svg",
-        title: "Twitter (Jack's version)",
         type: 4,
-        placeholder: "Enter Twitter URL*",
-        example: "https://twitter.com/yourusername",
         valueType: "url",
-        error: "Please enter a valid Twitter URL.",
-        baseUrl: "https://twitter.com/"
+        baseUrl: "https://twitter.com/",
+        translationKey: "twitter_jack"
     },
     {
         id: "3cb3ad25-6137-5ae2-b4d1-278fd2e8eb10",
         icon: "https://linktree.sirv.com/Images/icons/twitterE.svg",
-        title: "Twitter (Elon's version)",
         type: 5,
-        placeholder: "Enter Twitter URL*",
-        example: "https://twitter.com/yourusername",
         valueType: "url",
-        error: "Please enter a valid Twitter URL.",
-        baseUrl: "https://twitter.com/"
+        baseUrl: "https://twitter.com/",
+        translationKey: "twitter_elon"
     },
     {
         id: "c77a517b-5e6e-505e-a8f0-343ff468c4d4",
         icon: "https://linktree.sirv.com/Images/icons/tiktok.svg",
-        title: "Tiktok",
         type: 6,
-        placeholder: "Enter TikTok Username*",
-        example: "@yourusername",
         valueType: "text",
-        error: "Please enter a valid TikTok username.",
-        baseUrl: "https://www.tiktok.com/@"
+        baseUrl: "https://www.tiktok.com/@",
+        translationKey: "tiktok"
     },
     {
         id: "3d160d26-5a61-5b2a-9278-002f6bad7486",
         icon: "https://linktree.sirv.com/Images/icons/whatsapp.svg",
-        title: "WhatsApp",
         type: 7,
-        placeholder: "Enter WhatsApp Number*",
-        example: "+1234567890",
         valueType: "text",
-        error: "Please enter a valid WhatsApp number.",
-        baseUrl: "https://wa.me/"
+        baseUrl: "https://wa.me/",
+        translationKey: "whatsapp"
     },
     {
         id: "dfdf370a-029b-522b-b4e8-f659301a52f4",
         icon: "https://linktree.sirv.com/Images/icons/snapchat.svg",
-        title: "Snapchat",
         type: 8,
-        placeholder: "Enter Snapchat Username*",
-        example: "yourusername",
         valueType: "text",
-        error: "Please enter a valid Snapchat username.",
-        baseUrl: "https://www.snapchat.com/add/"
+        baseUrl: "https://www.snapchat.com/add/",
+        translationKey: "snapchat"
     },
     {
         id: "46ea79af-6298-509b-ab56-d20a425586a7",
         icon: "https://linktree.sirv.com/Images/icons/amazon.svg",
-        title: "Amazon",
         type: 9,
-        placeholder: "Enter Amazon URL*",
-        example: "https://www.amazon.com/yourproduct",
         valueType: "url",
-        error: "Please enter a valid Amazon URL.",
-        baseUrl: "https://www.amazon.com/"
+        baseUrl: "https://www.amazon.com/",
+        translationKey: "amazon"
     },
     {
         id: "7ed42fe6-7e5f-5f36-aec6-7a0f85b9b918",
         icon: "https://linktree.sirv.com/Images/icons/andriod.svg",
-        title: "Andriod Play Store",
         type: 10,
-        placeholder: "Enter Android Play Store URL*",
-        example: "https://play.google.com/store/apps/details?id=your.package.name",
         valueType: "url",
-        error: "Please enter a valid Android Play Store URL.",
-        baseUrl: "https://play.google.com/"
+        baseUrl: "https://play.google.com/",
+        translationKey: "android"
     },
     {
         id: "32549fd5-eba6-5cc0-a0eb-fefd090495ba",
         icon: "https://linktree.sirv.com/Images/icons/apple.svg",
-        title: "Apple App Store",
         type: 11,
-        placeholder: "Enter Apple App Store URL*",
-        example: "https://apps.apple.com/us/app/your-app/id1234567890",
         valueType: "url",
-        error: "Please enter a valid Apple App Store URL.",
-        baseUrl: "https://apps.apple.com/"
+        baseUrl: "https://apps.apple.com/",
+        translationKey: "apple_store"
     },
     {
         id: "0dafb665-cac2-5246-866b-6b10b4472077",
         icon: "https://linktree.sirv.com/Images/icons/appleMusic.svg",
-        title: "Apple Music",
         type: 12,
-        placeholder: "Enter Apple Music URL*",
-        example: "https://music.apple.com/us/album/your-album/1234567890",
         valueType: "url",
-        error: "Please enter a valid Apple Music URL.",
-        baseUrl: "https://music.apple.com/"
+        baseUrl: "https://music.apple.com/",
+        translationKey: "apple_music"
     },
     {
         id: "ba29e00f-16cf-57e0-8d08-f1670a7670b8",
         icon: "https://linktree.sirv.com/Images/icons/applePodcast.svg",
-        title: "Apple Podcast",
         type: 13,
-        placeholder: "Enter Apple Podcast URL*",
-        example: "https://podcasts.apple.com/us/podcast/your-podcast/id1234567890",
         valueType: "url",
-        error: "Please enter a valid Apple Podcast URL.",
-        baseUrl: "https://podcasts.apple.com/"
+        baseUrl: "https://podcasts.apple.com/",
+        translationKey: "apple_podcast"
     },
     {
         id: "3294eed3-bbdc-5720-b62e-b5df0c6274ac",
         icon: "https://linktree.sirv.com/Images/icons/bandcamp.svg",
-        title: "Bandcamp",
         type: 14,
-        placeholder: "Enter Bandcamp URL*",
-        example: "https://yourband.bandcamp.com",
         valueType: "url",
-        error: "Please enter a valid Bandcamp URL.",
-        baseUrl: "https://bandcamp.com/"
+        baseUrl: "https://bandcamp.com/",
+        translationKey: "bandcamp"
     },
     {
         id: "a57a4033-3407-5985-95fe-806a8a10eb00",
         icon: "https://linktree.sirv.com/Images/icons/bereal.svg",
-        title: "BeReal",
         type: 15,
-        placeholder: "Enter BeReal URL*",
-        example: "https://bereal.com/yourprofile",
         valueType: "url",
-        error: "Please enter a valid BeReal URL.",
-        baseUrl: "https://bereal.com/"
+        baseUrl: "https://bereal.com/",
+        translationKey: "bereal"
     },
     {
         id: "ecb4f919-0e0f-5c42-94c5-5b8316f0df8f",
         icon: "https://linktree.sirv.com/Images/icons/cameo.svg",
-        title: "Cameo",
         type: 16,
-        placeholder: "Enter Cameo URL*",
-        example: "https://www.cameo.com/yourusername",
         valueType: "url",
-        error: "Please enter a valid Cameo URL.",
-        baseUrl: "https://www.cameo.com/"
+        baseUrl: "https://www.cameo.com/",
+        translationKey: "cameo"
     },
     {
         id: "e70465a8-b99c-52f6-88fa-8ffe649d5c96",
         icon: "https://linktree.sirv.com/Images/icons/clubhouse.svg",
-        title: "Club House",
         type: 17,
-        placeholder: "Enter Club House URL*",
-        example: "https://www.joinclubhouse.com/room/123456",
         valueType: "url",
-        error: "Please enter a valid Club House URL.",
-        baseUrl: "https://www.joinclubhouse.com/"
+        baseUrl: "https://www.joinclubhouse.com/",
+        translationKey: "clubhouse"
     },
     {
         id: "b0501c72-7503-5a88-a0ac-ae4cd08f5f0c",
         icon: "https://linktree.sirv.com/Images/icons/discord.svg",
-        title: "Discord",
         type: 18,
-        placeholder: "Enter Discord URL*",
-        example: "https://discord.gg/yourinvite",
         valueType: "url",
-        error: "Please enter a valid Discord URL.",
-        baseUrl: "https://discord.gg/"
+        baseUrl: "https://discord.gg/",
+        translationKey: "discord"
     },
     {
         id: "66c4a560-6b2c-5e5f-9ba4-893f67ed2903",
         icon: "https://linktree.sirv.com/Images/icons/etsy.svg",
-        title: "Etsy",
         type: 19,
-        placeholder: "Enter Etsy URL*",
-        example: "https://www.etsy.com/shop/yourshop",
         valueType: "url",
-        error: "Please enter a valid Etsy URL.",
-        baseUrl: "https://www.etsy.com/"
+        baseUrl: "https://www.etsy.com/",
+        translationKey: "etsy"
     },
     {
         id: "37122bc6-89cb-5625-a35f-c4d6de07ccdb",
         icon: "https://linktree.sirv.com/Images/icons/linkedin.svg",
-        title: "LinkedIn",
         type: 20,
-        placeholder: "Enter LinkedIn URL*",
-        example: "https://www.linkedin.com/in/yourprofile",
         valueType: "url",
-        error: "Please enter a valid LinkedIn URL.",
-        baseUrl: "https://www.linkedin.com/"
+        baseUrl: "https://www.linkedin.com/",
+        translationKey: "linkedin"
     },
     {
         id: "805dadf2-d2d2-582d-b532-6f3c16bfe2f1",
         icon: "https://linktree.sirv.com/Images/icons/patreon.svg",
-        title: "Patreon",
         type: 21,
-        placeholder: "Enter Patreon URL*",
-        example: "https://www.patreon.com/yourusername",
         valueType: "url",
-        error: "Please enter a valid Patreon URL.",
-        baseUrl: "https://www.patreon.com/"
+        baseUrl: "https://www.patreon.com/",
+        translationKey: "patreon"
     },
     {
         id: "1968c63e-9a14-53a7-8623-0388f3b836c4",
         icon: "https://linktree.sirv.com/Images/icons/payment.svg",
-        title: "Payment",
         type: 22,
-        placeholder: "Enter Payment URL*",
-        example: "https://www.paypal.me/you",
         valueType: "url",
-        error: "Please enter a valid payment URL.",
-        baseUrl: "https://www.paypal.me/"
+        baseUrl: "https://www.paypal.me/",
+        translationKey: "payment"
     },
     {
         id: "8611c825-d692-5b48-b955-b58ffe6b39b3",
         icon: "https://linktree.sirv.com/Images/icons/pinterest.svg",
-        title: "Pinterest",
         type: 23,
-        placeholder: "Enter Pinterest URL*",
-        example: "https://www.pinterest.com/yourprofile",
         valueType: "url",
-        error: "Please enter a valid Pinterest URL.",
-        baseUrl: "https://www.pinterest.com/"
+        baseUrl: "https://www.pinterest.com/",
+        translationKey: "pinterest"
     },
     {
         id: "6e275629-3994-5971-9dea-729ee4c72194",
         icon: "https://linktree.sirv.com/Images/icons/poshmark.svg",
-        title: "Poshmark",
         type: 24,
-        placeholder: "Enter Poshmark URL*",
-        example: "https://poshmark.com/closet/yourusername",
         valueType: "url",
-        error: "Please enter a valid Poshmark URL.",
-        baseUrl: "https://poshmark.com/"
+        baseUrl: "https://poshmark.com/",
+        translationKey: "poshmark"
     },
     {
         id: "f8e2e8f2-10fd-562a-8ace-7b5cbe4cce87",
         icon: "https://linktree.sirv.com/Images/icons/signal.svg",
-        title: "Signal",
         type: 25,
-        placeholder: "Enter Signal URL*",
-        example: "https://signal.app/yourusername",
         valueType: "url",
-        error: "Please enter a valid Signal URL.",
-        baseUrl: "https://signal.app/"
+        baseUrl: "https://signal.app/",
+        translationKey: "signal"
     },
     {
         id: "5af20546-9926-5c6c-b301-8ec371286a1f",
         icon: "https://linktree.sirv.com/Images/icons/soundCloud.svg",
-        title: "SoundCloud",
         type: 26,
-        placeholder: "Enter SoundCloud URL*",
-        example: "https://soundcloud.com/yourusername",
         valueType: "url",
-        error: "Please enter a valid SoundCloud URL.",
-        baseUrl: "https://soundcloud.com/"
+        baseUrl: "https://soundcloud.com/",
+        translationKey: "soundcloud"
     },
     {
         id: "199e3494-6cbf-5d33-a0c8-db0a483d976b",
         icon: "https://linktree.sirv.com/Images/icons/spotify.svg",
-        title: "Spotify",
         type: 27,
-        placeholder: "Enter Spotify URL*",
-        example: "https://open.spotify.com/artist/yourid",
         valueType: "url",
-        error: "Please enter a valid Spotify URL.",
-        baseUrl: "https://open.spotify.com/"
+        baseUrl: "https://open.spotify.com/",
+        translationKey: "spotify"
     },
     {
         id: "87c6c6e4-92ac-5a7a-b408-b6a55c9eba4f",
         icon: "https://linktree.sirv.com/Images/icons/substack.svg",
-        title: "Substack",
         type: 28,
-        placeholder: "Enter Substack URL*",
-        example: "https://yourpublication.substack.com",
         valueType: "url",
-        error: "Please enter a valid Substack URL.",
-        baseUrl: "https://yourpublication.substack.com/"
+        baseUrl: "https://yourpublication.substack.com/",
+        translationKey: "substack"
     },
     {
         id: "2582ad8b-560e-5f0c-a330-3f75dd00a644",
         icon: "https://linktree.sirv.com/Images/icons/telegram.svg",
-        title: "Telegram",
         type: 29,
-        placeholder: "Enter Telegram URL*",
-        example: "https://t.me/yourusername",
         valueType: "url",
-        error: "Please enter a valid Telegram URL.",
-        baseUrl: "https://t.me/"
+        baseUrl: "https://t.me/",
+        translationKey: "telegram"
     },
     {
         id: "54e6c2c0-28c0-556c-98ee-aa3c675f6629",
         icon: "https://linktree.sirv.com/Images/icons/twitch.svg",
-        title: "Twitch",
         type: 30,
-        placeholder: "Enter Twitch URL*",
-        example: "https://www.twitch.tv/yourchannel",
         valueType: "url",
-        error: "Please enter a valid Twitch URL.",
-        baseUrl: "https://www.twitch.tv/"
+        baseUrl: "https://www.twitch.tv/",
+        translationKey: "twitch"
     }
 ];
+
+// Hook to get translated socials list
+export const useSocialsList = () => {
+    const { t, locale } = useTranslation();
+    
+    return useMemo(() => {
+        return baseSocialsList.map(social => ({
+            ...social,
+            title: t(`socials.${social.translationKey}.title`),
+            placeholder: t(`socials.${social.translationKey}.placeholder`),
+            example: t(`socials.${social.translationKey}.example`),
+            error: t(`socials.${social.translationKey}.error`)
+        }));
+    }, [t, locale]);
+};
+
+// For backward compatibility, export the static list (but recommend using the hook)
+export const SocialsList = baseSocialsList;

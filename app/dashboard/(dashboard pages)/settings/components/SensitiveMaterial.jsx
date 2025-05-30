@@ -6,8 +6,10 @@ import { testForActiveSession } from '@/lib/authentication/testForActiveSession'
 import { fireApp } from '@/important/firebase';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { updateSensitiveStatus } from '@/lib/update data/updateSocials';
+import { useTranslation } from '@/lib/useTranslation';
 
 export default function SensitiveMaterial() {
+    const { t } = useTranslation();
     const [containsSensitiveMaterial, setContainsSensitiveMaterial] = useState(null);
 
     const handleCheckboxChange = (event) => {
@@ -49,11 +51,11 @@ export default function SensitiveMaterial() {
                     height={24}
                     width={24}
                 />
-                <span className="text-xl font-semibold">Sensitive material</span>
+                <span className="text-xl font-semibold">{t('settings.sensitive_material')}</span>
             </div>
             <div className="p-5 bg-white rounded-lg">
                 <div className='flex gap-3 items-center justify-between w-full'>
-                    <span className='opacity-70 sm:text-[.965rem] text-sm'>Display a sensitive content warning before visitors can view your profile.</span>
+                    <span className='opacity-70 sm:text-[.965rem] text-sm'>{t('settings.sensitive_material_description')}</span>
                     <div>
                         <label className="cursor-pointer relative flex justify-between items-center group p-2 text-xl">
                             <input type="checkbox" onChange={handleCheckboxChange} checked={containsSensitiveMaterial} className="absolute left-1/2 -translate-x-1/2 w-full h-full peer appearance-none rounded-md" />

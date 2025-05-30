@@ -7,11 +7,13 @@ import { testForActiveSession } from "@/lib/authentication/testForActiveSession"
 import { fireApp } from "@/important/firebase";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { updateSupportBanner, updateSupportBannerStatus } from "@/lib/update data/updateSocials";
-
+import { useTranslation } from "@/lib/useTranslation";
 export const SupportContext = React.createContext();
 export default function SupportBanner() {
     const [showSupport, setShowSupport] = useState(null);
     const [chosenGroup, setChosenGroup] = useState(null);
+    const { t } = useTranslation();
+    
 
     useEffect(() => {
         if (chosenGroup ===null) {
@@ -57,7 +59,7 @@ export default function SupportBanner() {
                         height={24}
                         width={24}
                     />
-                    <span className="text-xl font-semibold">Support banner</span>
+                    <span className="text-xl font-semibold">{t("supportbanner.support_banner")}</span>
                 </div>
                 <div className="p-5 bg-white rounded-lg">
                     <SupportSwitch />

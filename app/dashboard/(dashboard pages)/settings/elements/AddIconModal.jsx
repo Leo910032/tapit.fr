@@ -4,9 +4,12 @@ import { useContext, useEffect, useState } from "react";
 import { SocialContext } from "../components/SocialSetting";
 import Image from "next/image";
 import { useDebounce } from "@/LocalHooks/useDebounce";
-import { SocialsList } from "@/lib/SocialsList";
+import { useSocialsList } from "@/lib/SocialsList";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function AddIconModal() {
+    const { t } = useTranslation();
+    const SocialsList = useSocialsList(); // Use the translated hook
     const { setAddIconModalOpen, setSettingIconModalOpen, socialsArray } = useContext(SocialContext);
     const [searchParam, setSearchParam] = useState("");
     const [showSocials, setShowSocials] = useState([]);
@@ -14,7 +17,7 @@ export default function AddIconModal() {
 
     useEffect(() => {
         setShowSocials([...SocialsList]);
-    }, []);
+    }, [SocialsList]);
 
     useEffect(() => {
         if (searchParam === "") {
@@ -30,7 +33,7 @@ export default function AddIconModal() {
         });
 
         setShowSocials(tempArr);
-    }, [debouceSearchParam]);
+    }, [debouceSearchParam, SocialsList]);
 
     const handleSelect = (item) =>{
         const selectedItem = item;
@@ -55,7 +58,7 @@ export default function AddIconModal() {
             <div className="relative z-10 sm:h-[33rem] flex flex-col h-60vh sm:w-[32rem] w-full enter pb-2 bg-white rounded-3xl">
                 <div className="grid grid-cols-[32px_auto_32px] p-5 items-center">
                     <span></span>
-                    <span className="text-center font-semibold">Add Icon</span>
+                    <span className="text-center font-semibold">{t('add_icon_modal.title')}</span>
                     <div className="cursor-pointer grid place-items-center h-md aspect-square rounded-lg active:border-black border border-transparent active:scale-90 hover:bg-black hover:bg-opacity-5" onClick={handleClose}><Image src={"https://linktree.sirv.com/Images/icons/svgexport-40.svg"} alt="x" width={15} height={15} /></div>
                 </div>
 
@@ -67,7 +70,7 @@ export default function AddIconModal() {
                                 <div className="relative grow">
                                     <input
                                         name="searchTerm"
-                                        placeholder="Search"
+                                        placeholder="transparent"
                                         className="placeholder-transparent peer px-0 text-base leading-[48px] placeholder:leading-[48px] rounded-xl block py-1 w-full bg-chalk text-black transition duration-75 ease-out !outline-none bg-transparent"
                                         value={searchParam}
                                         type="search"
@@ -76,7 +79,7 @@ export default function AddIconModal() {
                                     <label
                                         className="absolute pointer-events-none text-sm text-concrete transition-all transform -translate-y-2.5 scale-[0.85] top-[13px] origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-1 peer-placeholder-shown:tracking-normal peer-focus:scale-[0.85] peer-focus:-translate-y-2.5 max-w-[calc(100%-16px)] truncate"
                                     >
-                                        Search
+                                        {t('add_icon_modal.search_label')}
                                     </label>
                                 </div>
                             </div>
@@ -84,7 +87,6 @@ export default function AddIconModal() {
                     </div>
                 </div>
                 <section className="mx-5 my-3 overflow-y-auto flex-1">
-                    {/* <div className="font-semibold py-2">All</div> */}
                     <section className="grid">
                         {showSocials.length > 0 && showSocials.map((socialItem) => {
                             if (socialsArray.some(item => item.id === socialItem.id)) {
@@ -95,7 +97,7 @@ export default function AddIconModal() {
                                             <span className="font-semibold">{socialItem.title}</span>
                                         </div>
                                         <div>
-                                            <span className="text-green-700 text-sm font-semibold">Already Added</span>
+                                            <span className="text-green-700 text-sm font-semibold">{t('add_icon_modal.already_added')}</span>
                                         </div>
                                     </div>
                                 );
@@ -116,7 +118,7 @@ export default function AddIconModal() {
                         })}
 
                         {showSocials.length === 0 && <div className="text-sm text-center p-3">
-                            <span>No icons found. Try something else?</span>
+                            <span>{t('add_icon_modal.no_icons_found')}</span>
                         </div>}
                     </section>
                 </section>

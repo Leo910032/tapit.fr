@@ -6,9 +6,11 @@ import { updateCustomMetaData } from "@/lib/update data/updateSocials";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function SEO() {
-
+    const { t } = useTranslation();
+    
     const [metaTitle, setMetaTitle] = useState(null);
     const [metaDescription, setMetaDescription] = useState(null);
     const debounceMetaTitle = useDebounce(metaTitle, 500);
@@ -63,11 +65,11 @@ export default function SEO() {
                     height={24}
                     width={24}
                 />
-                <span className="text-xl font-semibold">SEO</span>
+                <span className="text-xl font-semibold">{t('seo.title')}</span>
             </div>
             <div className="p-5 bg-white rounded-lg">
-                <p className="font-semibold">Custom metadata</p>
-                <p className="opacity-60 sm:text-base text-sm">Changes to metadata may take some time to appear on other platforms.</p>
+                <p className="font-semibold">{t('seo.custom_metadata')}</p>
+                <p className="opacity-60 sm:text-base text-sm">{t('seo.metadata_notice')}</p>
 
                 <div className="my-3 grid gap-3">
                     <div className="rounded-[10px] relative focus-within:ring-2 focus-within:ring-black transition duration-75 ease-out hover:shadow-[inset_0_0_0_2px_#e0e2d9] hover:focus-within:shadow-none bg-black bg-opacity-[0.025]">
@@ -75,7 +77,7 @@ export default function SEO() {
                             <div className="flex w-full items-center bg-chalk rounded-sm px-3">
                                 <div className="relative grow">
                                     <input
-                                        placeholder="Meta title"
+                                        placeholder={t('seo.meta_title')}
                                         className="placeholder-transparent font-semibold peer px-0 sm:text-base text-sm leading-[48px] placeholder:leading-[48px] rounded-xl block pt-6 pb-2 w-full bg-chalk text-black transition duration-75 ease-out !outline-none bg-transparent"
                                         type="text"
                                         value={metaTitle ? metaTitle : ""}
@@ -84,7 +86,7 @@ export default function SEO() {
                                     <label
                                         className="absolute pointer-events-none text-base text-concrete transition-all transform -translate-y-2.5 scale-[0.85] top-[13px] origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-1 peer-placeholder-shown:tracking-normal peer-focus:scale-[0.85] peer-focus:-translate-y-2.5 max-w-[calc(100%-16px)] truncate"
                                     >
-                                        Meta title
+                                        {t('seo.meta_title')}
                                     </label>
                                 </div>
                             </div>
@@ -96,7 +98,7 @@ export default function SEO() {
                             <div className="flex w-full items-center bg-chalk rounded-sm px-3">
                                 <div className="relative grow">
                                     <input
-                                        placeholder="Meta description"
+                                        placeholder={t('seo.meta_description')}
                                         className="placeholder-transparent font-semibold peer px-0 sm:text-base text-sm leading-[48px] placeholder:leading-[48px] rounded-xl block pt-6 pb-2 w-full bg-chalk text-black transition duration-75 ease-out !outline-none bg-transparent"
                                         type="text"
                                         value={metaDescription ? metaDescription : ""}
@@ -105,7 +107,7 @@ export default function SEO() {
                                     <label
                                         className="absolute pointer-events-none text-base text-concrete transition-all transform -translate-y-2.5 scale-[0.85] top-[13px] origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-1 peer-placeholder-shown:tracking-normal peer-focus:scale-[0.85] peer-focus:-translate-y-2.5 max-w-[calc(100%-16px)] truncate"
                                     >
-                                        Meta description
+                                        {t('seo.meta_description')}
                                     </label>
                                 </div>
                             </div>

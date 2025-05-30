@@ -11,12 +11,44 @@
     "remove": "Remove",
     "loading": "Loading..."
   },
-    "profile": {
-    "add_social_icons": "Add social icons"
+  "controller" : {
+    "jump _to" : "Jump to:"
   },
     "textDetails": {
     "profile_title": "Profile title",
     "bio": "Bio"
+  },
+    "dropdown": {
+    "social_icons": "Social Icons",
+    "support_banner": "Support banner",
+    "sensitive_material": "Sensitive material",
+    "seo": "SEO"
+  },
+   "add_icon_modal": {
+    "title": "Add Icon",
+    "search_placeholder": "Search",
+    "search_label": "Search",
+    "already_added": "Already Added",
+    "no_icons_found": "No icons found. Try something else?",
+    "all_category": "All"
+  },
+  "supportbanner" : {
+    "support_banner" : "Support banner"
+  },
+  "support": {
+    "show_your_support": "Show your support",
+    "support_banner_description": "Show your support for important causes with a profile banner. Only one banner can be active at a time."
+  },
+  
+   "social": {
+    "social_icons": "Social Icons",
+    "be_iconic": "Be iconic",
+    "add_icons_description": "Add icons linking to your social profiles, email and more.",
+    "add_icon": "Add Icon",
+    "drag_drop_reorder": "Drag and drop the icons above to reorder them.",
+    "position": "Position",
+    "display_icons_at": "Display icons at the:",
+    "see_analytics": "See analytics"
   },
     "themes": {
     "custom": "Custom",
@@ -95,6 +127,7 @@
     "copy_url" : "Copy URL"
   },
   "profile": {
+    "add_social_icons": "Add social icons",
     "my_account": "My Account",
     "sign_out": "Sign Out"
   },
@@ -156,6 +189,13 @@
     "pinterest_description": "Add your Linktree to your Pinterest profile. Simply copy your Linktree URL, go your Pinterest settings, paste your Linktree URL into the Website URL field, then click Save.",
     
     "twitter_description": "Add your Linktree to your Twitter profile. Simply copy your Linktree URL, go to your profile, click on Edit Profile, and paste your Linktree URL into the Website field."
+  },
+   "seo": {
+    "title": "SEO",
+    "custom_metadata": "Custom metadata",
+    "metadata_notice": "Changes to metadata may take some time to appear on other platforms.",
+    "meta_title": "Meta title",
+    "meta_description": "Meta description"
   },
   "email": {
     "welcome": {
@@ -284,7 +324,8 @@
     "support_banner": "Support banner",
     "sensitive_material": "Sensitive material",
     "seo": "SEO",
-    "jump_to": "Jump to:"
+    "jump_to": "Jump to:",
+    "sensitive_material_description": "Display a sensitive content warning before visitors can view your profile."
   },
   "not_found": {
     "title": "Uh oh. Page not found",
@@ -346,6 +387,241 @@
     "cancel": "Cancel",
     "enter_url_setup": "Enter your {{urlKind}} URL, then setup your link",
     "custom": "Custom"
-  }
+  },
+  "socials": {
+    "threads": {
+      "title": "Threads",
+      "placeholder": "Username*",
+      "example": "@threaduser",
+      "error": "Please enter a valid username."
+    },
+    "instagram": {
+      "title": "Instagram",
+      "placeholder": "Enter Instagram URL*",
+      "example": "https://www.instagram.com/yourusername/",
+      "error": "Please enter a valid Instagram URL."
+    },
+    "email": {
+      "title": "Email",
+      "placeholder": "Address*",
+      "example": "youremail@example.com",
+      "error": "Please enter a valid email address."
+    },
+    "youtube": {
+      "title": "Youtube",
+      "placeholder": "Enter YouTube URL*",
+      "example": "https://www.youtube.com/user/yourchannel",
+      "error": "Please enter a valid YouTube URL."
+    },
+    "twitter_jack": {
+      "title": "Twitter (Jack's version)",
+      "placeholder": "Enter Twitter URL*",
+      "example": "https://twitter.com/yourusername",
+      "error": "Please enter a valid Twitter URL."
+    },
+    "twitter_elon": {
+      "title": "Twitter (Elon's version)",
+      "placeholder": "Enter Twitter URL*",
+      "example": "https://twitter.com/yourusername",
+      "error": "Please enter a valid Twitter URL."
+    },
+    "tiktok": {
+      "title": "Tiktok",
+      "placeholder": "Enter TikTok Username*",
+      "example": "@yourusername",
+      "error": "Please enter a valid TikTok username."
+    },
+    "whatsapp": {
+      "title": "WhatsApp",
+      "placeholder": "Enter WhatsApp Number*",
+      "example": "+1234567890",
+      "error": "Please enter a valid WhatsApp number."
+    },
+    "snapchat": {
+      "title": "Snapchat",
+      "placeholder": "Enter Snapchat Username*",
+      "example": "yourusername",
+      "error": "Please enter a valid Snapchat username."
+    },
+    "amazon": {
+      "title": "Amazon",
+      "placeholder": "Enter Amazon URL*",
+      "example": "https://www.amazon.com/yourproduct",
+      "error": "Please enter a valid Amazon URL."
+    },
+    "android": {
+      "title": "Android Play Store",
+      "placeholder": "Enter Android Play Store URL*",
+      "example": "https://play.google.com/store/apps/details?id=your.package.name",
+      "error": "Please enter a valid Android Play Store URL."
+    },
+    "apple_store": {
+      "title": "Apple App Store",
+      "placeholder": "Enter Apple App Store URL*",
+      "example": "https://apps.apple.com/us/app/your-app/id1234567890",
+      "error": "Please enter a valid Apple App Store URL."
+    },
+    "apple_music": {
+      "title": "Apple Music",
+      "placeholder": "Enter Apple Music URL*",
+      "example": "https://music.apple.com/us/album/your-album/1234567890",
+      "error": "Please enter a valid Apple Music URL."
+    },
+    "apple_podcast": {
+      "title": "Apple Podcast",
+      "placeholder": "Enter Apple Podcast URL*",
+      "example": "https://podcasts.apple.com/us/podcast/your-podcast/id1234567890",
+      "error": "Please enter a valid Apple Podcast URL."
+    },
+    "bandcamp": {
+      "title": "Bandcamp",
+      "placeholder": "Enter Bandcamp URL*",
+      "example": "https://yourband.bandcamp.com",
+      "error": "Please enter a valid Bandcamp URL."
+    },
+    "bereal": {
+      "title": "BeReal",
+      "placeholder": "Enter BeReal URL*",
+      "example": "https://bereal.com/yourprofile",
+      "error": "Please enter a valid BeReal URL."
+    },
+    "cameo": {
+      "title": "Cameo",
+      "placeholder": "Enter Cameo URL*",
+      "example": "https://www.cameo.com/yourusername",
+      "error": "Please enter a valid Cameo URL."
+    },
+    "clubhouse": {
+      "title": "Club House",
+      "placeholder": "Enter Club House URL*",
+      "example": "https://www.joinclubhouse.com/room/123456",
+      "error": "Please enter a valid Club House URL."
+    },
+    "discord": {
+      "title": "Discord",
+      "placeholder": "Enter Discord URL*",
+      "example": "https://discord.gg/yourinvite",
+      "error": "Please enter a valid Discord URL."
+    },
+    "etsy": {
+      "title": "Etsy",
+      "placeholder": "Enter Etsy URL*",
+      "example": "https://www.etsy.com/shop/yourshop",
+      "error": "Please enter a valid Etsy URL."
+    },
+    "linkedin": {
+      "title": "LinkedIn",
+      "placeholder": "Enter LinkedIn URL*",
+      "example": "https://www.linkedin.com/in/yourprofile",
+      "error": "Please enter a valid LinkedIn URL."
+    },
+    "patreon": {
+      "title": "Patreon",
+      "placeholder": "Enter Patreon URL*",
+      "example": "https://www.patreon.com/yourusername",
+      "error": "Please enter a valid Patreon URL."
+    },
+    "payment": {
+      "title": "Payment",
+      "placeholder": "Enter Payment URL*",
+      "example": "https://www.paypal.me/you",
+      "error": "Please enter a valid payment URL."
+    },
+    "pinterest": {
+      "title": "Pinterest",
+      "placeholder": "Enter Pinterest URL*",
+      "example": "https://www.pinterest.com/yourprofile",
+      "error": "Please enter a valid Pinterest URL."
+    },
+    "poshmark": {
+      "title": "Poshmark",
+      "placeholder": "Enter Poshmark URL*",
+      "example": "https://poshmark.com/closet/yourusername",
+      "error": "Please enter a valid Poshmark URL."
+    },
+    "signal": {
+      "title": "Signal",
+      "placeholder": "Enter Signal URL*",
+      "example": "https://signal.app/yourusername",
+      "error": "Please enter a valid Signal URL."
+    },
+    "soundcloud": {
+      "title": "SoundCloud",
+      "placeholder": "Enter SoundCloud URL*",
+      "example": "https://soundcloud.com/yourusername",
+      "error": "Please enter a valid SoundCloud URL."
+    },
+    "spotify": {
+      "title": "Spotify",
+      "placeholder": "Enter Spotify URL*",
+      "example": "https://open.spotify.com/artist/yourid",
+      "error": "Please enter a valid Spotify URL."
+    },
+    "substack": {
+      "title": "Substack",
+      "placeholder": "Enter Substack URL*",
+      "example": "https://yourpublication.substack.com",
+      "error": "Please enter a valid Substack URL."
+    },
+    "telegram": {
+      "title": "Telegram",
+      "placeholder": "Enter Telegram URL*",
+      "example": "https://t.me/yourusername",
+      "error": "Please enter a valid Telegram URL."
+    },
+    "twitch": {
+      "title": "Twitch",
+      "placeholder": "Enter Twitch URL*",
+      "example": "https://www.twitch.tv/yourchannel",
+      "error": "Please enter a valid Twitch URL."
+    }
+  },
 
+   "support_groups": {
+    "choose_cause": "Choose a cause",
+    "banner_link_text": "Your banner will link to this",
+    "support_creator": {
+      "caption": "Support Creator",
+      "card_title": "Explore more of my Projects.",
+      "card_message": "Take a look at my projects and the things I've added to GitHub. You'll find a mix of different stuff I've worked on, and I'm excited to share them with you!",
+      "title": "Discover My GitHub Projects",
+      "message": "I invite you to explore my GitHub profile, where you can find an array of exciting projects and contributions. Feel free to take a look, and if you find something you like, don't hesitate to show your support by leaving a star ⭐"
+    },
+    "free_palestine": {
+      "caption": "#FreePalestine",
+      "card_title": "War is never the answer.",
+      "card_message": "Display a support banner to encourage your visitors to #FreePalestine, donate and discover resources, and support the right for people everywhere to live in peace.",
+      "title": "War is not the answer.",
+      "message": "I'm driving awareness, donations, and support to #FreePalestine, and the right for people everywhere to live in peace. Will you join me?"
+    },
+    "stand_with_ukraine": {
+      "caption": "#StandWithUkraine",
+      "card_title": "War is never the answer.",
+      "card_message": "Display a support banner to encourage your visitors to #StandWithUkraine, donate and discover resources, and support the right for people everywhere to live in peace.",
+      "title": "War is not the answer.",
+      "message": "I'm driving awareness, donations and support to #StandWithUkraine, and the right for people everywhere to live in peace. Will you join me?"
+    },
+    "anti_racism": {
+      "caption": "Anti-Racism",
+      "card_title": "Racism is an international emergency.",
+      "card_message": "Display a support banner on your Linktree allowing your visitors to donate and discover resources in support of anti-racism, justice and equality.",
+      "title": "Support Anti-Racism",
+      "message": "I'm raising awareness, driving donations and sharing information in support of racial justice and equality. Will you join me?"
+    },
+    "pride": {
+      "caption": "Pride",
+      "card_title": "Support the LGBTQIA+ community",
+      "card_message": "Display a support banner to raise awareness and funds for the LGBTQIA+ community during Pride month.",
+      "title": "Protect LGBTQIA+ rights",
+      "message": "In celebration of Pride, I'm raising awareness and funds to support the LGBTQIA+ community. Join me."
+    }
+  },
+  "age_restriction": {
+    "please_select_one": "Please select one:",
+    "eighteen_plus": "18+",
+    "twenty_one_plus": "21+", 
+    "twenty_five_plus": "25+",
+    "sensitive_content": "Sensitive Content"
+  }
 }
+

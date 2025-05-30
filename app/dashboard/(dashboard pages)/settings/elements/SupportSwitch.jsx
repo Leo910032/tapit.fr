@@ -2,8 +2,10 @@
 
 import { useContext, useState } from "react";
 import { SupportContext } from "../components/SupportBanner";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function SupportSwitch() {
+    const { t } = useTranslation();
     const { showSupport, setShowSupport } = useContext(SupportContext);
 
     const handleCheckboxChange = (event) => {
@@ -14,8 +16,8 @@ export default function SupportSwitch() {
     return (
         <section className="flex gap-3">
             <div className="flex flex-col gap-2">
-                <span className="font-semibold">Show your support</span>
-                <span className="opacity-70 sm:text-base text-sm">Show your support for important causes with a profile banner. Only one banner can be active at a time.</span>
+                <span className="font-semibold">{t('support.show_your_support')}</span>
+                <span className="opacity-70 sm:text-base text-sm">{t('support.support_banner_description')}</span>
             </div>
             <div>
                 <label className="cursor-pointer relative flex justify-between items-center group p-2 text-xl">

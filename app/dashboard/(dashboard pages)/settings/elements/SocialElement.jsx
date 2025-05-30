@@ -1,14 +1,18 @@
 "use client"
 
-import { SocialsList } from "@/lib/SocialsList";
+import { useSocialsList } from "@/lib/SocialsList";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { SocialContext } from "../components/SocialSetting";
 
 export default function SocialElement({ item, index }) {
+    const SocialsList = useSocialsList(); // Use the translated hook
     const { setSettingIconModalOpen, setSocialsArray } = useContext(SocialContext);
     const [checkboxChecked, setCheckboxChecked] = useState(item.active);
+
+    // Find the social data using the type
+    const socialData = SocialsList.find(social => social.type === item.type);
 
     const handleCheckboxChange = (event) => {
         const checkedStatus = event.target.checked;
@@ -29,6 +33,10 @@ export default function SocialElement({ item, index }) {
         });
     }
 
+    if (!socialData) {
+        // Fallback if social data not found
+        return null;
+    }
 
     return (
         <Draggable draggableId={item.id} index={index} key={item.id}>
@@ -48,8 +56,8 @@ export default function SocialElement({ item, index }) {
                     
                     <div className='flex-1 flex items-center justify-between p-3 hover:bg-black hover:bg-opacity-5 cursor-pointer rounded-lg active:scale-95 active:opacity-60' onClick={handleEdit}>
                         <div className='flex-1 flex items-center gap-3'>
-                            <Image src={SocialsList[item.type].icon} alt='icon' height={25} width={25} />
-                            <span className='font-semibold sm:text-base text-sm'>{SocialsList[item.type].title}</span>
+                            <Image src={socialData.icon} alt='icon' height={25} width={25} />
+                            <span className='font-semibold sm:text-base text-sm'>{socialData.title}</span>
                         </div>
                         <Image src={"https://linktree.sirv.com/Images/icons/pen.svg"} alt='edit' height={15} width={15} />
                     </div>
