@@ -9,6 +9,8 @@ import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { fireApp } from "@/important/firebase";
 import { collection, doc, getDoc } from "firebase/firestore";
 import SensitiveWarning from "./components/SensitiveWarning";
+import { LanguageProvider } from "@/lib/languageContext";
+import PublicLanguageSwitcher from "./components/PublicLanguageSwitcher";
 
 export const HouseContext = React.createContext();
 
@@ -36,24 +38,23 @@ export default function House({ userId }) {
     }, [userId]);
 
     return (
-        <HouseContext.Provider value={{ setSensitiveWarning, sensitiveType }}>
-            {!sensitiveWarning ? <>
-                <BgDiv userId={userId} />
+        <LanguageProvider>
+            <PublicLanguageSwitcher />
+            <HouseContext.Provider value={{ setSensitiveWarning, sensitiveType }}>
+                {!sensitiveWarning ? <>
+                    <BgDiv userId={userId} />
 
-                <div className="relative z-20 md:w-[50rem] w-full flex flex-col items-center h-full mx-auto">
-                    {/* <div className="absolute z-10 top-3 right-0 mt-7 mb-4 mr-4 bg-white hover:bg-opacity-80 active:scale-90 duration-100 cursor-pointer border rounded-full ml-auto h-[2.5rem] w-[2.5rem] grid place-items-center">
-                        <FaEllipsis className="scale-80" />
-                    </div> */}
-
-                    <div className="flex flex-col items-center flex-1 overflow-auto py-6">
-                        <ProfilePic userId={userId} />
-                        <UserInfo userId={userId} hasSensitiveContent={hasSensitiveContent} />
-                        <MyLinks userId={userId} hasSensitiveContent={hasSensitiveContent} />
+                    <div className="relative z-20 md:w-[50rem] w-full flex flex-col items-center h-full mx-auto">
+                        <div className="flex flex-col items-center flex-1 overflow-auto py-6">
+                            <ProfilePic userId={userId} />
+                            <UserInfo userId={userId} hasSensitiveContent={hasSensitiveContent} />
+                            <MyLinks userId={userId} hasSensitiveContent={hasSensitiveContent} />
+                        </div>
                     </div>
-                </div>
-                <SupportBanner userId={userId} />
-            </>:
-                <SensitiveWarning />}
-        </HouseContext.Provider>
+                    <SupportBanner userId={userId} />
+                </>:
+                    <SensitiveWarning />}
+            </HouseContext.Provider>
+        </LanguageProvider>
     )
 }

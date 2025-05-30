@@ -2,9 +2,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { HouseContext } from "../House";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function SensitiveWarning() {
     const { setSensitiveWarning, sensitiveType } = useContext(HouseContext);
+    const { t } = useTranslation();
     const router = useRouter();
 
     const handleBack = () =>{
@@ -24,15 +26,21 @@ export default function SensitiveWarning() {
                     width={30}
                     height={30}
                 />
-                <h1 className="font-bold sm:text-2xl text-xl">Sensitive Content</h1>
-                <p className="sm:text-xl text-center">This profile may contain content that is not appropriate for all audiences</p>
+                <h1 className="font-bold sm:text-2xl text-xl">{t('sensitive.title')}</h1>
+                <p className="sm:text-xl text-center">{t('sensitive.description')}</p>
 
                 <div className="my-4 w-full">
                     <div className="p-3 font-semibold text-center hover:scale-105 active:scale-90 border border-white border-opacity-50 hover:border-opacity-100 w-full rounded-xl cursor-pointer" onClick={handleProceed}>
-                        {sensitiveType === 3 ? "Continue" : sensitiveType === 2 ? `I'm over 25` : sensitiveType === 1 ? `I'm over 21`: `I'm over 18`}
+                        {sensitiveType === 3 ? t('sensitive.continue') : 
+                         sensitiveType === 2 ? t('sensitive.over_25') : 
+                         sensitiveType === 1 ? t('sensitive.over_21') : 
+                         t('sensitive.over_18')}
                     </div>
                     <div className="p-3 font-semibold text-center hover:scale-105 active:scale-90 w-full rounded-xl cursor-pointer" onClick={handleBack}>
-                        {sensitiveType === 3 ? "Go Back" : sensitiveType === 2 ? `I'm under 25` : sensitiveType === 1 ? `I'm under 21` : `I'm under 18`}
+                        {sensitiveType === 3 ? t('sensitive.go_back') : 
+                         sensitiveType === 2 ? t('sensitive.under_25') : 
+                         sensitiveType === 1 ? t('sensitive.under_21') : 
+                         t('sensitive.under_18')}
                     </div>
                 </div>
             </main>

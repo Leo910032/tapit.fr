@@ -297,6 +297,19 @@
     "remenber_password": "Remembered your password?",
     "sign_up": " Sign up"
   },
+   "sensitive": {
+    "title": "Sensitive Content",
+    "description": "This profile may contain content that is not appropriate for all audiences",
+    "continue": "Continue",
+    "go_back": "Go Back",
+    "over_18": "I'm over 18",
+    "over_21": "I'm over 21", 
+    "over_25": "I'm over 25",
+    "under_18": "I'm under 18",
+    "under_21": "I'm under 21",
+    "under_25": "I'm under 25"
+  },
+
   "reset_password": {
     "title": "Enter your new password",
     "advice": "I'll advice that your new password be different from your previous password.",

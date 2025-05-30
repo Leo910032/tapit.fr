@@ -7,6 +7,7 @@ import { collection, doc, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function SupportBanner({ userId }) {
     const [supportGroup, setSupportGroup] = useState(0);
@@ -14,6 +15,7 @@ export default function SupportBanner({ userId }) {
     const [expanded, setExpanded] = useState(false);
     const [bgType, setBgType] = useState("");
     const [themeTextColour, setThemeTextColour] = useState("");
+    const { t } = useTranslation();
 
     useEffect(() => {
         async function fetchProfilePicture() {
@@ -69,7 +71,7 @@ export default function SupportBanner({ userId }) {
                             target="_blank"
                             className="sm:max-w-[30rem] w-full p-3 bg-white text-black font-semibold rounded-2xl uppercase hover:scale-105 active:scale-95 mt-2"
                         >
-                            Act now
+                            {t('support.act_now')}
                         </Link>
                     </div>
                 </div>

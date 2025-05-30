@@ -14,6 +14,7 @@ import { availableFonts_Classic } from "@/lib/FontsList";
 import ButtonText from "./ButtonText";
 import { FaCopy } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function Button({ url, content, userId }) {
     const [modifierClass, setModifierClass] = useState("");
@@ -28,6 +29,7 @@ export default function Button({ url, content, userId }) {
     const [btnFontStyle, setBtnFontStyle] = useState(null);
     const [selectedFontClass, setSelectedFontClass] = useState("");
     const router = useRouter();
+    const { t } = useTranslation();
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -47,7 +49,7 @@ export default function Button({ url, content, userId }) {
         if (myUrl) {
             navigator.clipboard.writeText(myUrl);
             toast.success(
-                "Link copied",
+                t('button.link_copied'),
                 {
                     style: {
                         border: '1px solid #6fc276',
