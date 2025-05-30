@@ -193,6 +193,18 @@
     
     "twitter_description": "Add your Linktree to your Twitter profile. Simply copy your Linktree URL, go to your profile, click on Edit Profile, and paste your Linktree URL into the Website field."
   },
+    "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Track your profile views and engagement",
+    "total_views": "Total Views",
+    "today_views": "Today's Views", 
+    "week_views": "This Week",
+    "month_views": "This Month",
+    "recent_activity": "Recent Activity",
+    "no_views_yet": "No views yet",
+    "share_to_track": "Share your profile to start tracking views!",
+    "last_updated": "Last updated"
+  },
    "qrcode": {
     "download_jpg": "Download JPG",
     "high_quality_image": "High quality image"

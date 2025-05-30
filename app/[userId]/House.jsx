@@ -11,6 +11,7 @@ import { collection, doc, getDoc } from "firebase/firestore";
 import SensitiveWarning from "./components/SensitiveWarning";
 import { LanguageProvider } from "@/lib/languageContext";
 import PublicLanguageSwitcher from "./components/PublicLanguageSwitcher";
+import { recordProfileView } from "@/lib/analytics/viewTracker";
 
 export const HouseContext = React.createContext();
 
@@ -18,6 +19,7 @@ export default function House({ userId }) {
     const [sensitiveWarning, setSensitiveWarning] = useState(null);
     const [hasSensitiveContent, setHasSensitiveContent]= useState(false);
     const [sensitiveType, setSensitiveType] = useState(false);
+    const [viewRecorded, setViewRecorded] = useState(false);
 
     useEffect(() => {
         async function fetchProfilePicture() {
@@ -36,6 +38,32 @@ export default function House({ userId }) {
         }
         fetchProfilePicture();
     }, [userId]);
+
+    // Record profile view
+    useEffect(() => {
+        async function recordView() {
+            if (!viewRecorded && userId) {
+                try {
+                    // Get some basic viewer info (without compromising privacy)
+                    const viewerInfo = {
+                        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
+                        referrer: typeof window !== 'undefined' ? document.referrer : '',
+                        recordDetailed: false // Set to true if you want detailed logs
+                    };
+
+                    await recordProfileView(userId, viewerInfo);
+                    setViewRecorded(true);
+                } catch (error) {
+                    console.error("Failed to record view:", error);
+                }
+            }
+        }
+
+        // Record view after a short delay to ensure it's a real view
+        const timer = setTimeout(recordView, 2000);
+        
+        return () => clearTimeout(timer);
+    }, [userId, viewRecorded]);
 
     return (
         <LanguageProvider>
