@@ -10,8 +10,10 @@ import { toast } from "react-hot-toast";
 import { useEffect } from "react";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 import { collection, doc, onSnapshot } from "firebase/firestore";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function ProfileImageManager() {
+    const { t } = useTranslation();
     const [uploadedPhoto, setUploadedPhoto] = useState('');
     const [uploadedPhotoPreview, setUploadedPhotoPreview] = useState('');
     const [profilePicture, setProfilePicture] = useState(null);
@@ -82,9 +84,9 @@ export default function ProfileImageManager() {
         toast.promise(
             promise,
             {
-                loading: "Setting new profile picture",
-                success: "Profile Picture set",
-                error: "An error occurred!"
+                loading: t("profile_image.setting_new_picture"),
+                success: t("profile_image.picture_set"),
+                error: t("profile_image.error_occurred")
             },
             {
                 style: {
@@ -123,7 +125,7 @@ export default function ProfileImageManager() {
                         setProfilePicture(
                             <Image
                                 src={`${profilePhoto}`}
-                                alt="profile"
+                                alt={t("profile_image.profile_alt")}
                                 height={1000}
                                 width={1000}
                                 className="min-w-full h-full object-contain"
@@ -143,7 +145,7 @@ export default function ProfileImageManager() {
             });
         }
         fetchProfilePicture();
-    }, []);
+    }, [t]);
 
     return (
         <div className="flex w-full p-6 items-center gap-4">
@@ -153,12 +155,12 @@ export default function ProfileImageManager() {
             <div className="flex-1 grid gap-2 relative">
                 <input type="file" className="absolute opacity-0 pointer-events-none" ref={inputRef} accept="image/*" onChange={handleFileChange} />
                 <div className={`flex items-center gap-3 justify-center p-3 rounded-3xl cursor-pointer active:scale-95 active:opacity-60 active:translate-y-1 hover:scale-[1.005] bg-btnPrimary text-white w-full`} onClick={() => inputRef.current.click()}>
-                    Pick an image
+                    {t("profile_image.pick_image")}
                 </div>
                 <div className={`flex items-center gap-3 justify-center p-3 rounded-3xl mix-blend-multiply cursor-pointer active:scale-95 active:opacity-60 active:translate-y-1 hover:scale-[1.005] border w-full`} onClick={handleRemoveProfilePicture}>
                     {!isRemoving ?
-                        "Remove" :
-                        <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className="filter invert" />
+                        t("profile_image.remove") :
+                        <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt={t("profile_image.loading_alt")} className="filter invert" />
                     }
                 </div>
             </div>
@@ -166,9 +168,9 @@ export default function ProfileImageManager() {
                 <div className="absolute h-full w-full bg-black bg-opacity-[0.25] backdrop-blur-[1px] top-0 left-0 p-2" onClick={handleReset}></div>
                 <form ref={formRef} className="relative z-10 sm:max-w-[30rem] max-w-18 max-h-[80vh] overflow-hidden p-4">
                     <div className="w-full scale-[0.95] relative rounded-full overflow-hidden place-items-center grid aspect-square bg-white">
-                        <Image src={uploadedPhotoPreview} alt="profile pic" height={1000} width={1000} priority className="min-w-[10rem] w-full object-contain min-h-full" />
+                        <Image src={uploadedPhotoPreview} alt={t("profile_image.profile_pic_alt")} height={1000} width={1000} priority className="min-w-[10rem] w-full object-contain min-h-full" />
                         {isLoading && <div className="absolute z-10 h-full w-full scale-110 grid place-items-center bg-black bg-opacity-[0.25] mix-blend-screen">
-                            <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={50} height={50} alt="loading" className="mix-blend-screen" />
+                            <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={50} height={50} alt={t("profile_image.loading_alt")} className="mix-blend-screen" />
                         </div>}
                     </div>
                     {!isLoading && <div className="absolute top-2 right-2 rounded-full p-2 hover:bg-red-500 active:scale-90 bg-black text-white text-sm cursor-pointer" onClick={handleReset}>

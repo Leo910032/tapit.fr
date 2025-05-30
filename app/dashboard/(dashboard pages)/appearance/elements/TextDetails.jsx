@@ -5,11 +5,13 @@ import { fireApp } from "@/important/firebase";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 import updateBio from "@/lib/update data/updateBio";
 import updateDisplayName from "@/lib/update data/updateDisplayName";
+import { useTranslation } from "@/lib/useTranslation";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { useEffect } from "react";
 import { useState } from "react";
 
 export default function TextDetails() {
+    const { t } = useTranslation();
     const [displayName, setDisplayName] = useState("");
     const [myBio, setMyBio] = useState("");
     const [dataLoaded, setDataLoaded]= useState(false);
@@ -63,7 +65,7 @@ export default function TextDetails() {
                     value={`${displayName}`}
                 />
                 <label className="absolute px-3 pointer-events-none top-[.25rem] left-1 text-sm text-main-green peer-placeholder-shown:top-2/4 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:bg-transparent peer-placeholder-shown:text-slate-500 peer-placeholder-shown:left-0 opacity-70 transition duration-[250] ease-linear">
-                    Profile title
+                    {t('textDetails.profile_title')}
                 </label>
             </div>
             <div className="flex-1 relative pt-2 flex items-center rounded-lg bg-black bg-opacity-[0.05] focus-within:border-black focus-within:border-[2px] border border-transparent">
@@ -75,7 +77,7 @@ export default function TextDetails() {
                     value={myBio}
                 ></textarea>
                 <label className="absolute px-3 pointer-events-none top-[.25rem] left-1 text-sm text-main-green peer-placeholder-shown:top-2/4 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:bg-transparent peer-placeholder-shown:text-slate-500 peer-placeholder-shown:left-0 opacity-70 transition duration-[250] ease-linear">
-                    Bio
+                    {t('textDetails.bio')}
                 </label>
             </div>
         </div>

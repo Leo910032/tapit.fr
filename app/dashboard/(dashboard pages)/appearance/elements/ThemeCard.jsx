@@ -6,35 +6,63 @@ import { collection, doc, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa6";
+import { useTranslation } from "@/lib/useTranslation";
 
-export default function ThemeCard({ type, pic, text }) {
+export default function ThemeCard({ type, pic, text, themeId = "custom" }) {
+    const { t } = useTranslation();
     const [isSelectedTheme, setIsSelectedTheme] = useState(false);
     const [themeColor, setThemeColor] = useState("");
 
-    const specialThemes = ["New Mario", "Matrix"];
+    // Map themeId to the text expected by updateTheme
+    const getThemeNameForUpdate = (themeId) => {
+        const themeMap = {
+            'custom': 'Custom',
+            'matrix': 'Matrix',
+            'new_mario': 'New Mario',
+            'pebble_blue': 'Pebble Blue',
+            'pebble_yellow': 'Pebble Yellow',
+            'pebble_pink': 'Pebble Pink',
+            'cloud_red': 'Cloud Red',
+            'cloud_green': 'Cloud Green',
+            'cloud_blue': 'Cloud Blue',
+            'breeze_pink': 'Breeze Pink',
+            'breeze_orange': 'Breeze Orange',
+            'breeze_green': 'Breeze Green',
+            'rainbow': 'Rainbow',
+            'confetti': 'Confetti',
+            '3d_blocks': '3D Blocks',
+            'starry_night': 'Starry Night',
+            'lake_white': 'Lake White',
+            'lake_black': 'Lake Black'
+        };
+        return themeMap[themeId] || 'Custom';
+    };
+
+    const specialThemes = ["new_mario", "matrix"];
 
     const handleUpdateTheme = async() => {
-        await updateTheme(text ? text : "Custom", themeColor);
-        if(!specialThemes.includes(text)) return;
+        const themeName = getThemeNameForUpdate(themeId);
+        await updateTheme(themeName, themeColor);
+        if(!specialThemes.includes(themeId)) return;
         await updateThemeTextColour(themeColor);
     }
 
     useEffect(() => {
         if(!isSelectedTheme) return;
-        switch (text) {
-            case 'Lake Black':
+        switch (themeId) {
+            case 'lake_black':
                 setThemeColor("#fff");
                 break;
-            case 'Starry Night':
+            case 'starry_night':
                 setThemeColor("#fff");
                 break;
-            case '3D Blocks':
+            case '3d_blocks':
                 setThemeColor("#fff");
                 break;
-            case 'Matrix':
+            case 'matrix':
                 setThemeColor("#0f0");
                 break;
-            case 'New Mario':
+            case 'new_mario':
                 setThemeColor("#000");
                 break;
         
@@ -42,7 +70,7 @@ export default function ThemeCard({ type, pic, text }) {
                 setThemeColor("#000");
                 break;
         }
-    }, [text, isSelectedTheme]);
+    }, [themeId, isSelectedTheme]);
     
     useEffect(() => {
         function fetchTheme() {
@@ -53,13 +81,14 @@ export default function ThemeCard({ type, pic, text }) {
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const { selectedTheme } = docSnap.data();
-                    setIsSelectedTheme(selectedTheme === text);
+                    const themeName = getThemeNameForUpdate(themeId);
+                    setIsSelectedTheme(selectedTheme === themeName);
                 }
             });
         }
         
         fetchTheme();
-    }, [text]);
+    }, [themeId]);
 
     return (
         <>
@@ -68,13 +97,13 @@ export default function ThemeCard({ type, pic, text }) {
                     <>
                         <div className="w-full h-[13rem] border border-dashed rounded-lg relative group-hover:bg-black group-hover:bg-opacity-[0.05] border-black grid place-items-center cursor-pointer">
                             <span className="uppercase max-w-[5rem] sm:text-xl text-base text-center">
-                                Create Your Own
+                                {t("themes.create_your_own")}
                             </span>
                             {isSelectedTheme && <div className="h-full w-full absolute top-0 left-0 bg-black bg-opacity-[0.5] grid place-items-center z-10 text-white text-xl">
                                 <FaCheck />
                             </div>}
                         </div>
-                        <span className="py-3 text-sm">Custom</span>
+                        <span className="py-3 text-sm">{t("themes.custom")}</span>
                     </>
                     :
                     <>

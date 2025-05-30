@@ -67,7 +67,7 @@ export default function ShareCard() {
                         <MLink myUrl={myLink} />
                     </>}
 
-                    {currentPage[currentPage.length - 1].page === "getAddSocials" && <>
+                    {currentPage[currentPage.length - 1].page === "addSocials" && <>
                         <div className="grid grid-cols-[32px_auto_32px] items-center p-3">
                             {currentPage[currentPage.length - 1].page === "home" ? <span></span> : <div className="cursor-pointer grid place-items-center h-md aspect-square rounded-lg active:border-black border border-transparent active:scale-90 hover:bg-black hover:bg-opacity-5" onClick={handleBack}><Image src={"https://linktree.sirv.com/Images/icons/arrow.svg"} className="rotate-90" alt="x" width={15} height={15} /></div>}
                             <span className="font-semibold text-center">{homePage[0].title}</span>
@@ -78,7 +78,7 @@ export default function ShareCard() {
                             <Image priority src={"https://linktree.sirv.com/Images/icons/socials-hero.png"} alt="banner" width={1024} height={576} className="w-full object-contain" />
                         </div>
                         <div className="grid my-3">
-                            {getAddSocials.map((page, index) => (
+                            {getAddSocials(t).map((page, index) => (
                                 <ShareLiElement nextPage={{page:page.nextPage, index:index}} key={index}>
                                     <div className="flex-1 flex gap-3 items-center">
                                         <Image src={page.icon} alt="x" width={60} height={60} priority />
@@ -97,7 +97,7 @@ export default function ShareCard() {
                         </div>
                     </>}
 
-                    {currentPage[currentPage.length - 1].page === "getShareTo" && <>
+                    {currentPage[currentPage.length - 1].page === "ShareTo" && <>
                         <div className="grid grid-cols-[32px_auto_32px] items-center p-3">
                             {currentPage[currentPage.length - 1].page === "home" ? <span></span> : <div className="cursor-pointer grid place-items-center h-md aspect-square rounded-lg active:border-black border border-transparent active:scale-90 hover:bg-black hover:bg-opacity-5" onClick={handleBack}><Image src={"https://linktree.sirv.com/Images/icons/arrow.svg"} className="rotate-90" alt="x" width={15} height={15} /></div>}
                             <span className="font-semibold text-center">{homePage[1].title}</span>
@@ -105,7 +105,7 @@ export default function ShareCard() {
                         </div>
                         <p className="text-sm opacity-50 px-3">{homePage[1].p}</p>
                         <div className="grid my-3">
-                            {getShareTo.map((page, index) => (
+                            {getShareTo(t).map((page, index) => (
                                 <ShareLiElement nextPage={page.nextPage} key={index}>
                                     <div className="flex-1 flex gap-3 items-center">
                                         <Image src={page.icon} alt="x" width={60} height={60} />
@@ -140,18 +140,18 @@ export default function ShareCard() {
                     {currentPage.length === 3 && <>
                         <div className="grid grid-cols-[32px_auto_32px] items-center p-3">
                             {currentPage[currentPage.length - 1].page === "home" ? <span></span> : <div className="cursor-pointer grid place-items-center h-md aspect-square rounded-lg active:border-black border border-transparent active:scale-90 hover:bg-black hover:bg-opacity-5" onClick={handleBack}><Image src={"https://linktree.sirv.com/Images/icons/arrow.svg"} className="rotate-90" alt="x" width={15} height={15} /></div>}
-                            <span className="font-semibold text-center">{getSocialPage[currentPage[currentPage.length - 1].page?.index].title}</span>
+                            <span className="font-semibold text-center">{getSocialPage(t)[currentPage[currentPage.length - 1].page?.index].title}</span>
                             <div className="cursor-pointer grid place-items-center h-md aspect-square rounded-lg active:border-black border border-transparent active:scale-90 hover:bg-black hover:bg-opacity-5" onClick={handleClose}><Image src={"https://linktree.sirv.com/Images/icons/svgexport-40.svg"} alt="x" width={15} height={15} /></div>
                         </div>
-                        <p className="text-sm opacity-50 px-3">{getSocialPage[currentPage[currentPage.length - 1].page?.index].description}</p>
+                        <p className="text-sm opacity-50 px-3">{getSocialPage(t)[currentPage[currentPage.length - 1].page?.index].description}</p>
                         <div className="w-full px-3 my-2">
-                            <Image priority src={getSocialPage[currentPage[currentPage.length - 1].page?.index].bannerImg} alt="banner" width={1024} height={576} className="w-full object-contain" />
+                            <Image priority src={getSocialPage(t)[currentPage[currentPage.length - 1].page?.index].bannerImg} alt="banner" width={1024} height={576} className="w-full object-contain" />
                         </div>
                         <MLink myUrl={myLink} />
-                        <ShareLiElement nextPage={{type: getSocialPage[currentPage[currentPage.length - 1].page?.index].nextPage, goTo: getSocialPage[currentPage[currentPage.length - 1].page?.index].externalShare}}>
+                        <ShareLiElement nextPage={{type: getSocialPage(t)[currentPage[currentPage.length - 1].page?.index].nextPage, goTo: getSocialPage(t)[currentPage[currentPage.length - 1].page?.index].externalShare}}>
                             <div className="flex-1 flex gap-3 items-center">
-                                <Image priority src={getSocialPage[currentPage[currentPage.length - 1].page?.index].icon} alt="x" width={60} height={60} />
-                                <span className="font-semibold">{getSocialPage[currentPage[currentPage.length - 1].page?.index].title}</span>
+                                <Image priority src={getSocialPage(t)[currentPage[currentPage.length - 1].page?.index].icon} alt="x" width={60} height={60} />
+                                <span className="font-semibold">{getSocialPage(t)[currentPage[currentPage.length - 1].page?.index].title}</span>
                             </div>
                             <Image
                                 src={"https://linktree.sirv.com/Images/icons/arrow.svg"}

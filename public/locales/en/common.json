@@ -11,6 +11,80 @@
     "remove": "Remove",
     "loading": "Loading..."
   },
+    "profile": {
+    "add_social_icons": "Add social icons"
+  },
+    "textDetails": {
+    "profile_title": "Profile title",
+    "bio": "Bio"
+  },
+    "themes": {
+    "custom": "Custom",
+    "create_your_own": "Create Your Own",
+    "matrix": "Matrix",
+    "new_mario": "New Mario",
+    "pebble_blue": "Pebble Blue",
+    "pebble_yellow": "Pebble Yellow", 
+    "pebble_pink": "Pebble Pink",
+    "cloud_red": "Cloud Red",
+    "cloud_green": "Cloud Green",
+    "cloud_blue": "Cloud Blue",
+    "breeze_pink": "Breeze Pink",
+    "breeze_orange": "Breeze Orange",
+    "breeze_green": "Breeze Green",
+    "rainbow": "Rainbow",
+    "confetti": "Confetti",
+    "3d_blocks": "3D Blocks",
+    "starry_night": "Starry Night",
+    "lake_white": "Lake White",
+    "lake_black": "Lake Black"
+  },
+  "fontsoptions" :{
+    "fontsoptions" : "Fonts"
+  },
+    "appearance": {
+    "profile": "Profile",
+    "themes": "Themes", 
+    "custom_appearance": "Custom appearance",
+    "custom_appearance_description": "Completely customize your Linktree profile. Change your background with colors, gradients and images. Choose a button style, change the typeface and more.",
+    "backgrounds": "Backgrounds",
+    "christmas_accessories": "Christmas Accessories",
+    "new_badge": "New",
+    "buttons": "Buttons",
+    "fonts": "Fonts"
+  },
+    "backgrounds": {
+    "flat_colour": "Flat Colour",
+    "gradient": "Gradient", 
+    "image": "Image",
+    "video": "Video",
+    "polka": "Polka",
+    "stripe": "Stripe", 
+    "waves": "Waves",
+    "zig_zag": "Zig Zag"
+  },
+    "christmas": {
+    "snow_fall": "Snow Fall"
+  },
+    "fonts": {
+    "select_font": "Select a font",
+    "search_by_font_name": "Search by font name",
+    "classic": "Classic",
+    "selected": "Selected",
+    "no_fonts_found": "No fonts found."
+  },
+  
+    "buttons": {
+    "fill": "Fill",
+    "outline": "Outline", 
+    "hard_shadow": "Hard Shadow",
+    "soft_shadow": "Soft Shadow",
+    "special": "Special",
+    "theme_text_color": "Theme text colour",
+    "button_color": "Button colour",
+    "button_font_color": "Button font colour", 
+    "shadow_color": "Shadow colour"
+  },
   "button" : {
     "copy_link_button" :  "Link copied"
 

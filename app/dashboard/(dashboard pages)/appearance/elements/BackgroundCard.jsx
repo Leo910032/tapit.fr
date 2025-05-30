@@ -13,7 +13,7 @@ import { backgroundImageUpload } from "@/lib/update data/backgroundImageUpload";
 import { backgroundVideoUpload } from "@/lib/update data/backgroundVideoUpload";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
-export default function BackgroundCard({ text, colorValue, backImg }) {
+export default function BackgroundCard({ type, text, colorValue, backImg }) {
     const { setIsGradient } = useContext(backgroundContext);
     const [isSelected, setIsSelected] = useState(false);
     const [uploadedFilePreview, setUploadedFilePreview] = useState('');
@@ -21,7 +21,6 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
     const [uploadedFile, setUploadedFile] = useState('');
     const [previewing, setPreviewing] = useState(false);
     const formRef = useRef();
-
     const inputRef = useRef();
 
     const handleFileChange = (e) => {
@@ -30,17 +29,16 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
             return;
         }
     
-        if (text === "Image" && selectedFile.size > 2 * 1024 * 1024) {
+        if (type === "image" && selectedFile.size > 2 * 1024 * 1024) {
             toast.error('Please select an image smaller than 2MB.');
             return;
         }
     
-        if (text === "Video" && selectedFile.size > 20 * 1024 * 1024) {
+        if (type === "video" && selectedFile.size > 20 * 1024 * 1024) {
             toast.error('Please select a video smaller than 20MB.');
             return;
         }
     
-        // Handle image preview
         const previewImageURL = URL.createObjectURL(selectedFile);
         setUploadedFilePreview(previewImageURL);
         setUploadedFile(selectedFile);
@@ -53,7 +51,7 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
         }
     
         const file = `${generateUniqueId()}.${(uploadedFile.name).substring((uploadedFile.name).lastIndexOf('.') + 1)}`;
-        const filePath = text === "Image" ? "backgroundImage": "backgroundVideo";
+        const filePath = type === "image" ? "backgroundImage": "backgroundVideo";
         const storageRef01 = ref(appStorage, `${filePath}/${file}`);
         let fileUrl = '';
     
@@ -66,8 +64,23 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
         return fileUrl;
     }
     
+    // Map type to the text expected by updateThemeBackground
+    const getBackgroundTypeForUpdate = (type) => {
+        const typeMap = {
+            'flat_color': 'Flat Colour',
+            'gradient': 'Gradient',
+            'image': 'Image',
+            'video': 'Video',
+            'polka': 'Polka',
+            'stripe': 'Stripe',
+            'waves': 'Waves',
+            'zig_zag': 'Zig Zag'
+        };
+        return typeMap[type] || type;
+    };
+    
     const handleUpdateTheme = async () => {
-        await updateThemeBackground(text);
+        await updateThemeBackground(getBackgroundTypeForUpdate(type));
     }
     
     const handleImagePickingProcess = async () => {
@@ -110,14 +123,13 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
     }
     
     function functionType() {
-        switch (text) {
-            case "Image":
+        switch (type) {
+            case "image":
                 inputRef.current.click();
                 break;
-            case "Video":
+            case "video":
                 inputRef.current.click();
                 break;
-    
             default:
                 handleUpdateTheme();
                 break;
@@ -125,7 +137,7 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
     }
     
     const toasthandler = () => {
-        const promise = text === "Image" ? handleImagePickingProcess() : handleVideoPickingProcess();
+        const promise = type === "image" ? handleImagePickingProcess() : handleVideoPickingProcess();
         toast.promise(
             promise,
             {
@@ -157,13 +169,13 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
                 if (docSnap.exists()) {
                     const { backgroundType } = docSnap.data();
                     setIsGradient(backgroundType === "Gradient");
-                    setIsSelected(backgroundType === text);
+                    setIsSelected(backgroundType === getBackgroundTypeForUpdate(type));
                 }
             });
         }
 
         fetchTheme();
-    }, [text]);
+    }, [type]);
 
     return (
         <div className="min-w-[8rem] flex-1 items-center flex flex-col">
@@ -180,8 +192,8 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
                         </div>
                         :
                         <div className="h-full w-full grid place-items-center">
-                            {text === "Image" && <input type="file" className="absolute opacity-0 pointer-events-none" ref={inputRef} accept="image/*" onChange={handleFileChange} />}
-                            {text === "Video" && <input type="file" className="absolute opacity-0 pointer-events-none" ref={inputRef} accept="video/*" onChange={handleFileChange} />}
+                            {type === "image" && <input type="file" className="absolute opacity-0 pointer-events-none" ref={inputRef} accept="image/*" onChange={handleFileChange} />}
+                            {type === "video" && <input type="file" className="absolute opacity-0 pointer-events-none" ref={inputRef} accept="video/*" onChange={handleFileChange} />}
                             <div className="bg-black bg-opacity-[0.1] rounded-lg p-1">
                                 <Image src={"https://linktree.sirv.com/Images/icons/image.svg"} alt={text} height={27} width={27} />
                             </div>
@@ -193,8 +205,8 @@ export default function BackgroundCard({ text, colorValue, backImg }) {
                 <div className="absolute h-full w-full bg-black bg-opacity-[0.25] backdrop-blur-[1px] top-0 left-0 p-2" onClick={handleReset}></div>
                 <form ref={formRef} className="relative z-10 sm:max-w-[30rem] max-w-18 max-h-[80vh] overflow-hidden p-4">
                     <div className="w-full scale-[0.95] relative overflow-hidden place-items-center grid aspect-square bg-white">
-                        {text ==="Image" && <Image src={uploadedFilePreview} alt="profile pic" height={1000} width={1000} priority className="min-w-[10rem] w-full object-contain min-h-full" />}
-                        {text === "Video" && <video className="min-w-[10rem] w-full object-contain min-h-full" controls>
+                        {type === "image" && <Image src={uploadedFilePreview} alt="profile pic" height={1000} width={1000} priority className="min-w-[10rem] w-full object-contain min-h-full" />}
+                        {type === "video" && <video className="min-w-[10rem] w-full object-contain min-h-full" controls>
                             <source src={uploadedFilePreview} type="video/mp4" />
                             Your browser does not support the video tag.
                         </video>}

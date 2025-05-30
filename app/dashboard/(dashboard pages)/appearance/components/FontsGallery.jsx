@@ -5,8 +5,10 @@ import { selectedFontContext } from "../elements/SelectFonts";
 import { useDebounce } from "@/LocalHooks/useDebounce";
 import { updateThemeFont } from "@/lib/update data/updateTheme";
 import { availableFonts_Classic } from "@/lib/FontsList";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function FontsGallery() {
+    const { t } = useTranslation();
     const { setOpenFontGallery } = useContext(selectedFontContext);
     const [selectedFont, setSelectedFont] = useState(0);
     const [classicFonts, setClassicFonts] = useState([...availableFonts_Classic]);
@@ -60,7 +62,7 @@ export default function FontsGallery() {
 
             <div className="sm:h-[41.5rem] h-[90vh] sm:w-[31.90rem] gap-3 w-[90vw] flex flex-col bg-white rounded-3xl shadow-lg relative enter p-5">
                 <div className="px-4 py-2 font-semibold text-center justify-center relative flex items-center w-full">
-                    Select a font
+                    {t('fonts.select_font')}
                     <span className="absolute right-0 cursor-pointer" onClick={handleClose}> <FaX className="text-sm" /> </span>
                 </div>
                 <div className="relative pt-2 flex items-center rounded-lg bg-black bg-opacity-[0.05] focus-within:border-black focus-within:border-2 border-2 hover:border-black hover:border-opacity-[0.1] border-transparent">
@@ -72,30 +74,30 @@ export default function FontsGallery() {
                         onChange={(e)=>setSearchParam(e.target.value)}
                     />
                     <label className="absolute px-3 pointer-events-none top-[.25rem] left-1 text-xs text-main-green peer-placeholder-shown:top-2/4 peer-placeholder-shown:pt-2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:bg-transparent peer-placeholder-shown:text-slate-500 peer-placeholder-shown:left-0 opacity-80 transition duration-[250] ease-linear">
-                        Search by font name
+                        {t('fonts.search_by_font_name')}
                     </label>
                 </div>
 
                 <div className="flex-1 overflow-auto">
                     <section className="flex flex-col gap-1">
-                        {classicFonts.length > 0 &&<span className="opacity-50 py-3">Classic</span>}
+                        {classicFonts.length > 0 &&<span className="opacity-50 py-3">{t('fonts.classic')}</span>}
                         {classicFonts.length > 0 && classicFonts.map((fontItem => (
                             <div className={`${fontItem.class} select-none px-5 py-3 flex items-center justify-between cursor-pointer w-full rounded-3xl ${selectedFont === fontItem.id ? "bg-btnPrimary bg-opacity-20" : "hover:bg-black hover:bg-opacity-5"}`} key={fontItem.id} onClick={() => handleSelectItem(fontItem.id)}>
                                 {fontItem.name}
                                 {selectedFont === fontItem.id && <span className="flex items-center gap-1 text-sm text-btnPrimaryAlt">
                                     <FaCheck />
-                                    Selected
+                                    {t('fonts.selected')}
                                 </span>}
                             </div>
                         )))}
 
                         {classicFonts.length === 0 && <div className="w-full text-center opacity-50 py-4">
-                            No fonts found.
+                            {t('fonts.no_fonts_found')}
                         </div> }
                     </section>
                 </div>
                 <div className={`flex items-center gap-3 justify-center p-3 rounded-3xl active:scale-95 active:opacity-60 active:translate-y-1 hover:scale-[1.005] border w-full ${selectedFont > 0 ? "bg-btnPrimary text-white cursor-pointer" : "bg-black bg-opacity-20 opacity-40"}`} onClick={handleSave}>
-                    Save
+                    {t('common.save')}
                 </div>
             </div>
         </div>

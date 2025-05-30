@@ -3,15 +3,19 @@ import Image from "next/image";
 import Button from "../elements/Button";
 import ColorPicker from "../elements/ColorPicker";
 import { updateThemeButton } from "@/lib/update data/updateTheme";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function Buttons() {
+    const { t } = useTranslation();
+    
     const handleUpdateTheme = async(type) => {
         await updateThemeButton(type);
     }
+    
     return (
         <div className="w-full bg-white rounded-3xl my-3 flex flex-col p-6">
             <section className="flex gap-5 text-sm flex-col mb-10">
-                <span className="font-semibold">Fill</span>
+                <span className="font-semibold">{t('buttons.fill')}</span>
                 <div className="items-center flex gap-5">
                     <Button type={0} modifierClass={"bg-black"} />
                     <Button type={1} modifierClass={"bg-black rounded-lg"} />
@@ -19,7 +23,7 @@ export default function Buttons() {
                 </div>
             </section>
             <section className="flex gap-5 text-sm flex-col mb-10">
-                <span className="font-semibold">Outline</span>
+                <span className="font-semibold">{t('buttons.outline')}</span>
                 <div className="items-center flex gap-5">
                     <Button type={3} modifierClass={"border border-black"} />
                     <Button type={4} modifierClass={"border border-black rounded-lg"} />
@@ -27,7 +31,7 @@ export default function Buttons() {
                 </div>
             </section>
             <section className="flex gap-5 text-sm flex-col mb-10">
-                <span className="font-semibold">Hard Shadow</span>
+                <span className="font-semibold">{t('buttons.hard_shadow')}</span>
                 <div className="items-center flex gap-5">
                     <Button type={6} modifierClass={"bg-white border border-black "} modifierStyles={{filter: `drop-shadow(4px 4px 0px black)`}} />
                     <Button type={7} modifierClass={"bg-white border border-black rounded-lg"} modifierStyles={{filter: `drop-shadow(4px 4px 0px black)`}} />
@@ -35,7 +39,7 @@ export default function Buttons() {
                 </div>
             </section>
             <section className="flex gap-5 text-sm flex-col mb-10">
-                <span className="font-semibold">Soft Shadow</span>
+                <span className="font-semibold">{t('buttons.soft_shadow')}</span>
                 <div className="items-center flex gap-5">
                     <Button type={9} modifierClass={"bg-white shadow-[0_4px_4px_0_rgb(0,0,0,0.16)]"} />
                     <Button type={10} modifierClass={"bg-white rounded-lg shadow-[0_4px_4px_0_rgb(0,0,0,0.16)]"} />
@@ -43,7 +47,7 @@ export default function Buttons() {
                 </div>
             </section>
             <section className="flex gap-5 text-sm flex-col mb-10">
-                <span className="font-semibold">Special</span>
+                <span className="font-semibold">{t('buttons.special')}</span>
                 <div className="items-center flex-wrap flex gap-5">
                     <div onClick={()=>handleUpdateTheme(12)} className={`min-w-[30%] h-10 cursor-pointer hover:scale-105 active:scale-95 flex-1 border relative border-black bg-black`}>
                         <span className="w-full absolute top-6 translate-y-[1px]">
@@ -73,21 +77,21 @@ export default function Buttons() {
                 </div>
             </section>
             <section className="flex text-sm flex-col mb-10">
-                <span className="font-semibold mb-[-10px]">Theme text colour</span>
+                <span className="font-semibold mb-[-10px]">{t('buttons.theme_text_color')}</span>
                 <ColorPicker colorFor={4} />
             </section>
             <section className="flex text-sm flex-col mb-10">
-                <span className="font-semibold mb-[-10px]">Button colour</span>
+                <span className="font-semibold mb-[-10px]">{t('buttons.button_color')}</span>
                 <ColorPicker colorFor={1} />
             </section>
             <section className="flex text-sm flex-col mb-10">
-                <span className="font-semibold mb-[-10px]">Button font colour</span>
+                <span className="font-semibold mb-[-10px]">{t('buttons.button_font_color')}</span>
                 <ColorPicker colorFor={2} />
             </section>
             <section className="flex text-sm flex-col">
-                <span className="font-semibold mb-[-10px]">Shadow colour</span>
+                <span className="font-semibold mb-[-10px]">{t('buttons.shadow_color')}</span>
                 <ColorPicker colorFor={3} />
             </section>
         </div>
     );
-} 
+}
