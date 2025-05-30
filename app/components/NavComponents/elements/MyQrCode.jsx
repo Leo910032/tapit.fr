@@ -3,8 +3,10 @@ import { useRef } from 'react';
 import QRCode from 'qrcode.react';
 import MLink from './MLink';
 import Image from 'next/image';
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function MyQrCode({ url }) {
+    const { t } = useTranslation();
     const qrCodeRef = useRef(null);
 
     const downloadAsJPEG = () => {
@@ -14,6 +16,7 @@ export default function MyQrCode({ url }) {
         downloadLink.download = 'qrcode.jpg';
         downloadLink.click();
     };
+    
     return (
         <div className="my-2">
             <div className='mx-auto overflow-hidden relative grid place-items-center mb-2 select-none pointer-events-none' ref={qrCodeRef}>
@@ -30,8 +33,8 @@ export default function MyQrCode({ url }) {
             </div>
             <div className="w-full flex justify-between border items-center p-3 rounded-xl select-none hover:bg-black hover:bg-opacity-5 cursor-pointer active:scale-95" onClick={downloadAsJPEG}>
                 <div className='grid gap-2'>
-                    <span className='font-semibold'>Download JPG</span>
-                    <span className='text-sm opacity-60'>High quality image</span>
+                    <span className='font-semibold'>{t('qrcode.download_jpg')}</span>
+                    <span className='text-sm opacity-60'>{t('qrcode.high_quality_image')}</span>
                 </div>
 
                 <div className='flex gap-3 items-center'>

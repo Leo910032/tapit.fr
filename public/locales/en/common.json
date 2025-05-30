@@ -119,7 +119,9 @@
     "shadow_color": "Shadow colour"
   },
   "button" : {
-    "copy_link_button" :  "Link copied"
+    "copy_link_button" :  "Link copied",
+    "link_copied": "Link copied"
+
 
   },
   "mylinkdiv":{
@@ -190,6 +192,10 @@
     "pinterest_description": "Add your Linktree to your Pinterest profile. Simply copy your Linktree URL, go your Pinterest settings, paste your Linktree URL into the Website URL field, then click Save.",
     
     "twitter_description": "Add your Linktree to your Twitter profile. Simply copy your Linktree URL, go to your profile, click on Edit Profile, and paste your Linktree URL into the Website field."
+  },
+   "qrcode": {
+    "download_jpg": "Download JPG",
+    "high_quality_image": "High quality image"
   },
    "seo": {
     "title": "SEO",
