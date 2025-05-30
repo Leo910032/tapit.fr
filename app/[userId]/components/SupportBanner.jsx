@@ -10,12 +10,32 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/useTranslation";
 
 export default function SupportBanner({ userId }) {
+    const { t } = useTranslation();
     const [supportGroup, setSupportGroup] = useState(0);
     const [supportGroupStatus, setSupportGroupStatus] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [bgType, setBgType] = useState("");
     const [themeTextColour, setThemeTextColour] = useState("");
-    const { t } = useTranslation();
+    // Helper function to get support group translations
+    const getSupportGroupText = (type, field) => {
+        const supportKeys = [
+            'support_groups.support_creator',
+            'support_groups.free_palestine', 
+            'support_groups.stand_with_ukraine',
+            'support_groups.anti_racism',
+            'support_groups.pride'
+        ];
+        
+        if (supportKeys[supportGroup]) {
+            const translationKey = `${supportKeys[supportGroup]}.${field}`;
+            console.log('Translation key:', translationKey, 'Result:', t(translationKey));
+            return t(translationKey);
+        }
+        
+        // Fallback to original if translation key doesn't exist
+        console.log('Using fallback for supportGroup:', supportGroup, 'field:', field);
+        return SupportGroups[supportGroup]?.[field] || '';
+    };
 
     useEffect(() => {
         async function fetchProfilePicture() {
@@ -57,15 +77,21 @@ export default function SupportBanner({ userId }) {
                         />
                     </div>
                     {!expanded && <div onClick={() => setExpanded(true)} className="w-full text-center cursor-pointer">
-                        <span className="font-semibold max-w-[20rem]">{SupportGroups[supportGroup].title}</span>
+                        <span className="font-semibold max-w-[20rem]">
+                            {getSupportGroupText(supportGroup, 'title')}
+                        </span>
                     </div>}
                     <div className={`flex flex-col text-center w-full gap-5 pt-2 items-center overflow-hidden ${expanded ? "openBanner" : "closeBanner"}`}
                     >
                         <div className="h-fit aspect-square rounded-full overflow-hidden">
                             <Image src={"https://linktree.sirv.com/Images/icons/logo.gif"} alt="logo" height={60} width={60} />
                         </div>
-                        <span className="font-semibold max-w-[20rem]">{SupportGroups[supportGroup].title}</span>
-                        <span className="text-sm max-w-[20rem]">{SupportGroups[supportGroup].message}</span>
+                        <span className="font-semibold max-w-[20rem]">
+                            {getSupportGroupText(supportGroup, 'title')}
+                        </span>
+                        <span className="text-sm max-w-[20rem]">
+                            {getSupportGroupText(supportGroup, 'message')}
+                        </span>
                         <Link
                             href={SupportGroups[supportGroup].linkTo}
                             target="_blank"

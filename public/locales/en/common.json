@@ -36,6 +36,7 @@
     "support_banner" : "Support banner"
   },
   "support": {
+    "act_now": "Act now",
     "show_your_support": "Show your support",
     "support_banner_description": "Show your support for important causes with a profile banner. Only one banner can be active at a time."
   },
@@ -636,5 +637,6 @@
     "twenty_five_plus": "25+",
     "sensitive_content": "Sensitive Content"
   }
+
 }
 
