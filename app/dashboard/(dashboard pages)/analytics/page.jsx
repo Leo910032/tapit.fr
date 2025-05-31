@@ -1,4 +1,4 @@
-// app/dashboard/(dashboard pages)/analytics/page.jsx (Updated with click analytics)
+// app/dashboard/(dashboard pages)/analytics/page.jsx - Enhanced with date range navigation
 "use client"
 import React, { useEffect, useState } from "react";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
@@ -15,6 +15,17 @@ export default function AnalyticsPage() {
     const [error, setError] = useState(null);
     const [username, setUsername] = useState("");
     const [isConnected, setIsConnected] = useState(false);
+    
+    // Date range selector state
+    const [selectedPeriod, setSelectedPeriod] = useState('today'); // 'today', 'week', 'month', 'all'
+
+    // Analytics data organized by periods
+    const [analyticsData, setAnalyticsData] = useState({
+        today: { views: 0, clicks: 0 },
+        week: { views: 0, clicks: 0 },
+        month: { views: 0, clicks: 0 },
+        all: { views: 0, clicks: 0 }
+    });
 
     useEffect(() => {
         let unsubscribe = null;
@@ -65,7 +76,7 @@ export default function AnalyticsPage() {
                             .sort((a, b) => (b.totalClicks || 0) - (a.totalClicks || 0))
                             .slice(0, 5); // Top 5 clicked links
                         
-                        const analyticsData = {
+                        const processedAnalytics = {
                             // Views data
                             totalViews: data.totalViews || 0,
                             todayViews: data.dailyViews?.[today] || 0,
@@ -94,11 +105,31 @@ export default function AnalyticsPage() {
                             username: data.username
                         };
                         
-                        setAnalytics(analyticsData);
+                        // Update organized analytics data
+                        setAnalyticsData({
+                            today: {
+                                views: processedAnalytics.todayViews,
+                                clicks: processedAnalytics.todayClicks
+                            },
+                            week: {
+                                views: processedAnalytics.thisWeekViews,
+                                clicks: processedAnalytics.thisWeekClicks
+                            },
+                            month: {
+                                views: processedAnalytics.thisMonthViews,
+                                clicks: processedAnalytics.thisMonthClicks
+                            },
+                            all: {
+                                views: processedAnalytics.totalViews,
+                                clicks: processedAnalytics.totalClicks
+                            }
+                        });
+                        
+                        setAnalytics(processedAnalytics);
                     } else {
                         console.log("No analytics document found - initializing with zeros");
                         // Document doesn't exist yet, show zeros
-                        setAnalytics({
+                        const emptyAnalytics = {
                             totalViews: 0,
                             todayViews: 0,
                             yesterdayViews: 0,
@@ -118,6 +149,14 @@ export default function AnalyticsPage() {
                             linkClicks: {},
                             topLinks: [],
                             username: userData.username
+                        };
+                        
+                        setAnalytics(emptyAnalytics);
+                        setAnalyticsData({
+                            today: { views: 0, clicks: 0 },
+                            week: { views: 0, clicks: 0 },
+                            month: { views: 0, clicks: 0 },
+                            all: { views: 0, clicks: 0 }
                         });
                     }
                     
@@ -160,6 +199,49 @@ export default function AnalyticsPage() {
         return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
     }
 
+    const getChangeIndicator = (current, previous) => {
+        if (previous === 0) return null;
+        const change = ((current - previous) / previous) * 100;
+        const isPositive = change > 0;
+        
+        return (
+            <div className={`flex items-center text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                <Image 
+                    src={`https://linktree.sirv.com/Images/icons/arrow.svg`}
+                    alt="trend"
+                    width={12}
+                    height={12}
+                    className={`mr-1 ${isPositive ? '-rotate-90' : 'rotate-90'}`}
+                />
+                {Math.abs(change).toFixed(1)}%
+            </div>
+        );
+    };
+
+    // Get current period data
+    const getCurrentData = () => {
+        return analyticsData[selectedPeriod] || { views: 0, clicks: 0 };
+    };
+
+    // Get period label
+    const getPeriodLabel = () => {
+        switch (selectedPeriod) {
+            case 'today': return t('analytics.period.today') || 'Today';
+            case 'week': return t('analytics.period.this_week') || 'This Week';
+            case 'month': return t('analytics.period.this_month') || 'This Month';
+            case 'all': return t('analytics.period.all_time') || 'All Time';
+            default: return 'Today';
+        }
+    };
+
+    // Navigation items
+    const navigationItems = [
+        { id: 'today', label: t('analytics.nav.today') || 'Today', icon: '📅' },
+        { id: 'week', label: t('analytics.nav.week') || 'Week', icon: '📊' },
+        { id: 'month', label: t('analytics.nav.month') || 'Month', icon: '📈' },
+        { id: 'all', label: t('analytics.nav.all_time') || 'All Time', icon: '🚀' }
+    ];
+
     if (loading) {
         return (
             <div className="flex items-center justify-center p-8 min-h-[400px]">
@@ -191,27 +273,11 @@ export default function AnalyticsPage() {
         );
     }
 
-    const getChangeIndicator = (current, previous) => {
-        if (previous === 0) return null;
-        const change = ((current - previous) / previous) * 100;
-        const isPositive = change > 0;
-        
-        return (
-            <div className={`flex items-center text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                <Image 
-                    src={`https://linktree.sirv.com/Images/icons/arrow.svg`}
-                    alt="trend"
-                    width={12}
-                    height={12}
-                    className={`mr-1 ${isPositive ? '-rotate-90' : 'rotate-90'}`}
-                />
-                {Math.abs(change).toFixed(1)}%
-            </div>
-        );
-    };
+    const currentData = getCurrentData();
 
     return (
         <div className="p-4 lg:p-6 w-full h-full min-h-screen flex flex-col">
+            {/* Header */}
             <div className="mb-6 lg:mb-8">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
@@ -241,19 +307,45 @@ export default function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* Overview Cards - Views */}
-            <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Profile Views</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
-                    {/* Total Views */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
+         {/* Date Range Navigation - UPDATED with even spacing */}
+            <div className="mb-8">
+                <div className="bg-white rounded-xl shadow-sm border p-2">
+                    {/* Changed from flex flex-wrap gap-2 to grid with equal columns */}
+                    <div className="grid grid-cols-4 gap-2">
+                        {navigationItems.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => setSelectedPeriod(item.id)}
+                                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                    selectedPeriod === item.id
+                                        ? 'bg-blue-500 text-white shadow-md'
+                                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                                }`}
+                            >
+                                <span className="text-lg">{item.icon}</span>
+                                <span className="hidden sm:inline">{item.label}</span>
+                                <span className="sm:hidden">{item.label.split(' ')[0]}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Current Period Overview */}
+            <div className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                    {t('analytics.overview_title', { period: getPeriodLabel() }) || `${getPeriodLabel()} Overview`}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Views Card */}
+                    <div className="bg-white rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-md">
                         <div className="flex items-center justify-between mb-4">
                             <div className="bg-blue-100 p-3 rounded-lg">
                                 <Image 
                                     src="https://linktree.sirv.com/Images/icons/analytics.svg"
                                     alt="views"
-                                    width={24}
-                                    height={24}
+                                    width={28}
+                                    height={28}
                                 />
                             </div>
                             {isConnected && (
@@ -262,110 +354,24 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-gray-600">
-                                {t('analytics.total_views') || 'Total Views'}
+                                {t('analytics.profile_views') || 'Profile Views'}
                             </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.totalViews?.toLocaleString() || '0'}
+                            <p className="text-4xl font-bold text-gray-900 transition-all duration-500">
+                                {currentData.views.toLocaleString()}
                             </p>
+                            {selectedPeriod === 'today' && getChangeIndicator(analytics?.todayViews || 0, analytics?.yesterdayViews || 0)}
                         </div>
                     </div>
 
-                    {/* Today's Views */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="bg-green-100 p-3 rounded-lg">
-                                <Image 
-                                    src="https://linktree.sirv.com/Images/icons/analytics.svg"
-                                    alt="today"
-                                    width={24}
-                                    height={24}
-                                />
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {getChangeIndicator(analytics?.todayViews || 0, analytics?.yesterdayViews || 0)}
-                                {isConnected && (
-                                    <div className="animate-pulse bg-green-500 w-2 h-2 rounded-full"></div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">
-                                {t('analytics.today_views') || "Today's Views"}
-                            </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.todayViews?.toLocaleString() || '0'}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                                {t('analytics.yesterday') || 'Yesterday'}: {analytics?.yesterdayViews || 0}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* This Week Views */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="bg-purple-100 p-3 rounded-lg">
-                                <Image 
-                                    src="https://linktree.sirv.com/Images/icons/analytics.svg"
-                                    alt="week"
-                                    width={24}
-                                    height={24}
-                                />
-                            </div>
-                            {isConnected && (
-                                <div className="animate-pulse bg-purple-500 w-2 h-2 rounded-full"></div>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">
-                                {t('analytics.week_views') || 'This Week'}
-                            </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.thisWeekViews?.toLocaleString() || '0'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* This Month Views */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="bg-orange-100 p-3 rounded-lg">
-                                <Image 
-                                    src="https://linktree.sirv.com/Images/icons/analytics.svg"
-                                    alt="month"
-                                    width={24}
-                                    height={24}
-                                />
-                            </div>
-                            {isConnected && (
-                                <div className="animate-pulse bg-orange-500 w-2 h-2 rounded-full"></div>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">
-                                {t('analytics.month_views') || 'This Month'}
-                            </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.thisMonthViews?.toLocaleString() || '0'}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Overview Cards - Clicks */}
-            <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Link Clicks</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
-                    {/* Total Clicks */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
+                    {/* Clicks Card */}
+                    <div className="bg-white rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-md">
                         <div className="flex items-center justify-between mb-4">
                             <div className="bg-indigo-100 p-3 rounded-lg">
                                 <Image 
                                     src="https://linktree.sirv.com/Images/icons/links.svg"
                                     alt="clicks"
-                                    width={24}
-                                    height={24}
+                                    width={28}
+                                    height={28}
                                 />
                             </div>
                             {isConnected && (
@@ -374,91 +380,79 @@ export default function AnalyticsPage() {
                         </div>
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-gray-600">
-                                Total Clicks
+                                {t('analytics.link_clicks') || 'Link Clicks'}
                             </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.totalClicks?.toLocaleString() || '0'}
+                            <p className="text-4xl font-bold text-gray-900 transition-all duration-500">
+                                {currentData.clicks.toLocaleString()}
+                            </p>
+                            {selectedPeriod === 'today' && getChangeIndicator(analytics?.todayClicks || 0, analytics?.yesterdayClicks || 0)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* All Time Statistics Grid */}
+            <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    {t('analytics.complete_statistics') || 'Complete Statistics'}
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Today */}
+                    <div className="bg-white rounded-lg shadow-sm border p-4">
+                        <h3 className="text-sm font-medium text-gray-600 mb-2">
+                            {t('analytics.stats.today') || 'Today'}
+                        </h3>
+                        <div className="space-y-1">
+                            <p className="text-lg font-bold text-blue-600">
+                                {analytics?.todayViews || 0} {t('analytics.stats.views') || 'views'}
+                            </p>
+                            <p className="text-lg font-bold text-indigo-600">
+                                {analytics?.todayClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
                             </p>
                         </div>
                     </div>
 
-                    {/* Today's Clicks */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="bg-emerald-100 p-3 rounded-lg">
-                                <Image 
-                                    src="https://linktree.sirv.com/Images/icons/links.svg"
-                                    alt="today clicks"
-                                    width={24}
-                                    height={24}
-                                />
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {getChangeIndicator(analytics?.todayClicks || 0, analytics?.yesterdayClicks || 0)}
-                                {isConnected && (
-                                    <div className="animate-pulse bg-emerald-500 w-2 h-2 rounded-full"></div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">
-                                Today's Clicks
+                    {/* This Week */}
+                    <div className="bg-white rounded-lg shadow-sm border p-4">
+                        <h3 className="text-sm font-medium text-gray-600 mb-2">
+                            {t('analytics.stats.this_week') || 'This Week'}
+                        </h3>
+                        <div className="space-y-1">
+                            <p className="text-lg font-bold text-blue-600">
+                                {analytics?.thisWeekViews || 0} {t('analytics.stats.views') || 'views'}
                             </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.todayClicks?.toLocaleString() || '0'}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                                Yesterday: {analytics?.yesterdayClicks || 0}
+                            <p className="text-lg font-bold text-indigo-600">
+                                {analytics?.thisWeekClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
                             </p>
                         </div>
                     </div>
 
-                    {/* This Week Clicks */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="bg-pink-100 p-3 rounded-lg">
-                                <Image 
-                                    src="https://linktree.sirv.com/Images/icons/links.svg"
-                                    alt="week clicks"
-                                    width={24}
-                                    height={24}
-                                />
-                            </div>
-                            {isConnected && (
-                                <div className="animate-pulse bg-pink-500 w-2 h-2 rounded-full"></div>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">
-                                This Week Clicks
+                    {/* This Month */}
+                    <div className="bg-white rounded-lg shadow-sm border p-4">
+                        <h3 className="text-sm font-medium text-gray-600 mb-2">
+                            {t('analytics.stats.this_month') || 'This Month'}
+                        </h3>
+                        <div className="space-y-1">
+                            <p className="text-lg font-bold text-blue-600">
+                                {analytics?.thisMonthViews || 0} {t('analytics.stats.views') || 'views'}
                             </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.thisWeekClicks?.toLocaleString() || '0'}
+                            <p className="text-lg font-bold text-indigo-600">
+                                {analytics?.thisMonthClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
                             </p>
                         </div>
                     </div>
 
-                    {/* This Month Clicks */}
-                    <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="bg-yellow-100 p-3 rounded-lg">
-                                <Image 
-                                    src="https://linktree.sirv.com/Images/icons/links.svg"
-                                    alt="month clicks"
-                                    width={24}
-                                    height={24}
-                                />
-                            </div>
-                            {isConnected && (
-                                <div className="animate-pulse bg-yellow-500 w-2 h-2 rounded-full"></div>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-gray-600">
-                                This Month Clicks
+                    {/* All Time */}
+                    <div className="bg-white rounded-lg shadow-sm border p-4">
+                        <h3 className="text-sm font-medium text-gray-600 mb-2">
+                            {t('analytics.stats.all_time') || 'All Time'}
+                        </h3>
+                        <div className="space-y-1">
+                            <p className="text-lg font-bold text-blue-600">
+                                {analytics?.totalViews || 0} {t('analytics.stats.views') || 'views'}
                             </p>
-                            <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
-                                {analytics?.thisMonthClicks?.toLocaleString() || '0'}
+                            <p className="text-lg font-bold text-indigo-600">
+                                {analytics?.totalClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
                             </p>
                         </div>
                     </div>
@@ -467,47 +461,47 @@ export default function AnalyticsPage() {
 
             {/* Top Clicked Links */}
             {analytics?.topLinks?.length > 0 && (
-                <div className="mb-6">
+                <div className="mb-8">
                     <div className="bg-white rounded-xl shadow-sm border p-6">
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-semibold text-gray-900">
-                                Top Clicked Links
+                                {t('analytics.top_clicked_links') || 'Top Clicked Links'}
                             </h2>
                             {isConnected && (
                                 <div className="flex items-center gap-2 text-sm text-green-600">
                                     <div className="animate-pulse bg-green-500 w-2 h-2 rounded-full"></div>
-                                    <span>Real-time updates</span>
+                                    <span>{t('analytics.real_time_updates') || 'Real-time updates'}</span>
                                 </div>
                             )}
                         </div>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {analytics.topLinks.map((link, index) => (
-                                <div key={link.linkId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium">
+                                <div key={link.linkId} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                                             #{index + 1}
                                         </div>
-                                        <div>
+                                        <div className="flex-1">
                                             <p className="font-medium text-gray-900 truncate max-w-xs">
-                                                {link.title || 'Untitled Link'}
+                                                {link.title || t('analytics.untitled_link') || 'Untitled Link'}
                                             </p>
                                             <p className="text-sm text-gray-500 truncate max-w-xs">
                                                 {link.url}
                                             </p>
                                             {link.lastClicked && (
                                                 <p className="text-xs text-gray-400">
-                                                    Last clicked: {new Date(link.lastClicked.seconds * 1000).toLocaleDateString()}
+                                                    {t('analytics.last_clicked') || 'Last clicked'}: {new Date(link.lastClicked.seconds * 1000).toLocaleDateString()}
                                                 </p>
                                             )}
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold text-gray-900">
+                                        <p className="text-2xl font-bold text-gray-900">
                                             {link.totalClicks?.toLocaleString() || 0}
                                         </p>
                                         <p className="text-sm text-gray-500">
-                                            clicks
+                                            {t('analytics.stats.clicks') || 'clicks'}
                                         </p>
                                     </div>
                                 </div>
@@ -518,7 +512,7 @@ export default function AnalyticsPage() {
             )}
 
             {/* Recent Activity */}
-            <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 flex-1">
+            <div className="bg-white rounded-xl shadow-sm border p-6 flex-1">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">
                         {t('analytics.recent_activity') || 'Recent Activity'}
@@ -580,10 +574,10 @@ export default function AnalyticsPage() {
                                     </div>
                                     <div>
                                         <p className="font-medium text-gray-900">
-                                            Link Clicks
+                                            {t('analytics.link_clicks') || 'Link Clicks'}
                                         </p>
                                         <p className="text-sm text-gray-600">
-                                            Total interactions with your links
+                                            {t('analytics.total_interactions_description') || 'Total interactions with your links'}
                                         </p>
                                     </div>
                                 </div>
@@ -592,7 +586,7 @@ export default function AnalyticsPage() {
                                         {analytics?.totalClicks?.toLocaleString()}
                                     </p>
                                     <p className="text-sm text-gray-600">
-                                        clicks
+                                        {t('analytics.stats.clicks') || 'clicks'}
                                     </p>
                                 </div>
                             </div>

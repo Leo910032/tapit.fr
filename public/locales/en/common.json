@@ -193,31 +193,7 @@
     
     "twitter_description": "Add your Linktree to your Twitter profile. Simply copy your Linktree URL, go to your profile, click on Edit Profile, and paste your Linktree URL into the Website field."
   },
-   "analytics": {
-    "profile": "Profile:",
-    "title": "Analytics Dashboard",
-    "subtitle": "Track your profile views and engagement",
-    "total_views": "Total Views",
-    "today_views": "Today's Views",
-    "week_views": "This Week",
-    "month_views": "This Month",
-    "recent_activity": "Recent Activity",
-    "no_views_yet": "No views yet",
-    "share_to_track": "Share your profile to start tracking views!",
-    "last_updated": "Last updated",
-    "live_connection": "Live",
-    "disconnected": "Disconnected",
-    "real_time_updates": "Real-time updates",
-    "profile_views": "Profile Views",
-    "yesterday": "Yesterday",
-    "total": "Total",
-    "loading": "Loading analytics...",
-    "error_loading": "Error Loading Analytics",
-    "not_authenticated": "Not authenticated",
-    "user_data_not_found": "User data not found",
-    "failed_to_load": "Failed to load analytics data",
-    "failed_to_connect": "Failed to connect to analytics"
-  },
+  
    "qrcode": {
     "download_jpg": "Download JPG",
     "high_quality_image": "High quality image"
@@ -667,6 +643,56 @@
     "twenty_one_plus": "21+", 
     "twenty_five_plus": "25+",
     "sensitive_content": "Sensitive Content"
+  },
+
+
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Track your profile views and link clicks",
+    "profile": "Profile:",
+    "loading": "Loading analytics...",
+    "not_authenticated": "Not authenticated",
+    "user_data_not_found": "User data not found",
+    "failed_to_connect": "Failed to connect to analytics",
+    "failed_to_load": "Failed to load analytics data",
+    "error_loading": "Error Loading Analytics",
+    "live_connection": "Live",
+    "disconnected": "Disconnected",
+    "real_time_updates": "Real-time updates",
+    "profile_views": "Profile Views",
+    "link_clicks": "Link Clicks",
+    "recent_activity": "Recent Activity",
+    "last_updated": "Last updated",
+    "total": "Total",
+    "no_activity_yet": "No activity yet",
+    "share_to_track": "Share your profile to start tracking views and clicks!",
+    
+    "nav": {
+      "today": "Today",
+      "week": "Week", 
+      "month": "Month",
+      "all_time": "All Time"
+    },
+    "period": {
+      "today": "Today",
+      "this_week": "This Week",
+      "this_month": "This Month",
+      "all_time": "All Time"
+    },
+    "overview_title": "{{period}} Overview",
+    "complete_statistics": "Complete Statistics",
+    "stats": {
+      "today": "Today",
+      "this_week": "This Week", 
+      "this_month": "This Month",
+      "all_time": "All Time",
+      "views": "views",
+      "clicks": "clicks"
+    },
+    "top_clicked_links": "Top Clicked Links",
+    "untitled_link": "Untitled Link",
+    "last_clicked": "Last clicked",
+    "total_interactions_description": "Total interactions with your links"
   }
 
 }

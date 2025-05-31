@@ -1,4 +1,4 @@
-// app/[userId]/components/MyLinks.jsx (Updated to pass link IDs)
+// app/[userId]/components/MyLinks.jsx (Updated with better link ID passing)
 "use client"
 
 import { fireApp } from "@/important/firebase";
@@ -73,14 +73,33 @@ export default function MyLinks({ userId, hasSensitiveContent }) {
                         </span>
                     );
                 } else {
+                    // Ensure we have a proper linkId - use the link's ID or generate a fallback
+                    const linkId = link.id || `link_${index}_${Date.now()}`;
+                    
+                    // Determine link type more accurately
+                    let linkType = "custom";
+                    if (link.type === 0) {
+                        linkType = "header";
+                    } else if (link.urlKind && link.urlKind !== "") {
+                        linkType = link.urlKind.toLowerCase();
+                    }
+
+                    console.log("🔗 Rendering button:", {
+                        linkId,
+                        title: link.title,
+                        url: link.url,
+                        linkType,
+                        userId
+                    });
+
                     return (
                         <Button 
-                            key={link.id} 
+                            key={linkId} // Use linkId as key for better React reconciliation
                             content={hasSensitiveContent ? link.title : filterProperly(link.title)} 
                             url={link.url} 
                             userId={userId}
-                            linkId={link.id} // Pass the link ID for analytics
-                            linkType={link.urlKind || link.type === 1 ? "custom" : "header"} // Determine link type
+                            linkId={linkId} // Pass the link ID for analytics
+                            linkType={linkType} // Pass more specific link type
                         />
                     );
                 }

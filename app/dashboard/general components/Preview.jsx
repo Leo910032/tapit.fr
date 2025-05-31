@@ -109,8 +109,8 @@ export default function Preview() {
                         </div>
                         <div className="h-full w-full">
                             {/* Add preview=true parameter to distinguish from real visits */}
-                            <iframe src={`http://localhost:3000/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe>
-                            {/*<iframe src={`https://www.tapit.fr/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe> */}
+                            {/* <iframe src={`http://localhost:3000/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe>*/}
+                           <iframe src={`https://www.tapit.fr/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe> 
 
                         </div>
                     </div>

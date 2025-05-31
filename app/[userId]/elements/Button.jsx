@@ -1,4 +1,4 @@
-// app/[userId]/elements/Button.jsx (Updated with click tracking)
+// Fixed Button.jsx - Corrected username extraction
 "use client"
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
@@ -30,7 +30,8 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
     const [accentColor, setAccentColor] = useState([]);
     const [btnFontStyle, setBtnFontStyle] = useState(null);
     const [selectedFontClass, setSelectedFontClass] = useState("");
-    const [username, setUsername] = useState(""); // Store username for analytics
+    const [username, setUsername] = useState(""); // Store actual username for analytics
+    const [currentUserId, setCurrentUserId] = useState(""); // Store user ID
     const router = useRouter();
     const { t } = useTranslation();
 
@@ -45,25 +46,40 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
     });
 
     /**
-     * Handles link click tracking
+     * Handles link click tracking - FIXED VERSION
      */
-    const handleLinkClick = async () => {
-        if (!username || !linkId) return;
+    const handleLinkClick = async (e) => {
+        // Don't prevent default navigation, just track the click
+        console.log("🔥 Link clicked:", content);
+        console.log("📊 Tracking data:", { username, linkId, content, url, linkType });
+        
+        if (!username) {
+            console.warn("⚠️ No username available for click tracking");
+            return;
+        }
+
+        if (!linkId) {
+            console.warn("⚠️ No linkId provided for click tracking");
+            return;
+        }
 
         try {
-            // Record the click
-            await recordLinkClick(username, {
-                linkId: linkId || `link_${Date.now()}`, // Fallback ID if not provided
+            // Record the click using the actual username (not user ID)
+            recordLinkClick(username, {
+                linkId: linkId || `link_${Date.now()}`,
                 linkTitle: content,
                 linkUrl: url,
                 linkType: linkType
             }, {
                 userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
                 referrer: typeof window !== 'undefined' ? document.referrer : '',
-                recordDetailed: false // Set to true if you want detailed logs
+                recordDetailed: false
+            }).then(() => {
+                console.log("✅ Link click recorded successfully:", content);
+            }).catch((error) => {
+                console.error("❌ Failed to record link click:", error);
             });
 
-            console.log("✅ Link click recorded:", content);
         } catch (error) {
             console.error("❌ Failed to record link click:", error);
         }
@@ -111,38 +127,95 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
 
     useEffect(() => {
         async function fetchInfo() {
-            const currentUser = await fetchUserData(userId);
+            try {
+                const currentUser = await fetchUserData(userId);
 
-            if (!currentUser) {
-                router.push("/");
-                return;
-            }
-
-            // Store username for analytics
-            setUsername(currentUser.username);
-
-            const collectionRef = collection(fireApp, "AccountData");
-            const docRef = doc(collectionRef, `${currentUser}`);
-
-            onSnapshot(docRef, (docSnapshot) => {
-                if (!docSnapshot.exists()) {
+                if (!currentUser) {
+                    router.push("/");
                     return;
                 }
-                const { btnType, btnShadowColor, btnFontColor, themeFontColor, btnColor, selectedTheme, fontType } = docSnapshot.data();
-                const fontName = availableFonts_Classic[fontType ? fontType - 1 : 0];
-                setSelectedFontClass(fontName.class);
-                setThemeTextColour(themeFontColor ? themeFontColor : "");
-                setBtnColor(btnColor ? btnColor : "#fff");
-                setSelectedTheme(selectedTheme);
-                setBtnFontColor(btnFontColor ? btnFontColor : "#000");
-                setBtnShadowColor(btnShadowColor ? btnShadowColor : "#000");
-                setBtnType(btnType);
-            });
+
+                console.log("👤 Current user data:", currentUser);
+
+                // FIXED: Properly extract username and userId
+                let actualUsername = '';
+                let actualUserId = '';
+
+                // Check if currentUser is a string (user ID) or object (user data)
+                if (typeof currentUser === 'string') {
+                    // currentUser is the user ID, we need to get the username from AccountData
+                    actualUserId = currentUser;
+                    
+                    // Get username from AccountData collection
+                    const collectionRef = collection(fireApp, "AccountData");
+                    const docRef = doc(collectionRef, currentUser);
+                    
+                    onSnapshot(docRef, (docSnapshot) => {
+                        if (docSnapshot.exists()) {
+                            const accountData = docSnapshot.data();
+                            console.log("📋 Account data:", accountData);
+                            
+                            // Try to get username from different possible fields
+                            if (accountData.username) {
+                                actualUsername = accountData.username;
+                            } else if (accountData.displayName) {
+                                actualUsername = accountData.displayName;
+                            } else {
+                                // Fallback: use the userId from URL parameter
+                                actualUsername = userId;
+                            }
+                            
+                            console.log("🎯 Setting username to:", actualUsername);
+                            setUsername(actualUsername);
+                            setCurrentUserId(actualUserId);
+                            
+                            // Apply other styling data
+                            const { btnType, btnShadowColor, btnFontColor, themeFontColor, btnColor, selectedTheme, fontType } = accountData;
+                            const fontName = availableFonts_Classic[fontType ? fontType - 1 : 0];
+                            setSelectedFontClass(fontName?.class || '');
+                            setThemeTextColour(themeFontColor ? themeFontColor : "");
+                            setBtnColor(btnColor ? btnColor : "#fff");
+                            setSelectedTheme(selectedTheme);
+                            setBtnFontColor(btnFontColor ? btnFontColor : "#000");
+                            setBtnShadowColor(btnShadowColor ? btnShadowColor : "#000");
+                            setBtnType(btnType);
+                        }
+                    });
+                } else if (currentUser.username) {
+                    // currentUser is an object with username
+                    actualUsername = currentUser.username;
+                    actualUserId = currentUser.userId || currentUser.id;
+                    setUsername(actualUsername);
+                    setCurrentUserId(actualUserId);
+                } else {
+                    // Fallback: use the userId parameter as username
+                    actualUsername = userId;
+                    setUsername(actualUsername);
+                    setCurrentUserId(userId);
+                }
+
+            } catch (error) {
+                console.error("❌ Error in fetchInfo:", error);
+            }
         }
 
         fetchInfo();
     }, [router, userId]);
 
+    // Log for debugging
+    useEffect(() => {
+        console.log("🔍 Button debug info:", {
+            username,
+            currentUserId,
+            linkId,
+            content,
+            url,
+            linkType,
+            userId
+        });
+    }, [username, currentUserId, linkId, content, url, linkType, userId]);
+
+    // Rest of your styling useEffects remain the same...
     useEffect(() => {
         if (selectedTheme === "3D Blocks") {
             const rootName = getRootNameFromUrl(url);
@@ -323,7 +396,7 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
         }
     }, [btnType, selectedTheme, modifierStyles.backgroundColor, url]);
 
-    // Rest of the styling useEffects remain the same...
+    // Rest of your useEffects for styling...
     useEffect(() => {
         if (selectedTheme === "3D Blocks") {
             return;
@@ -426,7 +499,7 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
                 className={`cursor-pointer flex gap-3 items-center min-h-10 py-3 px-3 flex-1`}
                 href={makeValidUrl(url)}
                 target="_blank"
-                onClick={handleLinkClick} // Add click tracking
+                onClick={handleLinkClick}
             >
                 {specialElements}
                 <IconDiv url={url} />
@@ -457,7 +530,7 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
                 href={makeValidUrl(url)}
                 target="_blank"
                 ref={urlRef}
-                onClick={handleLinkClick} // Add click tracking
+                onClick={handleLinkClick}
             >
                 <div className="grid place-items-center">
                     <Image
