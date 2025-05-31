@@ -1,3 +1,4 @@
+// app/[userId]/House.jsx
 "use client"
 import ProfilePic from "./components/ProfilePic";
 import UserInfo from "./components/UserInfo";
@@ -42,7 +43,11 @@ export default function House({ userId }) {
     // Record profile view
     useEffect(() => {
         async function recordView() {
-            if (!viewRecorded && userId) {
+            // Check if this is a preview - don't record views for previews
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPreview = urlParams.get('preview') === 'true';
+            
+            if (!viewRecorded && userId && !isPreview) {
                 try {
                     // Get some basic viewer info (without compromising privacy)
                     const viewerInfo = {

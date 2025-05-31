@@ -1,3 +1,4 @@
+// app/dashboard/general components/Preview.jsx
 "use client"
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -107,7 +108,8 @@ export default function Preview() {
                             <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className=" mix-blend-screen" />
                         </div>
                         <div className="h-full w-full">
-                            <iframe src={`https://www.tapit.fr/${username}`} frameBorder="0" className='h-full bg-white w-full'></iframe>
+                            {/* Add preview=true parameter to distinguish from real visits */}
+                            <iframe src={`https://www.tapit.fr/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe>
                         </div>
                     </div>
                 </div>
