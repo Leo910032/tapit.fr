@@ -1,3 +1,4 @@
+// app/[userId]/elements/Button.jsx (Updated with click tracking)
 "use client"
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
@@ -15,8 +16,9 @@ import ButtonText from "./ButtonText";
 import { FaCopy } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "@/lib/useTranslation";
+import { recordLinkClick } from "@/lib/analytics/linkClickTracker";
 
-export default function Button({ url, content, userId }) {
+export default function Button({ url, content, userId, linkId, linkType = "custom" }) {
     const [modifierClass, setModifierClass] = useState("");
     const [specialElements, setSpecialElements] = useState(null);
     const [selectedTheme, setSelectedTheme] = useState('');
@@ -28,6 +30,7 @@ export default function Button({ url, content, userId }) {
     const [accentColor, setAccentColor] = useState([]);
     const [btnFontStyle, setBtnFontStyle] = useState(null);
     const [selectedFontClass, setSelectedFontClass] = useState("");
+    const [username, setUsername] = useState(""); // Store username for analytics
     const router = useRouter();
     const { t } = useTranslation();
 
@@ -40,6 +43,31 @@ export default function Button({ url, content, userId }) {
         color: "",
         boxShadow: "",
     });
+
+    /**
+     * Handles link click tracking
+     */
+    const handleLinkClick = async () => {
+        if (!username || !linkId) return;
+
+        try {
+            // Record the click
+            await recordLinkClick(username, {
+                linkId: linkId || `link_${Date.now()}`, // Fallback ID if not provided
+                linkTitle: content,
+                linkUrl: url,
+                linkType: linkType
+            }, {
+                userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
+                referrer: typeof window !== 'undefined' ? document.referrer : '',
+                recordDetailed: false // Set to true if you want detailed logs
+            });
+
+            console.log("✅ Link click recorded:", content);
+        } catch (error) {
+            console.error("❌ Failed to record link click:", error);
+        }
+    };
 
     /**
      * The `handleCopy` function copies a given URL to the clipboard and displays a success toast
@@ -81,7 +109,6 @@ export default function Button({ url, content, userId }) {
         }
     }
 
-
     useEffect(() => {
         async function fetchInfo() {
             const currentUser = await fetchUserData(userId);
@@ -90,6 +117,9 @@ export default function Button({ url, content, userId }) {
                 router.push("/");
                 return;
             }
+
+            // Store username for analytics
+            setUsername(currentUser.username);
 
             const collectionRef = collection(fireApp, "AccountData");
             const docRef = doc(collectionRef, `${currentUser}`);
@@ -191,6 +221,7 @@ export default function Button({ url, content, userId }) {
             return;
         }
 
+        // Rest of the button styling logic remains the same...
         switch (btnType) {
             case 0:
                 setModifierClass("");
@@ -292,6 +323,7 @@ export default function Button({ url, content, userId }) {
         }
     }, [btnType, selectedTheme, modifierStyles.backgroundColor, url]);
 
+    // Rest of the styling useEffects remain the same...
     useEffect(() => {
         if (selectedTheme === "3D Blocks") {
             return;
@@ -394,6 +426,7 @@ export default function Button({ url, content, userId }) {
                 className={`cursor-pointer flex gap-3 items-center min-h-10 py-3 px-3 flex-1`}
                 href={makeValidUrl(url)}
                 target="_blank"
+                onClick={handleLinkClick} // Add click tracking
             >
                 {specialElements}
                 <IconDiv url={url} />
@@ -424,6 +457,7 @@ export default function Button({ url, content, userId }) {
                 href={makeValidUrl(url)}
                 target="_blank"
                 ref={urlRef}
+                onClick={handleLinkClick} // Add click tracking
             >
                 <div className="grid place-items-center">
                     <Image

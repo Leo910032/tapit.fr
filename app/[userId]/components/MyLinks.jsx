@@ -1,3 +1,4 @@
+// app/[userId]/components/MyLinks.jsx (Updated to pass link IDs)
 "use client"
 
 import { fireApp } from "@/important/firebase";
@@ -59,15 +60,32 @@ export default function MyLinks({ userId, hasSensitiveContent }) {
     
     return (
         <div className={`flex flex-col gap-4 my-4 w-full px-5 py-1 items-center max-h-fit ${supportGroupStatus ? "pb-12" : ""}`}>
-            {socialPosition === 0 && socialArray.length > 0 && <Socials themeFontColor={themeFontColor} socialArray={socialArray} />}
+            {socialPosition === 0 && socialArray.length > 0 && <Socials themeFontColor={themeFontColor} socialArray={socialArray} userId={userId} />}
             {displayLinks.map((link, index) => {
                 if (link.type === 0) {
-                    return (<span key={index} style={{color: `${themeFontColor === "#000" ? themeTextColour : themeFontColor}`}} className="mx-auto font-semibold text-sm mt-2">{hasSensitiveContent ? link.title : filterProperly(link.title)}</span>);
-                }else{
-                    return (<Button key={link.id} content={hasSensitiveContent ? link.title : filterProperly(link.title)} url={link.url} userId={userId} />);
+                    return (
+                        <span 
+                            key={index} 
+                            style={{color: `${themeFontColor === "#000" ? themeTextColour : themeFontColor}`}} 
+                            className="mx-auto font-semibold text-sm mt-2"
+                        >
+                            {hasSensitiveContent ? link.title : filterProperly(link.title)}
+                        </span>
+                    );
+                } else {
+                    return (
+                        <Button 
+                            key={link.id} 
+                            content={hasSensitiveContent ? link.title : filterProperly(link.title)} 
+                            url={link.url} 
+                            userId={userId}
+                            linkId={link.id} // Pass the link ID for analytics
+                            linkType={link.urlKind || link.type === 1 ? "custom" : "header"} // Determine link type
+                        />
+                    );
                 }
             })}
-            {socialPosition === 1 && socialArray.length > 0 && <Socials themeFontColor={themeFontColor} socialArray={socialArray} />}
+            {socialPosition === 1 && socialArray.length > 0 && <Socials themeFontColor={themeFontColor} socialArray={socialArray} userId={userId} />}
         </div>
     )
 }
