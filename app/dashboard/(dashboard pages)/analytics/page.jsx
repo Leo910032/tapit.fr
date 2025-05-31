@@ -1,11 +1,11 @@
-
 "use client"
 import React, { useEffect, useState } from "react";
-import { getAnalyticsData } from "@/lib/analytics/viewTracker";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { useTranslation } from "@/lib/useTranslation";
 import Image from "next/image";
+import { fireApp } from "@/important/firebase";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 
 export default function AnalyticsPage() {
     const { t } = useTranslation();
@@ -13,43 +13,121 @@ export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [username, setUsername] = useState("");
+    const [isConnected, setIsConnected] = useState(false);
 
     useEffect(() => {
-        async function loadAnalytics() {
+        let unsubscribe = null;
+
+        async function setupRealtimeAnalytics() {
             try {
                 const currentUser = testForActiveSession();
+                console.log("Setting up real-time analytics for user:", currentUser);
+                
                 if (!currentUser) {
-                    setError("Not authenticated");
+                    setError(t("analytics.not_authenticated") || "Not authenticated");
                     setLoading(false);
                     return;
                 }
 
                 const userData = await fetchUserData(currentUser);
+                
                 if (!userData) {
-                    setError("User data not found");
+                    setError(t("analytics.user_data_not_found") || "User data not found");
                     setLoading(false);
                     return;
                 }
 
                 setUsername(userData.username);
-                const analyticsData = await getAnalyticsData(userData.username);
-                setAnalytics(analyticsData);
+
+                // Set up real-time listener for analytics document
+                const analyticsRef = doc(collection(fireApp, "Analytics"), currentUser);
+                
+                unsubscribe = onSnapshot(analyticsRef, (docSnapshot) => {
+                    console.log("📊 Analytics update received!");
+                    setIsConnected(true);
+                    
+                    if (docSnapshot.exists()) {
+                        const data = docSnapshot.data();
+                        console.log("Analytics data updated:", data);
+                        
+                        // Calculate derived metrics
+                        const today = new Date().toISOString().split('T')[0];
+                        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                        
+                        const analyticsData = {
+                            totalViews: data.totalViews || 0,
+                            todayViews: data.dailyViews?.[today] || 0,
+                            yesterdayViews: data.dailyViews?.[yesterday] || 0,
+                            thisWeekViews: data.weeklyViews?.[getWeekKey()] || 0,
+                            thisMonthViews: data.monthlyViews?.[getMonthKey()] || 0,
+                            dailyViews: data.dailyViews || {},
+                            weeklyViews: data.weeklyViews || {},
+                            monthlyViews: data.monthlyViews || {},
+                            lastUpdated: data.lastUpdated,
+                            username: data.username
+                        };
+                        
+                        setAnalytics(analyticsData);
+                    } else {
+                        console.log("No analytics document found - initializing with zeros");
+                        // Document doesn't exist yet, show zeros
+                        setAnalytics({
+                            totalViews: 0,
+                            todayViews: 0,
+                            yesterdayViews: 0,
+                            thisWeekViews: 0,
+                            thisMonthViews: 0,
+                            dailyViews: {},
+                            weeklyViews: {},
+                            monthlyViews: {},
+                            username: userData.username
+                        });
+                    }
+                    
+                    setLoading(false);
+                }, (error) => {
+                    console.error("Error in analytics listener:", error);
+                    setError(t("analytics.failed_to_connect") || "Failed to connect to analytics");
+                    setIsConnected(false);
+                    setLoading(false);
+                });
+
             } catch (err) {
-                console.error("Error loading analytics:", err);
-                setError("Failed to load analytics data");
-            } finally {
+                console.error("Error setting up analytics:", err);
+                setError(t("analytics.failed_to_load") || "Failed to load analytics data");
                 setLoading(false);
             }
         }
 
-        loadAnalytics();
-    }, []);
+        setupRealtimeAnalytics();
+
+        // Cleanup function to unsubscribe from listener
+        return () => {
+            if (unsubscribe) {
+                console.log("🔌 Disconnecting analytics listener");
+                unsubscribe();
+            }
+        };
+    }, [t]);
+
+    // Helper functions for date calculations
+    function getWeekKey() {
+        const now = new Date();
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        const weekNumber = Math.ceil(((now - yearStart) / 86400000 + yearStart.getDay() + 1) / 7);
+        return `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`;
+    }
+
+    function getMonthKey() {
+        const now = new Date();
+        return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+    }
 
     if (loading) {
         return (
             <div className="flex items-center justify-center p-8 min-h-[400px]">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                <span className="ml-3">Loading analytics...</span>
+                <span className="ml-3">{t("analytics.loading") || "Loading analytics..."}</span>
             </div>
         );
     }
@@ -67,7 +145,9 @@ export default function AnalyticsPage() {
                             className="mx-auto opacity-50"
                         />
                     </div>
-                    <p className="text-lg font-semibold mb-2">Error Loading Analytics</p>
+                    <p className="text-lg font-semibold mb-2">
+                        {t("analytics.error_loading") || "Error Loading Analytics"}
+                    </p>
                     <p className="text-sm">{error}</p>
                 </div>
             </div>
@@ -94,25 +174,40 @@ export default function AnalyticsPage() {
     };
 
     return (
-        <div className="p-6 max-w-6xl mx-auto">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    {t('analytics.title') || 'Analytics Dashboard'}
-                </h1>
-                <p className="text-gray-600">
-                    {t('analytics.subtitle') || 'Track your profile views and engagement'}
-                </p>
-                {username && (
-                    <p className="text-sm text-gray-500 mt-2">
-                        Profile: @{username}
-                    </p>
-                )}
+        <div className="p-4 lg:p-6 w-full h-full min-h-screen flex flex-col">
+            <div className="mb-6 lg:mb-8">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                            {t('analytics.title') || 'Analytics Dashboard'}
+                        </h1>
+                        <p className="text-gray-600">
+                            {t('analytics.subtitle') || 'Track your profile views and engagement'}
+                        </p>
+                        {username && (
+                            <p className="text-sm text-gray-500 mt-2">
+                                {t('analytics.profile') || 'Profile:'} @{username}
+                            </p>
+                        )}
+                    </div>
+                    
+                    {/* Real-time connection indicator */}
+                    <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <span className="text-sm text-gray-500">
+                            {isConnected ? 
+                                (t("analytics.live_connection") || "Live") : 
+                                (t("analytics.disconnected") || "Disconnected")
+                            }
+                        </span>
+                    </div>
+                </div>
             </div>
 
             {/* Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
                 {/* Total Views */}
-                <div className="bg-white rounded-xl shadow-sm border p-6">
+                <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
                     <div className="flex items-center justify-between mb-4">
                         <div className="bg-blue-100 p-3 rounded-lg">
                             <Image 
@@ -122,19 +217,22 @@ export default function AnalyticsPage() {
                                 height={24}
                             />
                         </div>
+                        {isConnected && (
+                            <div className="animate-pulse bg-blue-500 w-2 h-2 rounded-full"></div>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <p className="text-sm font-medium text-gray-600">
                             {t('analytics.total_views') || 'Total Views'}
                         </p>
-                        <p className="text-3xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
                             {analytics?.totalViews?.toLocaleString() || '0'}
                         </p>
                     </div>
                 </div>
 
                 {/* Today's Views */}
-                <div className="bg-white rounded-xl shadow-sm border p-6">
+                <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
                     <div className="flex items-center justify-between mb-4">
                         <div className="bg-green-100 p-3 rounded-lg">
                             <Image 
@@ -144,23 +242,28 @@ export default function AnalyticsPage() {
                                 height={24}
                             />
                         </div>
-                        {getChangeIndicator(analytics?.todayViews || 0, analytics?.yesterdayViews || 0)}
+                        <div className="flex items-center gap-2">
+                            {getChangeIndicator(analytics?.todayViews || 0, analytics?.yesterdayViews || 0)}
+                            {isConnected && (
+                                <div className="animate-pulse bg-green-500 w-2 h-2 rounded-full"></div>
+                            )}
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <p className="text-sm font-medium text-gray-600">
                             {t('analytics.today_views') || "Today's Views"}
                         </p>
-                        <p className="text-3xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
                             {analytics?.todayViews?.toLocaleString() || '0'}
                         </p>
                         <p className="text-xs text-gray-500">
-                            Yesterday: {analytics?.yesterdayViews || 0}
+                            {t('analytics.yesterday') || 'Yesterday'}: {analytics?.yesterdayViews || 0}
                         </p>
                     </div>
                 </div>
 
                 {/* This Week */}
-                <div className="bg-white rounded-xl shadow-sm border p-6">
+                <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
                     <div className="flex items-center justify-between mb-4">
                         <div className="bg-purple-100 p-3 rounded-lg">
                             <Image 
@@ -170,19 +273,22 @@ export default function AnalyticsPage() {
                                 height={24}
                             />
                         </div>
+                        {isConnected && (
+                            <div className="animate-pulse bg-purple-500 w-2 h-2 rounded-full"></div>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <p className="text-sm font-medium text-gray-600">
                             {t('analytics.week_views') || 'This Week'}
                         </p>
-                        <p className="text-3xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
                             {analytics?.thisWeekViews?.toLocaleString() || '0'}
                         </p>
                     </div>
                 </div>
 
                 {/* This Month */}
-                <div className="bg-white rounded-xl shadow-sm border p-6">
+                <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 transition-all duration-300 hover:shadow-md">
                     <div className="flex items-center justify-between mb-4">
                         <div className="bg-orange-100 p-3 rounded-lg">
                             <Image 
@@ -192,12 +298,15 @@ export default function AnalyticsPage() {
                                 height={24}
                             />
                         </div>
+                        {isConnected && (
+                            <div className="animate-pulse bg-orange-500 w-2 h-2 rounded-full"></div>
+                        )}
                     </div>
                     <div className="space-y-2">
                         <p className="text-sm font-medium text-gray-600">
                             {t('analytics.month_views') || 'This Month'}
                         </p>
-                        <p className="text-3xl font-bold text-gray-900">
+                        <p className="text-3xl font-bold text-gray-900 transition-all duration-500">
                             {analytics?.thisMonthViews?.toLocaleString() || '0'}
                         </p>
                     </div>
@@ -205,10 +314,18 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    {t('analytics.recent_activity') || 'Recent Activity'}
-                </h2>
+            <div className="bg-white rounded-xl shadow-sm border p-4 lg:p-6 flex-1">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900">
+                        {t('analytics.recent_activity') || 'Recent Activity'}
+                    </h2>
+                    {isConnected && (
+                        <div className="flex items-center gap-2 text-sm text-green-600">
+                            <div className="animate-pulse bg-green-500 w-2 h-2 rounded-full"></div>
+                            <span>{t('analytics.real_time_updates') || 'Real-time updates'}</span>
+                        </div>
+                    )}
+                </div>
                 
                 {analytics && analytics.totalViews > 0 ? (
                     <div className="space-y-4">
@@ -223,20 +340,24 @@ export default function AnalyticsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-gray-900">Profile Views</p>
+                                    <p className="font-medium text-gray-900">
+                                        {t('analytics.profile_views') || 'Profile Views'}
+                                    </p>
                                     <p className="text-sm text-gray-600">
                                         {analytics?.lastUpdated ? 
-                                            `Last updated: ${new Date(analytics.lastUpdated.seconds * 1000).toLocaleDateString()}` :
+                                            `${t('analytics.last_updated') || 'Last updated'}: ${new Date(analytics.lastUpdated.seconds * 1000).toLocaleDateString()}` :
                                             'No recent activity'
                                         }
                                     </p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="font-semibold text-gray-900">
+                                <p className="font-semibold text-gray-900 transition-all duration-500">
                                     {analytics?.totalViews?.toLocaleString()}
                                 </p>
-                                <p className="text-sm text-gray-600">Total</p>
+                                <p className="text-sm text-gray-600">
+                                    {t('analytics.total') || 'Total'}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -249,9 +370,11 @@ export default function AnalyticsPage() {
                             height={48}
                             className="mx-auto mb-4 opacity-50"
                         />
-                        <p className="text-gray-600 mb-2">No views yet</p>
+                        <p className="text-gray-600 mb-2">
+                            {t('analytics.no_views_yet') || 'No views yet'}
+                        </p>
                         <p className="text-sm text-gray-500">
-                            Share your profile to start tracking views!
+                            {t('analytics.share_to_track') || 'Share your profile to start tracking views!'}
                         </p>
                         {username && (
                             <div className="mt-4">
@@ -266,22 +389,3 @@ export default function AnalyticsPage() {
         </div>
     );
 }
-
-
-{/*import GoogleMaps from './components/GoogleMaps';
-
-export default function AnalyticsPage() {
-    return (
-        <div className="flex-1 py-2 flex flex-col max-h-full overflow-y-auto">
-            <div className="w-full bg-white rounded-3xl my-3 flex flex-col p-6">
-                <h2 className="text-xl font-semibold mb-4">Analytics Map</h2>
-                <p className="text-gray-600 mb-6">
-                    View geographic data and analytics for your Linktree profile.
-                </p>
-                <div className="w-full">
-                    <GoogleMaps />
-                </div>
-            </div>
-        </div>
-    )
-} */}

@@ -51,6 +51,7 @@ export default function House({ userId }) {
                         recordDetailed: false // Set to true if you want detailed logs
                     };
 
+                    // userId here is actually the username from the URL parameter
                     await recordProfileView(userId, viewerInfo);
                     setViewRecorded(true);
                 } catch (error) {
