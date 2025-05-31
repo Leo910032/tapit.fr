@@ -11,10 +11,9 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
     const [isLoaded, setIsLoaded] = useState(false);
     const [error, setError] = useState(null);
 
-    // Filter contacts that have location data
-    const contactsWithLocation = contacts.filter(contact => 
-        contact.location && 
-        contact.location.latitude && 
+    const contactsWithLocation = contacts.filter(contact =>
+        contact.location &&
+        contact.location.latitude &&
         contact.location.longitude &&
         !isNaN(contact.location.latitude) &&
         !isNaN(contact.location.longitude)
@@ -26,204 +25,160 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
         const initializeMap = async () => {
             try {
                 const loader = new Loader({
-                    apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyATAmD5lVb1jZe6pGoeZGF5OU-8-hrLeF4",
-                    version: 'weekly',
-                    libraries: ['maps', 'marker']
+                    apiKey: process.env.NEXT_PUBLIC_Maps_API_KEY || "AIzaSyATAmD5lVb1jZe6pGoeZGF5OU-8-hrLeF4", //
+                    version: 'weekly', //
+                    libraries: ['maps', 'marker'] //
                 });
 
-                const { Map } = await loader.importLibrary('maps');
-                const { AdvancedMarkerElement } = await loader.importLibrary('marker');
+                const { Map } = await loader.importLibrary('maps'); //
+                const { AdvancedMarkerElement } = await loader.importLibrary('marker'); //
 
                 if (!isMounted || !mapRef.current) return;
 
-                // Calculate center point from contacts or use default
-                let centerLocation = { lat: 39.60128890889341, lng: -9.069839810859907 };
-                let initialZoom = 15;
-                
-                if (contactsWithLocation.length > 0) {
-                    if (contactsWithLocation.length === 1) {
-                        // Single contact - center on that contact
-                        centerLocation = { 
-                            lat: contactsWithLocation[0].location.latitude, 
-                            lng: contactsWithLocation[0].location.longitude 
+                let centerLocation = { lat: 39.60128890889341, lng: -9.069839810859907 }; //
+                let initialZoom = 15; //
+
+                if (contactsWithLocation.length > 0) { //
+                    if (contactsWithLocation.length === 1) { //
+                        centerLocation = {
+                            lat: contactsWithLocation[0].location.latitude, //
+                            lng: contactsWithLocation[0].location.longitude //
                         };
-                        initialZoom = 16;
+                        initialZoom = 16; //
                     } else {
-                        // Multiple contacts - calculate center
-                        const avgLat = contactsWithLocation.reduce((sum, contact) => 
-                            sum + contact.location.latitude, 0) / contactsWithLocation.length;
-                        const avgLng = contactsWithLocation.reduce((sum, contact) => 
-                            sum + contact.location.longitude, 0) / contactsWithLocation.length;
-                        
-                        centerLocation = { lat: avgLat, lng: avgLng };
-                        initialZoom = 10;
+                        const avgLat = contactsWithLocation.reduce((sum, contact) =>
+                            sum + contact.location.latitude, 0) / contactsWithLocation.length; //
+                        const avgLng = contactsWithLocation.reduce((sum, contact) =>
+                            sum + contact.location.longitude, 0) / contactsWithLocation.length; //
+                        centerLocation = { lat: avgLat, lng: avgLng }; //
+                        initialZoom = 10; //
                     }
                 }
 
                 const mapOptions = {
-                    center: centerLocation,
-                    zoom: initialZoom,
-                    mapId: 'CONTACTS_MAP_ID',
-                    gestureHandling: 'greedy',
-                    disableDefaultUI: false,
-                    mapTypeControl: true,
-                    streetViewControl: true,
-                    fullscreenControl: true,
-                    zoomControl: true,
-                    clickableIcons: false,
-                    keyboardShortcuts: false,
-                    styles: [
+                    center: centerLocation, //
+                    zoom: initialZoom, //
+                    mapId: 'CONTACTS_MAP_ID', //
+                    gestureHandling: 'greedy', //
+                    disableDefaultUI: false, //
+                    mapTypeControl: true, //
+                    streetViewControl: true, //
+                    fullscreenControl: true, //
+                    zoomControl: true, //
+                    clickableIcons: false, //
+                    keyboardShortcuts: false, //
+                    styles: [ //
                         {
-                            featureType: 'poi',
-                            elementType: 'labels',
-                            stylers: [{ visibility: 'off' }]
+                            featureType: 'poi', //
+                            elementType: 'labels', //
+                            stylers: [{ visibility: 'off' }] //
                         }
                     ]
                 };
 
-                const map = new Map(mapRef.current, mapOptions);
-                mapInstanceRef.current = map;
+                const map = new Map(mapRef.current, mapOptions); //
+                mapInstanceRef.current = map; //
 
-                // Clear existing markers
-                markersRef.current.forEach(marker => {
-                    if (marker.map) marker.map = null;
+                markersRef.current.forEach(marker => { //
+                    if (marker.map) marker.map = null; //
                 });
-                markersRef.current = [];
+                markersRef.current = []; //
 
-                // Create markers for each contact with location
-                contactsWithLocation.forEach((contact, index) => {
+                contactsWithLocation.forEach((contact) => { //
                     const position = {
-                        lat: contact.location.latitude,
-                        lng: contact.location.longitude
+                        lat: contact.location.latitude, //
+                        lng: contact.location.longitude //
                     };
 
-                    // Create custom marker element
-                    const markerElement = document.createElement('div');
-                    markerElement.className = `contact-marker ${selectedContactId === contact.id ? 'selected' : ''}`;
-                    
-                    // Determine marker color based on contact status
-                    let statusColor = 'from-blue-400 to-purple-500'; // default
-                    if (contact.status === 'new') statusColor = 'from-blue-500 to-blue-600';
-                    if (contact.status === 'viewed') statusColor = 'from-green-500 to-green-600';
-                    if (contact.status === 'archived') statusColor = 'from-gray-400 to-gray-500';
-                    
+                    const markerElement = document.createElement('div'); //
+                    markerElement.className = 'contact-marker'; //
+                    if (selectedContactId === contact.id) { //
+                        markerElement.classList.add('selected'); //
+                    }
+
+                    let statusColor = 'from-blue-400 to-purple-500'; //
+                    if (contact.status === 'new') statusColor = 'from-blue-500 to-blue-600'; //
+                    if (contact.status === 'viewed') statusColor = 'from-green-500 to-green-600'; //
+                    if (contact.status === 'archived') statusColor = 'from-gray-400 to-gray-500'; //
+
                     markerElement.innerHTML = `
                         <div class="marker-content">
                             <div class="marker-avatar bg-gradient-to-br ${statusColor}">${contact.name.charAt(0).toUpperCase()}</div>
                             <div class="marker-label">${contact.name}</div>
                             <div class="marker-info">${contact.email}</div>
                         </div>
-                    `;
+                    `; //
 
-                    const marker = new AdvancedMarkerElement({
-                        map,
-                        position,
-                        content: markerElement,
-                        title: `${contact.name} - ${contact.email}`,
+                    const marker = new AdvancedMarkerElement({ //
+                        map, //
+                        position, //
+                        content: markerElement, //
+                        title: `${contact.name} - ${contact.email}`, //
                     });
 
-                    // Add click listener
-                    markerElement.addEventListener('click', () => {
-                        // Remove selected class from all markers
-                        markersRef.current.forEach(m => {
-                            if (m.content) {
-                                m.content.classList.remove('selected');
-                            }
+                    markerElement.addEventListener('click', () => { //
+                        markersRef.current.forEach(m => { //
+                            m.content?.classList.remove('selected'); //
                         });
-                        
-                        // Add selected class to clicked marker
-                        markerElement.classList.add('selected');
-                        
-                        // Call callback if provided
-                        if (onMarkerClick) {
-                            onMarkerClick(contact);
+                        markerElement.classList.add('selected'); //
+                        if (onMarkerClick) { //
+                            onMarkerClick(contact); //
                         }
-                        
-                        // Center map on marker with smooth animation
-                        map.panTo(position);
-                        if (map.getZoom() < 16) {
-                            map.setZoom(16);
+                        map.panTo(position); //
+                        if (map.getZoom() < 16) { //
+                            map.setZoom(16); //
                         }
                     });
 
-                    // Add hover effects
-                    markerElement.addEventListener('mouseenter', () => {
-                        markerElement.style.transform = 'scale(1.1)';
-                        markerElement.style.zIndex = '1000';
-                    });
-
-                    markerElement.addEventListener('mouseleave', () => {
-                        if (!markerElement.classList.contains('selected')) {
-                            markerElement.style.transform = 'scale(1)';
-                            markerElement.style.zIndex = '1';
-                        }
-                    });
-
-                    markersRef.current.push(marker);
+                    markersRef.current.push(marker); //
                 });
 
-                // Fit map to show all markers if multiple contacts
-                if (contactsWithLocation.length > 1) {
-                    const bounds = new google.maps.LatLngBounds();
-                    contactsWithLocation.forEach(contact => {
-                        bounds.extend({
-                            lat: contact.location.latitude,
-                            lng: contact.location.longitude
+                if (contactsWithLocation.length > 1) { //
+                    const bounds = new google.maps.LatLngBounds(); //
+                    contactsWithLocation.forEach(contact => { //
+                        bounds.extend({ //
+                            lat: contact.location.latitude, //
+                            lng: contact.location.longitude //
                         });
                     });
-                    map.fitBounds(bounds, { padding: 50 });
+                    map.fitBounds(bounds, { padding: 50 }); //
                 }
 
-                // If there's a selected contact, highlight it
-                if (selectedContactId) {
-                    const selectedMarker = markersRef.current.find(marker => {
-                        const contact = contactsWithLocation.find(c => c.id === selectedContactId);
-                        return contact && marker.position.lat === contact.location.latitude;
-                    });
-                    
-                    if (selectedMarker && selectedMarker.content) {
-                        selectedMarker.content.classList.add('selected');
-                        selectedMarker.content.style.transform = 'scale(1.2)';
-                        selectedMarker.content.style.zIndex = '1000';
-                    }
-                }
-
-                map.addListener('idle', () => {
-                    if (isMounted) {
-                        setIsLoaded(true);
-                    }
+                map.addListener('idle', () => { //
+                    if (isMounted) setIsLoaded(true); //
                 });
 
-                const handleResize = () => {
-                    if (mapInstanceRef.current) {
-                        google.maps.event.trigger(mapInstanceRef.current, 'resize');
+                const handleResize = () => { //
+                    if (mapInstanceRef.current) { //
+                        google.maps.event.trigger(mapInstanceRef.current, 'resize'); //
                     }
                 };
+                window.addEventListener('resize', handleResize); //
 
-                window.addEventListener('resize', handleResize);
-
-                return () => {
-                    window.removeEventListener('resize', handleResize);
+                return () => { //
+                    window.removeEventListener('resize', handleResize); //
                 };
 
-            } catch (error) {
-                console.error('Error loading Google Maps:', error);
-                setError(`Failed to load Google Maps: ${error.message}`);
-                setIsLoaded(true);
+            } catch (error) { //
+                console.error('Error loading Google Maps:', error); //
+                setError(`Failed to load Google Maps: ${error.message}`); //
+                setIsLoaded(true); //
             }
         };
 
-        if (mapRef.current) {
-            initializeMap();
+        if (mapRef.current) { //
+            initializeMap(); //
         }
 
-        return () => {
-            isMounted = false;
+        return () => { //
+            isMounted = false; //
         };
     }, [contacts, selectedContactId]);
 
-    // No contacts with location
-    if (contactsWithLocation.length === 0) {
+    // ... The rest of your component's JSX remains the same ...
+    // Make sure to remove the <style jsx> block entirely.
+
+    if (contactsWithLocation.length === 0) { //
         return (
             <div className="h-[600px] w-full rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center">
                 <div className="text-center p-6 max-w-md">
@@ -239,7 +194,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                     </p>
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                         <p className="text-xs text-blue-700">
-                            💡 Tip: Location tracking helps you understand your audience's geographic distribution and can be useful for local networking or events.
+💡 Tip: Location tracking helps you understand your audience&#39;s geographic distribution and can be useful for local networking or events.
                         </p>
                     </div>
                 </div>
@@ -247,7 +202,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
         );
     }
 
-    if (error) {
+    if (error) { //
         return (
             <div className="h-[600px] w-full rounded-lg border border-red-200 bg-red-50 flex items-center justify-center">
                 <div className="text-center p-6 max-w-md">
@@ -268,85 +223,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
 
     return (
         <>
-            <style jsx>{`
-                .contact-marker {
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    position: relative;
-                    z-index: 1;
-                }
-                .contact-marker:hover {
-                    transform: scale(1.1);
-                    z-index: 1000;
-                }
-                .contact-marker.selected {
-                    transform: scale(1.2);
-                    z-index: 1000;
-                }
-                .marker-content {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 4px;
-                    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-                }
-                .marker-avatar {
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    color: white;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    font-size: 14px;
-                    border: 3px solid white;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                    transition: all 0.2s ease;
-                }
-                .marker-label {
-                    background: white;
-                    padding: 4px 8px;
-                    border-radius: 12px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    color: #374151;
-                    border: 1px solid #e5e7eb;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    white-space: nowrap;
-                    max-width: 120px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-                .marker-info {
-                    background: rgba(59, 130, 246, 0.9);
-                    color: white;
-                    padding: 2px 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    font-weight: 500;
-                    white-space: nowrap;
-                    max-width: 140px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    opacity: 0;
-                    transition: opacity 0.2s ease;
-                }
-                .contact-marker:hover .marker-info,
-                .contact-marker.selected .marker-info {
-                    opacity: 1;
-                }
-                .contact-marker.selected .marker-avatar {
-                    border-color: #f59e0b;
-                    box-shadow: 0 0 0 2px #fbbf24, 0 4px 12px rgba(0,0,0,0.2);
-                }
-                .contact-marker.selected .marker-label {
-                    background: #fbbf24;
-                    color: #92400e;
-                    border-color: #f59e0b;
-                }
-            `}</style>
-            
+            {/* The <style jsx> block has been removed from here */}
             <div className="relative">
                 {!isLoaded && (
                     <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center z-10">
@@ -360,17 +237,10 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                 )}
                 
                 <div 
-                    className="h-[600px] w-full rounded-lg overflow-hidden border border-gray-200" 
+                    className="h-[600px] w-full rounded-lg overflow-hidden border border-gray-200"
                     ref={mapRef}
-                    style={{
-                        transform: 'translateZ(0)',
-                        backfaceVisibility: 'hidden',
-                        willChange: 'transform',
-                        transition: 'none !important',
-                    }}
                 />
                 
-                {/* Map Legend */}
                 {isLoaded && (
                     <div className="absolute top-4 left-4 bg-white p-4 rounded-lg shadow-lg border max-w-xs">
                         <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
@@ -403,10 +273,9 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                     </div>
                 )}
 
-                {/* Zoom Controls Info */}
                 {isLoaded && contactsWithLocation.length > 1 && (
                     <div className="absolute bottom-4 left-4 bg-white p-2 rounded-lg shadow border text-xs text-gray-500">
-                        💡 Click any marker to focus on that contact's location
+💡 Click any marker to focus on that contact&#39;s location
                     </div>
                 )}
             </div>

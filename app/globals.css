@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @font-face {
   font-family: 'MariaFont';
   src: url('https://linktree.sirv.com/Images/Scene/Mario/SuperMario256.woff2') format('woff2'),
@@ -14,27 +13,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-
-}
-
-/* Add transition only to specific elements, not maps */
-*:not([class*="gm-"]):not([class*="google-"]):not(.gmap-container *) {
   transition: .25s ease-in-out;
-}
-.gmap-container,
-.gmap-container *,
-[class*="gm-"],
-[class*="google-"] {
-  transition: none !important;
-}
-
-*::selection {
-  background-color: rgb(58, 224, 154);
-  color: #fff;
-}
-.dashboard *::selection {
-  background-color: #3AE09A;
-  color: #fff;
 }
 
 *::selection {
@@ -257,4 +236,91 @@
 
 .MariaFont {
   font-family: "MariaFont", sans-serif;
+}
+/* STYLES FOR CONTACTS MAP MARKERS */
+.contact-marker {
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.2s ease, z-index 0.2s ease;
+}
+
+.contact-marker .marker-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.contact-marker .marker-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.contact-marker .marker-label {
+  background: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151; /* text-gray-700 */
+  border: 1px solid #e5e7eb; /* border-gray-200 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contact-marker .marker-info {
+  background: rgba(59, 130, 246, 0.9); /* bg-blue-600 with opacity */
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* HOVER AND SELECTED STATES */
+.contact-marker:hover {
+  transform: scale(1.1);
+  z-index: 1000;
+}
+
+.contact-marker.selected {
+  transform: scale(1.2);
+  z-index: 1000;
+}
+
+.contact-marker:hover .marker-info,
+.contact-marker.selected .marker-info {
+  opacity: 1;
+}
+
+.contact-marker.selected .marker-avatar {
+  border-color: #f59e0b; /* amber-500 */
+  box-shadow: 0 0 0 2px #fbbf24, 0 4px 12px rgba(0,0,0,0.2); /* ring-amber-400 */
+}
+
+.contact-marker.selected .marker-label {
+  background: #fbbf24; /* bg-amber-400 */
+  color: #92400e; /* text-amber-800 */
+  border-color: #f59e0b; /* border-amber-500 */
 }

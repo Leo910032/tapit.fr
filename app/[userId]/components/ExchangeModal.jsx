@@ -1,6 +1,6 @@
 // app/[userId]/components/ExchangeModal.jsx
 "use client"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslation } from '@/lib/useTranslation';
 import { validateEmail } from '@/lib/utilities';
@@ -18,6 +18,31 @@ export default function ExchangeModal({ isOpen, onClose, profileOwnerUsername })
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
+    const [location, setLocation] = useState(null);
+    const [isLocationPermissionGranted, setIsLocationPermissionGranted] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            // Check for geolocation permission when the modal opens
+            navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+                setIsLocationPermissionGranted(result.state === 'granted');
+                if (result.state === 'granted') {
+                    // Automatically get location if permission is already granted
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            setLocation({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                            });
+                        },
+                        () => {
+                            // Handle error silently if permission is granted but location fails
+                        }
+                    );
+                }
+            });
+        }
+    }, [isOpen]);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({
@@ -25,7 +50,6 @@ export default function ExchangeModal({ isOpen, onClose, profileOwnerUsername })
             [field]: value
         }));
         
-        // Clear error when user starts typing
         if (errors[field]) {
             setErrors(prev => ({
                 ...prev,
@@ -51,6 +75,36 @@ export default function ExchangeModal({ isOpen, onClose, profileOwnerUsername })
         return Object.keys(newErrors).length === 0;
     };
 
+    const requestLocation = () => {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) {
+                toast.error("Geolocation is not supported by your browser.");
+                return resolve(null);
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                    };
+                    setLocation(userLocation);
+                    setIsLocationPermissionGranted(true);
+                    resolve(userLocation);
+                },
+                (error) => {
+                    // Handle different error cases
+                    if (error.code === error.PERMISSION_DENIED) {
+                        toast.error("Location access was denied. You can enable it in your browser settings.");
+                    } else {
+                        toast.error("Could not retrieve your location.");
+                    }
+                    resolve(null);
+                }
+            );
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -61,10 +115,17 @@ export default function ExchangeModal({ isOpen, onClose, profileOwnerUsername })
         setIsSubmitting(true);
         
         try {
+            // Attempt to get location if not already set
+            let finalLocation = location;
+            if (!finalLocation && !isLocationPermissionGranted) {
+                finalLocation = await requestLocation();
+            }
+
             const contactData = {
                 ...formData,
                 submittedAt: new Date().toISOString(),
-                profileOwner: profileOwnerUsername
+                profileOwner: profileOwnerUsername,
+                location: finalLocation // Add location to the contact data
             };
             
             await addContactToProfile(profileOwnerUsername, contactData);
@@ -81,7 +142,6 @@ export default function ExchangeModal({ isOpen, onClose, profileOwnerUsername })
                 },
             });
             
-            // Reset form and close modal
             setFormData({
                 name: '',
                 email: '',
@@ -89,6 +149,7 @@ export default function ExchangeModal({ isOpen, onClose, profileOwnerUsername })
                 company: '',
                 message: ''
             });
+            setLocation(null);
             onClose();
             
         } catch (error) {
@@ -221,6 +282,32 @@ export default function ExchangeModal({ isOpen, onClose, profileOwnerUsername })
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-none"
                                 placeholder={t('exchange.message_placeholder') || 'Add a personal message...'}
                             />
+                        </div>
+                        
+                        {/* Location Consent */}
+                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                            <svg className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-800">Share your location?</h4>
+                                <p className="text-xs text-gray-500 mt-1">To help visualize where connections are being made, you can share your approximate location. This is optional.</p>
+                                {!isLocationPermissionGranted && (
+                                    <button
+                                        type="button"
+                                        onClick={requestLocation}
+                                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 mt-2"
+                                    >
+                                        Share Location
+                                    </button>
+                                )}
+                                {isLocationPermissionGranted && location && (
+                                    <div className="text-xs font-semibold text-green-600 mt-2">
+                                        Location access granted. Thank you!
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Submit Button */}
