@@ -666,6 +666,22 @@
     "total": "Total",
     "no_activity_yet": "No activity yet",
     "share_to_track": "Share your profile to start tracking views and clicks!",
+    "link_performance" : "Link performance",
+    "clicks_by_link" : "Clicks by link",
+    "click_distribution" : "Clicks distribution",
+    "total_links" : "Total links", 
+    "total_clicks" : "Total clicks",
+    "avg_clicks_per_link" : "Average clicks per link",
+    "created" : "Created",
+    "today" : "Today",
+    "this_week" : "This Week",
+    "legend" : "Legend",
+
+
+
+
+
+
     
     "nav": {
       "today": "Today",
@@ -679,7 +695,7 @@
       "this_month": "This Month",
       "all_time": "All Time"
     },
-    "overview_title": "{{period}} Overview",
+    "overview_title": "Overview",
     "complete_statistics": "Complete Statistics",
     "stats": {
       "today": "Today",
