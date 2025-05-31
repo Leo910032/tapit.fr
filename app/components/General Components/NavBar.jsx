@@ -1,3 +1,4 @@
+// app/components/General Components/NavBar.jsx
 "use client"
 import { fireApp } from "@/important/firebase";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
@@ -130,8 +131,11 @@ export default function NavBar() {
             case "/dashboard/analytics":
                 setActivePage(2);
                 break;
-            case "/dashboard/settings":
+            case "/dashboard/contacts":
                 setActivePage(3);
+                break;
+            case "/dashboard/settings":
+                setActivePage(4);
                 break;
             default:
                 setActivePage(0);
@@ -141,7 +145,7 @@ export default function NavBar() {
     
       return (
         <NavContext.Provider value={{ username, myLink, profilePicture, showProfileCard, setShowProfileCard, showShareCard, setShowShareCard }}>
-            {/* Top navigation - remains the same */}
+            {/* Top navigation - Updated with contacts */}
             <div className="w-full justify-between flex items-center rounded-[3rem] py-3 sticky top-0 z-[9999999999] px-3 mx-auto bg-white border backdrop-blur-lg">
                 <div className="flex items-center gap-8">
                     <Link href={'/dashboard'} className="ml-3">
@@ -154,15 +158,21 @@ export default function NavBar() {
                             {t('dashboard.links')}
                         </Link>
                         <Link href={'/dashboard/appearance'} className={`flex items-center gap-2 px-2 py-2 active:scale-90 active:opacity-40 hover:bg-black hover:bg-opacity-[0.075] rounded-lg text-sm font-semibold ${activePage === 1 ? "opacity-100" : "opacity-50 hover:opacity-70"}`}>
-                            <Image src={"https://linktree.sirv.com/Images/icons/appearance.svg"} alt="links" height={16} width={16} />
+                            <Image src={"https://linktree.sirv.com/Images/icons/appearance.svg"} alt="appearance" height={16} width={16} />
                             {t('dashboard.appearance')}
                         </Link>
                         <Link href={'/dashboard/analytics'} className={`flex items-center gap-2 px-2 py-2 active:scale-90 active:opacity-40 hover:bg-black hover:bg-opacity-[0.075] rounded-lg text-sm font-semibold ${activePage === 2 ? "opacity-100" : "opacity-50 hover:opacity-70"}`}>
-                            <Image src={"https://linktree.sirv.com/Images/icons/analytics.svg"} alt="links" height={16} width={16} />
+                            <Image src={"https://linktree.sirv.com/Images/icons/analytics.svg"} alt="analytics" height={16} width={16} />
                             {t('dashboard.analytics')}
                         </Link>
-                        <Link href={'/dashboard/settings'} className={`flex items-center gap-2 px-2 py-2 active:scale-90 active:opacity-40 hover:bg-black hover:bg-opacity-[0.075] rounded-lg text-sm font-semibold ${activePage === 3 ? "opacity-100" : "opacity-50 hover:opacity-70"}`}>
-                            <Image src={"https://linktree.sirv.com/Images/icons/setting.svg"} alt="links" height={16} width={16} />
+                        <Link href={'/dashboard/contacts'} className={`flex items-center gap-2 px-2 py-2 active:scale-90 active:opacity-40 hover:bg-black hover:bg-opacity-[0.075] rounded-lg text-sm font-semibold ${activePage === 3 ? "opacity-100" : "opacity-50 hover:opacity-70"}`}>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            {t('dashboard.contacts') || 'Contacts'}
+                        </Link>
+                        <Link href={'/dashboard/settings'} className={`flex items-center gap-2 px-2 py-2 active:scale-90 active:opacity-40 hover:bg-black hover:bg-opacity-[0.075] rounded-lg text-sm font-semibold ${activePage === 4 ? "opacity-100" : "opacity-50 hover:opacity-70"}`}>
+                            <Image src={"https://linktree.sirv.com/Images/icons/setting.svg"} alt="settings" height={16} width={16} />
                             {t('dashboard.settings')}
                         </Link>
                     </div>
@@ -184,9 +194,9 @@ export default function NavBar() {
                 </div>
             </div>
             
-            {/* New improved mobile navigation bar */}
+            {/* Updated mobile navigation bar with contacts */}
             <div className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 p-3 shadow-lg sm:hidden z-50">
-                <div className="grid grid-cols-4 gap-1 max-w-lg mx-auto">
+                <div className="grid grid-cols-5 gap-1 max-w-lg mx-auto">
                     <Link 
                         href={'/dashboard'} 
                         className={`flex flex-col items-center p-2 rounded-xl ${activePage === 0 
@@ -201,7 +211,7 @@ export default function NavBar() {
                                 width={22} 
                             />
                         </div>
-                        <span className="text-sm font-medium">{t('dashboard.links')}</span>
+                        <span className="text-xs font-medium">{t('dashboard.links')}</span>
                     </Link>
                     
                     <Link 
@@ -218,7 +228,7 @@ export default function NavBar() {
                                 width={22} 
                             />
                         </div>
-                        <span className="text-sm font-medium">{t('dashboard.appearance')}</span>
+                        <span className="text-xs font-medium">{t('dashboard.appearance')}</span>
                     </Link>
                     
                     <Link 
@@ -235,12 +245,26 @@ export default function NavBar() {
                                 width={22} 
                             />
                         </div>
-                        <span className="text-sm font-medium">{t('dashboard.analytics')}</span>
+                        <span className="text-xs font-medium">{t('dashboard.analytics')}</span>
+                    </Link>
+
+                    <Link 
+                        href={'/dashboard/contacts'} 
+                        className={`flex flex-col items-center p-2 rounded-xl ${activePage === 3 
+                            ? "bg-purple-100 text-purple-700" 
+                            : "text-gray-600 hover:bg-gray-100"}`}
+                    >
+                        <div className="p-1.5 mb-1">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <span className="text-xs font-medium">{t('dashboard.contacts') || 'Contacts'}</span>
                     </Link>
                     
                     <Link 
                         href={'/dashboard/settings'} 
-                        className={`flex flex-col items-center p-2 rounded-xl ${activePage === 3 
+                        className={`flex flex-col items-center p-2 rounded-xl ${activePage === 4 
                             ? "bg-purple-100 text-purple-700" 
                             : "text-gray-600 hover:bg-gray-100"}`}
                     >
@@ -252,7 +276,7 @@ export default function NavBar() {
                                 width={22} 
                             />
                         </div>
-                        <span className="text-sm font-medium">{t('dashboard.settings')}</span>
+                        <span className="text-xs font-medium">{t('dashboard.settings')}</span>
                     </Link>
                 </div>
             </div>

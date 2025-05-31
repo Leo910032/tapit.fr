@@ -2,6 +2,8 @@
 "use client"
 import Image from "next/image";
 import { useTranslation } from "@/lib/useTranslation";
+import { baseUrlIcons } from "@/lib/BrandLinks";
+import { makeValidUrl } from "@/lib/utilities";
 
 export default function TopClickedLinks({ analytics, isConnected }) {
     const { t } = useTranslation();
@@ -10,28 +12,28 @@ export default function TopClickedLinks({ analytics, isConnected }) {
         return null;
     }
 
-    // Get link type icon
-    const getLinkTypeIcon = (type) => {
-        switch (type?.toLowerCase()) {
-            case 'social':
-                return 'https://linktree.sirv.com/Images/icons/social.svg';
-            case 'instagram':
-                return 'https://linktree.sirv.com/Images/brands/instagram.svg';
-            case 'twitter':
-                return 'https://linktree.sirv.com/Images/brands/twitter.svg';
-            case 'tiktok':
-                return 'https://linktree.sirv.com/Images/brands/tiktok.svg';
-            case 'youtube':
-                return 'https://linktree.sirv.com/Images/brands/youtube.svg';
-            case 'spotify':
-                return 'https://linktree.sirv.com/Images/brands/spotify.svg';
-            case 'video':
-                return 'https://linktree.sirv.com/Images/brands/video.svg';
-            case 'music':
-                return 'https://linktree.sirv.com/Images/brands/music.svg';
-            default:
-                return 'https://linktree.sirv.com/Images/icons/links.svg';
+    // Function to get the root domain from URL (same as in IconDiv.jsx)
+    function getRootNameFromUrl(url) {
+        try {
+            const urlObj = new URL(makeValidUrl(url));
+            const rootName = urlObj.hostname;
+            return rootName;
+        } catch (error) {
+            console.log(error.message, url);
+            return '';
         }
+    }
+
+    // Function to get icon URL from base URL (same as in IconDiv.jsx)
+    function getIconUrlFromBaseUrl(baseUrl) {
+        return baseUrlIcons[baseUrl.toLowerCase()] || 'https://linktree.sirv.com/Images/brands/link-svgrepo-com.svg';
+    }
+
+    // Get link icon using the same logic as the public profile
+    const getLinkIcon = (url) => {
+        if (!url) return 'https://linktree.sirv.com/Images/brands/link-svgrepo-com.svg';
+        const rootName = getRootNameFromUrl(url);
+        return getIconUrlFromBaseUrl(rootName);
     };
 
     // Get link type color
@@ -90,14 +92,14 @@ export default function TopClickedLinks({ analytics, isConnected }) {
                                      `#${index + 1}`}
                                 </div>
 
-                                {/* Link Icon */}
-                                <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${getLinkTypeColor(link.type)}`}>
+                                {/* Link Icon - Using the same system as public profile */}
+                                <div className="flex-shrink-0 h-10 w-10 rounded-lg p-1 bg-white border">
                                     <Image 
-                                        src={getLinkTypeIcon(link.type)}
+                                        src={getLinkIcon(link.url)}
                                         alt={link.type || 'link'}
-                                        width={20}
-                                        height={20}
-                                        className={link.type?.toLowerCase() === 'tiktok' ? 'filter invert' : ''}
+                                        width={32}
+                                        height={32}
+                                        className="object-fit h-full w-full"
                                     />
                                 </div>
 
@@ -164,24 +166,27 @@ export default function TopClickedLinks({ analytics, isConnected }) {
                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                                     title={t('analytics.visit_link') || 'Visit Link'}
                                 >
-                                    <Image 
-                                        src="https://linktree.sirv.com/Images/icons/external-link.svg"
-                                        alt="visit"
-                                        width={16}
-                                        height={16}
-                                    />
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
                                 </button>
                                 <button
-                                    onClick={() => navigator.clipboard.writeText(link.url)}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(link.url);
+                                        // Optional: Show a brief success message
+                                        const button = event.currentTarget;
+                                        const originalTitle = button.title;
+                                        button.title = 'Copied!';
+                                        setTimeout(() => {
+                                            button.title = originalTitle;
+                                        }, 1000);
+                                    }}
                                     className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
                                     title={t('analytics.copy_link') || 'Copy Link'}
                                 >
-                                    <Image 
-                                        src="https://linktree.sirv.com/Images/icons/copy.svg"
-                                        alt="copy"
-                                        width={16}
-                                        height={16}
-                                    />
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>

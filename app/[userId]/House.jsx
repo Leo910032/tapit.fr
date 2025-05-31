@@ -5,6 +5,7 @@ import UserInfo from "./components/UserInfo";
 import BgDiv from "./components/BgDiv";
 import MyLinks from "./components/MyLinks";
 import SupportBanner from "./components/SupportBanner";
+import ExchangeButton from "./components/ExchangeButton";
 import React, { useEffect, useState } from "react";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { fireApp } from "@/important/firebase";
@@ -21,21 +22,22 @@ export default function House({ userId }) {
     const [hasSensitiveContent, setHasSensitiveContent]= useState(false);
     const [sensitiveType, setSensitiveType] = useState(false);
     const [viewRecorded, setViewRecorded] = useState(false);
+    const [username, setUsername] = useState("");
 
     useEffect(() => {
         async function fetchProfilePicture() {
-            const currentUser = await fetchUserData(userId);;
+            const currentUser = await fetchUserData(userId);
             const collectionRef = collection(fireApp, "AccountData");
             const docRef = doc(collectionRef, `${currentUser}`);
             const getDocRef = await getDoc(docRef);
 
             if (getDocRef.exists()) {
-                const { sensitiveStatus, sensitivetype } = getDocRef.data();
+                const { sensitiveStatus, sensitivetype, username: profileUsername } = getDocRef.data();
                 setSensitiveWarning(sensitiveStatus ? sensitiveStatus : false);
                 setHasSensitiveContent(sensitiveStatus ? sensitiveStatus : false);
                 setSensitiveType(sensitivetype ? sensitivetype : 3);
+                setUsername(profileUsername || userId);
             }
-
         }
         fetchProfilePicture();
     }, [userId]);
@@ -83,6 +85,11 @@ export default function House({ userId }) {
                             <ProfilePic userId={userId} />
                             <UserInfo userId={userId} hasSensitiveContent={hasSensitiveContent} />
                             <MyLinks userId={userId} hasSensitiveContent={hasSensitiveContent} />
+                            
+                            {/* Exchange Button */}
+                            <div className="w-full px-5 mb-4">
+                                <ExchangeButton username={username} />
+                            </div>
                         </div>
                     </div>
                     <SupportBanner userId={userId} />

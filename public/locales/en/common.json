@@ -1,4 +1,33 @@
 {
+
+
+   "exchange": {
+    "button_text": "Exchange Contact",
+    "title": "Exchange Contact",
+    "description": "Share your contact information to connect with this profile owner.",
+    "name_label": "Full Name",
+    "name_placeholder": "Enter your full name",
+    "name_required": "Name is required",
+    "email_label": "Email Address",
+    "email_placeholder": "Enter your email address",
+    "email_required": "Email is required",
+    "email_invalid": "Please enter a valid email",
+    "phone_label": "Phone Number",
+    "phone_placeholder": "Enter your phone number",
+    "company_label": "Company/Organization",
+    "company_placeholder": "Enter your company or organization",
+    "message_label": "Message (Optional)",
+    "message_placeholder": "Add a personal message...",
+    "cancel": "Cancel",
+    "submit": "Share Contact",
+    "submitting": "Sharing...",
+    "success_message": "Contact information shared successfully!",
+    "error_message": "Failed to share contact information. Please try again."
+  },
+    "contacts": {
+    "title": "Contact List",
+    "subtitle": "Manage contacts who have shared their information through your profile"
+  },
   "common": {
     "login": "Log in",
     "signup": "Sign up",
@@ -253,7 +282,8 @@
     "settings": "Settings",
     "your_linktree": "Your Linktree is live:",
     "copy_url": "Copy URL",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "contacts": "Contacts"
   },
   "login": {
     "title": "Log in to your Linktree",
@@ -597,6 +627,8 @@
       "error": "Please enter a valid Twitch URL."
     }
   },
+  
+  
 
    "support_groups": {
     "choose_cause": "Choose a cause",
@@ -644,6 +676,8 @@
     "twenty_five_plus": "25+",
     "sensitive_content": "Sensitive Content"
   },
+  
+  
 
 
   "analytics": {
@@ -710,6 +744,8 @@
     "last_clicked": "Last clicked",
     "total_interactions_description": "Total interactions with your links"
   }
+  
+  
 
 }
 
