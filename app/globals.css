@@ -13,7 +13,37 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  /* REMOVED: transition: .25s ease-in-out; - This was causing choppy map movement */
+}
+
+/* Add transitions only to specific elements that need them, excluding map containers */
+button, 
+input, 
+textarea, 
+select, 
+a, 
+.transition,
+.contact-marker,
+.marker-avatar,
+.marker-label,
+.marker-info {
   transition: .25s ease-in-out;
+}
+
+/* Explicitly disable transitions for map-related elements */
+[class*="gm-"], 
+.gm-style div, 
+.gm-style img, 
+.gm-style span,
+.gmnoprint,
+.gmnoscreen {
+  transition: none !important;
+}
+
+/* Ensure no transitions apply to any Google Maps elements */
+div[style*="transform"],
+div[style*="position: absolute"][style*="left"][style*="top"] {
+  transition: none !important;
 }
 
 *::selection {
@@ -25,7 +55,6 @@
   background-color: #3AE09A;
   color: #fff;
 }
-
 
 .bg-dark {
   background-color: #3b3b3b;
@@ -87,6 +116,7 @@
 
 .dropshadow {
   filter: drop-shadow(0 10px 25px rgba(255, 255, 255, 0.25));
+  transition: filter .25s ease-in-out;
 }
 
 .dropshadow:has(input:focus) {
@@ -95,6 +125,7 @@
 
 .dropshadow-good {
   filter: drop-shadow(0 10px 25px rgba(58, 224, 154, 0.25));
+  transition: filter .25s ease-in-out;
 }
 
 .dropshadow-good:has(input:focus) {
@@ -103,6 +134,7 @@
 
 .dropshadow-bad {
   filter: drop-shadow(0 10px 25px rgba(255, 44, 79, 0.25));
+  transition: filter .25s ease-in-out;
 }
 
 .dropshadow-bad:has(input:focus) {
@@ -115,6 +147,7 @@
 
 .myInput {
   border: 1px solid rgba(0, 0, 0, 0.25);
+  transition: border .25s ease-in-out;
 }
 
 .myInput:hover {
@@ -155,7 +188,6 @@
     transform: translateX(0);
   }
 }
-
 
 *::-webkit-scrollbar {
   display: none;
@@ -232,11 +264,13 @@
 
 .userBtn:has(a:active) {
   transform: scale(.95);
+  transition: transform .15s ease-in-out;
 }
 
 .MariaFont {
   font-family: "MariaFont", sans-serif;
 }
+
 /* STYLES FOR CONTACTS MAP MARKERS */
 .contact-marker {
   cursor: pointer;
@@ -281,6 +315,7 @@
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .contact-marker .marker-info {
@@ -323,4 +358,11 @@
   background: #fbbf24; /* bg-amber-400 */
   color: #92400e; /* text-amber-800 */
   border-color: #f59e0b; /* border-amber-500 */
+}
+
+/* Additional safeguard to ensure Google Maps elements are not affected by transitions */
+.gm-style,
+.gm-style * {
+  transition: none !important;
+  animation: none !important;
 }
