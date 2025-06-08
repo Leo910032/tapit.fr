@@ -1,7 +1,7 @@
-// components/ContactsMap.jsx - Mobile Optimized Version (Fixed)
+// components/ContactsMap.jsx - Fixed Linting Errors
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -43,61 +43,83 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
         archived: contactsWithLocation.filter(c => c.status === 'archived').length,
         total: contactsWithLocation.length
     };
-// Updated component with max width
-function ExpandableHelpButtonFixed() {
-    const [isExpanded, setIsExpanded] = useState(false);
-    
-    return (
-        <div className="absolute bottom-8 left-2 z-30">
-            <div 
-                className={`bg-white rounded-lg shadow-lg border transition-all duration-300 ease-in-out overflow-hidden ${
-                    isExpanded 
-                        ? 'w-80 max-w-[calc(100vw-2rem)]' // 320px max width, but responsive to screen size
-                        : 'w-12 h-12'
-                }`}
-                style={{
-                    maxWidth: isExpanded ? '300px' : 'none'
-                }}
-            >
-                <div className="flex items-center h-12">
-                    {/* Icon Button */}
-                    <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className={`flex-shrink-0 w-12 h-12 flex items-center justify-center text-yellow-500 hover:bg-yellow-50 transition-all duration-200 ${
-                            isExpanded ? 'rounded-l-lg' : 'rounded-lg'
-                        }`}
-                        aria-label={isExpanded ? "Masquer l'aide" : "Afficher l'aide"}
-                    >
-                        <span className="text-lg">💡</span>
-                    </button>
-                    
-                    {/* Expandable Text */}
-                    <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+
+    // Updated component with max width
+    function ExpandableHelpButtonFixed() {
+        const [isExpanded, setIsExpanded] = useState(false);
+        
+        return (
+            <div className="absolute bottom-8 left-2 z-30">
+                <div 
+                    className={`bg-white rounded-lg shadow-lg border transition-all duration-300 ease-in-out overflow-hidden ${
                         isExpanded 
-                            ? 'opacity-100 flex-1 pr-2' 
-                            : 'opacity-0 w-0'
-                    }`}>
+                            ? 'w-80 max-w-[calc(100vw-2rem)]' // 320px max width, but responsive to screen size
+                            : 'w-12 h-12'
+                    }`}
+                    style={{
+                        maxWidth: isExpanded ? '300px' : 'none'
+                    }}
+                >
+                    <div className="flex items-center h-12">
+                        {/* Icon Button */}
+                        <button
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className={`flex-shrink-0 w-12 h-12 flex items-center justify-center text-yellow-500 hover:bg-yellow-50 transition-all duration-200 ${
+                                isExpanded ? 'rounded-l-lg' : 'rounded-lg'
+                            }`}
+                            aria-label={isExpanded ? "Masquer l&apos;aide" : "Afficher l&apos;aide"}
+                        >
+                            <span className="text-lg">💡</span>
+                        </button>
+                        
+                        {/* Expandable Text */}
+                        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                            isExpanded 
+                                ? 'opacity-100 flex-1 pr-2' 
+                                : 'opacity-0 w-0'
+                        }`}>
+                            {isExpanded && (
+                                <div className="text-xs text-gray-600 py-3 px-2 leading-relaxed">
+                                    Cliquez sur les marqueurs pour voir plus d&apos;informations
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Close button */}
                         {isExpanded && (
-                            <div className="text-xs text-gray-600 py-3 px-2 leading-relaxed">
-                                Cliquez sur les marqueurs pour voir plus d'informations
-                            </div>
+                            <button
+                                onClick={() => setIsExpanded(false)}
+                                className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 mr-1 rounded"
+                            >
+                                ×
+                            </button>
                         )}
                     </div>
-                    
-                    {/* Close button */}
-                    {isExpanded && (
-                        <button
-                            onClick={() => setIsExpanded(false)}
-                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 mr-1 rounded"
-                        >
-                            ×
-                        </button>
-                    )}
                 </div>
             </div>
-        </div>
-    );
-}
+        );
+    }
+
+    // Memoize the marker click handler to prevent unnecessary re-renders
+    const handleMarkerClick = useCallback((contact, markerElement, position, map) => {
+        // Remove selection from all markers
+        markersRef.current.forEach(m => {
+            m.content?.classList.remove('selected');
+        });
+        
+        // Add selection to clicked marker
+        markerElement.classList.add('selected');
+        
+        if (onMarkerClick) {
+            onMarkerClick(contact);
+        }
+        
+        // Center map on clicked marker
+        map.panTo(position);
+        if (map.getZoom() < 16) {
+            map.setZoom(16);
+        }
+    }, [onMarkerClick]);
 
     useEffect(() => {
         let isMounted = true;
@@ -105,7 +127,7 @@ function ExpandableHelpButtonFixed() {
         const initializeMap = async () => {
             try {
                 const loader = new Loader({
-                    apiKey: process.env.NEXT_PUBLIC_Maps_API_KEY || "AIzaSyATAmD5lVb1jZe6pGoeZGF5OU-8-hrLeF4",
+                    apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
                     version: 'weekly',
                     libraries: ['maps', 'marker']
                 });
@@ -221,23 +243,7 @@ function ExpandableHelpButtonFixed() {
                     });
 
                     markerElement.addEventListener('click', () => {
-                        // Remove selection from all markers
-                        markersRef.current.forEach(m => {
-                            m.content?.classList.remove('selected');
-                        });
-                        
-                        // Add selection to clicked marker
-                        markerElement.classList.add('selected');
-                        
-                        if (onMarkerClick) {
-                            onMarkerClick(contact);
-                        }
-                        
-                        // Center map on clicked marker
-                        map.panTo(position);
-                        if (map.getZoom() < 16) {
-                            map.setZoom(16);
-                        }
+                        handleMarkerClick(contact, markerElement, position, map);
                     });
 
                     markersRef.current.push(marker);
@@ -272,7 +278,7 @@ function ExpandableHelpButtonFixed() {
 
             } catch (error) {
                 console.error('Error loading Google Maps:', error);
-                setError(t('map.failed_to_load', { error: error.message }) || `Failed to load Google Maps: ${error.message}`);
+                setError(t('contacts_map.failed_to_load', { error: error.message }) || `Failed to load Google Maps: ${error.message}`);
                 setIsLoaded(true);
             }
         };
@@ -284,7 +290,7 @@ function ExpandableHelpButtonFixed() {
         return () => {
             isMounted = false;
         };
-    }, [contacts, selectedContactId, isMobile]);
+    }, [contacts, selectedContactId, isMobile, contactsWithLocation, handleMarkerClick, t]);
 
     if (contactsWithLocation.length === 0) {
         return (
@@ -297,10 +303,10 @@ function ExpandableHelpButtonFixed() {
                         </svg>
                     </div>
                     <h3 className="text-lg font-medium text-gray-700 mb-2">
-                        {t('map.no_location_data_title') || 'Aucune donnée de localisation'}
+                        {t('contacts_map.no_location_data_title') || 'Aucune donnée de localisation'}
                     </h3>
                     <p className="text-gray-500 text-sm leading-relaxed">
-                        {t('map.no_location_data_description') || 'Aucun contact avec localisation trouvé'}
+                        {t('contacts_map.no_location_data_description') || 'Aucun contact avec localisation trouvé'}
                     </p>
                 </div>
             </div>
@@ -317,7 +323,7 @@ function ExpandableHelpButtonFixed() {
                         </svg>
                     </div>
                     <h3 className="text-lg font-semibold text-red-800 mb-2">
-                        {t('map.loading_error_title') || 'Erreur de chargement'}
+                        {t('contacts_map.loading_error_title') || 'Erreur de chargement'}
                     </h3>
                     <p className="text-red-600 text-sm mb-3">{error}</p>
                 </div>
@@ -332,7 +338,10 @@ function ExpandableHelpButtonFixed() {
                     <div className="flex flex-col items-center space-y-3">
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
                         <span className="text-gray-500 text-sm font-medium">
-                            Chargement de {contactsWithLocation.length} contact{contactsWithLocation.length !== 1 ? 's' : ''}...
+                            {t('contacts_map.loading_contacts', { 
+                                count: contactsWithLocation.length,
+                                plural: contactsWithLocation.length !== 1 ? 's' : ''
+                            }) || `Chargement de ${contactsWithLocation.length} contact${contactsWithLocation.length !== 1 ? 's' : ''}...`}
                         </span>
                     </div>
                 </div>
@@ -354,7 +363,7 @@ function ExpandableHelpButtonFixed() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
                     <span className="text-sm font-medium text-gray-700">
-                        Localisations des contacts
+                        {t('contacts_map.contact_locations') || 'Localisations des contacts'}
                     </span>
                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                         {contactCounts.total}
@@ -364,33 +373,33 @@ function ExpandableHelpButtonFixed() {
 
             {/* Desktop Legend - Left Side */}
             {isLoaded && !isMobile && (
-                <div className="absolute top-16 left- bg-white p-4 rounded-lg shadow-lg border min-w-48 z-20">
+                <div className="absolute top-16 left-3 bg-white p-4 rounded-lg shadow-lg border min-w-48 z-20">
                     <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
                         <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         </svg>
-                        Localisations des contacts
+                        {t('contacts_map.contact_locations') || 'Localisations des contacts'}
                     </h4>
                     
                     <div className="space-y-2 text-xs">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow"></div>
-                                <span className="text-gray-600">Nouveaux contacts</span>
+                                <span className="text-gray-600">{t('contacts_map.new_contacts') || 'Nouveaux contacts'}</span>
                             </div>
                             <span className="font-medium text-blue-600">{contactCounts.new}</span>
                         </div>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow"></div>
-                                <span className="text-gray-600">Contacts vus</span>
+                                <span className="text-gray-600">{t('contacts_map.viewed_contacts') || 'Contacts vus'}</span>
                             </div>
                             <span className="font-medium text-green-600">{contactCounts.viewed}</span>
                         </div>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-white shadow"></div>
-                                <span className="text-gray-600">Contacts archivés</span>
+                                <span className="text-gray-600">{t('contacts_map.archived_contacts') || 'Contacts archivés'}</span>
                             </div>
                             <span className="font-medium text-gray-600">{contactCounts.archived}</span>
                         </div>
@@ -398,7 +407,10 @@ function ExpandableHelpButtonFixed() {
                     
                     <div className="mt-3 pt-3 border-t border-gray-200">
                         <div className="text-xs text-gray-500">
-                            Total : <span className="font-semibold text-gray-700">{contactCounts.total}</span> contact{contactCounts.total !== 1 ? 's' : ''}
+                            {t('contacts_map.total_with_count', { 
+                                count: contactCounts.total,
+                                plural: contactCounts.total !== 1 ? 's' : ''
+                            }) || `Total : ${contactCounts.total} contact${contactCounts.total !== 1 ? 's' : ''}`}
                         </div>
                     </div>
                 </div>
@@ -409,11 +421,12 @@ function ExpandableHelpButtonFixed() {
                 <div className="absolute inset-x-4 top-16 bg-white p-4 rounded-lg shadow-lg border z-30">
                     <div className="flex items-center justify-between mb-3">
                         <h4 className="font-semibold text-sm">
-                            Localisations des contacts
+                            {t('contacts_map.contact_locations') || 'Localisations des contacts'}
                         </h4>
                         <button
                             onClick={() => setShowLegend(false)}
                             className="p-1 text-gray-400 hover:text-gray-600"
+                            aria-label={t('contacts_map.close') || 'Fermer'}
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -425,38 +438,40 @@ function ExpandableHelpButtonFixed() {
                         <div className="text-center">
                             <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white shadow mx-auto mb-1"></div>
                             <div className="font-medium text-blue-600">{contactCounts.new}</div>
-                            <div className="text-gray-600">Nouveaux contacts</div>
+                            <div className="text-gray-600">{t('contacts_map.new_contacts') || 'Nouveaux contacts'}</div>
                         </div>
                         <div className="text-center">
                             <div className="w-6 h-6 rounded-full bg-green-500 border-2 border-white shadow mx-auto mb-1"></div>
                             <div className="font-medium text-green-600">{contactCounts.viewed}</div>
-                            <div className="text-gray-600">Contacts vus</div>
+                            <div className="text-gray-600">{t('contacts_map.viewed_contacts') || 'Contacts vus'}</div>
                         </div>
                         <div className="text-center">
                             <div className="w-6 h-6 rounded-full bg-gray-500 border-2 border-white shadow mx-auto mb-1"></div>
                             <div className="font-medium text-gray-600">{contactCounts.archived}</div>
-                            <div className="text-gray-600">Contacts archivés</div>
+                            <div className="text-gray-600">{t('contacts_map.archived_contacts') || 'Contacts archivés'}</div>
                         </div>
                     </div>
                     
                     <div className="mt-3 pt-3 border-t border-gray-200 text-center">
                         <div className="text-xs text-gray-500">
-                            Total : <span className="font-semibold text-gray-700">{contactCounts.total}</span> contact{contactCounts.total !== 1 ? 's' : ''}
+                            {t('contacts_map.total_with_count', { 
+                                count: contactCounts.total,
+                                plural: contactCounts.total !== 1 ? 's' : ''
+                            }) || `Total : ${contactCounts.total} contact${contactCounts.total !== 1 ? 's' : ''}`}
                         </div>
                     </div>
                 </div>
             )}
 
-
-
-        {/* Helper Text (Mobile) - Simple Expandable Button */}
-{isLoaded && isMobile && contactsWithLocation.length > 1 && (
-    <ExpandableHelpButtonFixed />
-)}
+            {/* Helper Text (Mobile) - Simple Expandable Button */}
+            {isLoaded && isMobile && contactsWithLocation.length > 1 && (
+                <ExpandableHelpButtonFixed />
+            )}
+            
             {/* Helper Text (Desktop) */}
             {isLoaded && !isMobile && contactsWithLocation.length > 1 && (
                 <div className="absolute bottom-8 left-2 bg-white p-2 rounded-lg shadow border text-xs text-gray-500">
-                    💡 Cliquez sur les marqueurs pour voir plus d'informations
+                    💡 {t('contacts_map.click_markers_for_info') || 'Cliquez sur les marqueurs pour voir plus d&apos;informations'}
                 </div>
             )}
         </div>

@@ -258,35 +258,36 @@ export default function ContactsPage() {
                 onSave={saveEditedContact}
             />
 
-            {/* Map Modal - Full screen on mobile */}
-            {showMap && (
-                <div className="fixed inset-0 bg-white z-[9999] flex flex-col md:bg-black md:bg-opacity-50 md:items-center md:justify-center md:p-2">
-                    <div className="bg-white w-full h-full md:rounded-xl md:shadow-xl md:max-w-[98vw] md:max-h-[90vh] flex flex-col md:mt-[70px] ">
-                        <div className="flex items-center justify-between p-4 border-b flex-shrink-0 bg-white mt-14 ">
-                            <h2 className="text-lg font-semibold">
-                                {selectedContactForMap 
-                                    ? t('contacts.location_for_contact', { name: selectedContactForMap.name })
-                                    : t('contacts.all_contact_locations')
-                                }
-                            </h2>
-                            <button
-                                onClick={closeMap}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="flex-1 p-2 md:p-4 min-h-0">
-                            <ContactsMap
-                                contacts={selectedContactForMap ? [selectedContactForMap] : contacts.filter(c => c.location?.latitude)}
-                                selectedContact={selectedContactForMap}
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
+
+{/* Map Modal - Fixed responsive top margin */}
+{showMap && (
+    <div className="fixed inset-0 bg-white z-[9999] flex flex-col md:bg-black md:bg-opacity-50 md:items-center md:justify-center md:p-2">
+<div className="bg-white w-full h-full rounded-xl md:shadow-xl md:max-w-[98vw] md:max-h-[90vh] flex flex-col mt-14 md:mt-20">
+            <div className="flex items-center justify-between p-4 border-b flex-shrink-0 bg-white">
+                <h2 className="text-lg font-semibold">
+                    {selectedContactForMap 
+                        ? t('contacts.location_for_contact', { name: selectedContactForMap.name })
+                        : t('contacts.all_contact_locations')
+                    }
+                </h2>
+                <button
+                    onClick={closeMap}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div className="flex-1 p-2 md:p-4 min-h-0">
+                <ContactsMap
+                    contacts={selectedContactForMap ? [selectedContactForMap] : contacts.filter(c => c.location?.latitude)}
+                    selectedContact={selectedContactForMap}
+                />
+            </div>
+        </div>
+    </div>
+)}
 
             <div className="p-4">
                 {/* Header - Mobile optimized */}
