@@ -1,4 +1,4 @@
-// components/ContactsMap.jsx
+// components/ContactsMap.jsx - Mobile Optimized Version (Fixed)
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -12,6 +12,20 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
     const markersRef = useRef([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [error, setError] = useState(null);
+    const [showLegend, setShowLegend] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Check if device is mobile
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const contactsWithLocation = contacts.filter(contact =>
         contact.location &&
@@ -20,6 +34,14 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
         !isNaN(contact.location.latitude) &&
         !isNaN(contact.location.longitude)
     );
+
+    // Get contact counts by status
+    const contactCounts = {
+        new: contactsWithLocation.filter(c => c.status === 'new').length,
+        viewed: contactsWithLocation.filter(c => c.status === 'viewed').length,
+        archived: contactsWithLocation.filter(c => c.status === 'archived').length,
+        total: contactsWithLocation.length
+    };
 
     useEffect(() => {
         let isMounted = true;
@@ -53,39 +75,37 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                         const avgLng = contactsWithLocation.reduce((sum, contact) =>
                             sum + contact.location.longitude, 0) / contactsWithLocation.length;
                         centerLocation = { lat: avgLat, lng: avgLng };
-                        initialZoom = 10;
+                        initialZoom = isMobile ? 12 : 10;
                     }
                 }
 
+                // Fixed map options - Use mapId for AdvancedMarkers but without custom styles
                 const mapOptions = {
                     center: centerLocation,
                     zoom: initialZoom,
-                    mapId: 'CONTACTS_MAP_ID',
+                    mapId: 'DEMO_MAP_ID', // Required for AdvancedMarkerElement
                     gestureHandling: 'greedy',
-                    disableDefaultUI: false,
-                    mapTypeControl: true,
-                    streetViewControl: true,
-                    fullscreenControl: true,
+                    disableDefaultUI: isMobile,
+                    mapTypeControl: !isMobile,
+                    streetViewControl: !isMobile,
+                    fullscreenControl: !isMobile,
                     zoomControl: true,
                     clickableIcons: false,
                     keyboardShortcuts: false,
-                    styles: [
-                        {
-                            featureType: 'poi',
-                            elementType: 'labels',
-                            stylers: [{ visibility: 'off' }]
-                        }
-                    ]
+                    mapTypeId: 'roadmap' // Start with roadmap (plan view) instead of satellite
+                    // Note: Cannot use custom styles when mapId is present
                 };
 
                 const map = new Map(mapRef.current, mapOptions);
                 mapInstanceRef.current = map;
 
+                // Clear existing markers
                 markersRef.current.forEach(marker => {
                     if (marker.map) marker.map = null;
                 });
                 markersRef.current = [];
 
+                // Create markers for each contact
                 contactsWithLocation.forEach((contact) => {
                     const position = {
                         lat: contact.location.latitude,
@@ -98,18 +118,44 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                         markerElement.classList.add('selected');
                     }
 
-                    let statusColor = 'from-blue-400 to-purple-500';
-                    if (contact.status === 'new') statusColor = 'from-blue-500 to-blue-600';
-                    if (contact.status === 'viewed') statusColor = 'from-green-500 to-green-600';
-                    if (contact.status === 'archived') statusColor = 'from-gray-400 to-gray-500';
+                    // Create marker based on status
+                    let backgroundColor;
+                    switch (contact.status) {
+                        case 'new':
+                            backgroundColor = '#3B82F6'; // Blue
+                            break;
+                        case 'viewed':
+                            backgroundColor = '#10B981'; // Green
+                            break;
+                        case 'archived':
+                            backgroundColor = '#6B7280'; // Gray
+                            break;
+                        default:
+                            backgroundColor = '#3B82F6';
+                    }
 
-                    markerElement.innerHTML = `
-                        <div class="marker-content">
-                            <div class="marker-avatar bg-gradient-to-br ${statusColor}">${contact.name.charAt(0).toUpperCase()}</div>
-                            <div class="marker-label">${contact.name}</div>
-                            <div class="marker-info">${contact.email}</div>
+                    const markerContent = `
+                        <div style="
+                            width: 40px;
+                            height: 40px;
+                            background: ${backgroundColor};
+                            border: 3px solid white;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-weight: bold;
+                            font-size: 14px;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                            cursor: pointer;
+                            transition: transform 0.2s;
+                        " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                            ${contact.name.charAt(0).toUpperCase()}
                         </div>
                     `;
+
+                    markerElement.innerHTML = markerContent;
 
                     const marker = new AdvancedMarkerElement({
                         map,
@@ -119,13 +165,19 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                     });
 
                     markerElement.addEventListener('click', () => {
+                        // Remove selection from all markers
                         markersRef.current.forEach(m => {
                             m.content?.classList.remove('selected');
                         });
+                        
+                        // Add selection to clicked marker
                         markerElement.classList.add('selected');
+                        
                         if (onMarkerClick) {
                             onMarkerClick(contact);
                         }
+                        
+                        // Center map on clicked marker
                         map.panTo(position);
                         if (map.getZoom() < 16) {
                             map.setZoom(16);
@@ -135,6 +187,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                     markersRef.current.push(marker);
                 });
 
+                // Fit bounds if multiple contacts
                 if (contactsWithLocation.length > 1) {
                     const bounds = new google.maps.LatLngBounds();
                     contactsWithLocation.forEach(contact => {
@@ -143,7 +196,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                             lng: contact.location.longitude
                         });
                     });
-                    map.fitBounds(bounds, { padding: 50 });
+                    map.fitBounds(bounds, { padding: isMobile ? 20 : 50 });
                 }
 
                 map.addListener('idle', () => {
@@ -163,7 +216,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
 
             } catch (error) {
                 console.error('Error loading Google Maps:', error);
-                setError(t('map.failed_to_load', { error: error.message }));
+                setError(t('map.failed_to_load', { error: error.message }) || `Failed to load Google Maps: ${error.message}`);
                 setIsLoaded(true);
             }
         };
@@ -175,7 +228,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
         return () => {
             isMounted = false;
         };
-    }, [contacts, selectedContactId]);
+    }, [contacts, selectedContactId, isMobile]);
 
     if (contactsWithLocation.length === 0) {
         return (
@@ -187,15 +240,12 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-700 mb-2">{t('map.no_location_data_title')}</h3>
+                    <h3 className="text-lg font-medium text-gray-700 mb-2">
+                        {t('map.no_location_data_title') || 'Aucune donnée de localisation'}
+                    </h3>
                     <p className="text-gray-500 text-sm leading-relaxed">
-                        {t('map.no_location_data_description')}
+                        {t('map.no_location_data_description') || 'Aucun contact avec localisation trouvé'}
                     </p>
-                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                        <p className="text-xs text-blue-700">
-                            💡 {t('map.location_tracking_tip')}
-                        </p>
-                    </div>
                 </div>
             </div>
         );
@@ -210,72 +260,150 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                         </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-red-800 mb-2">{t('map.loading_error_title')}</h3>
+                    <h3 className="text-lg font-semibold text-red-800 mb-2">
+                        {t('map.loading_error_title') || 'Erreur de chargement'}
+                    </h3>
                     <p className="text-red-600 text-sm mb-3">{error}</p>
-                    <p className="text-xs text-red-500">
-                        {t('map.loading_error_description')}
-                    </p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="relative">
+        <div className="relative h-full w-full">
             {!isLoaded && (
                 <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center z-10">
                     <div className="flex flex-col items-center space-y-3">
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
                         <span className="text-gray-500 text-sm font-medium">
-                            {t('map.loading_message', { 
-                                count: contactsWithLocation.length,
-                                plural: contactsWithLocation.length !== 1 ? 's' : ''
-                            })}
+                            Chargement de {contactsWithLocation.length} contact{contactsWithLocation.length !== 1 ? 's' : ''}...
                         </span>
                     </div>
                 </div>
             )}
             
+            {/* Map Container */}
             <div 
-                className="h-[550px] w-full rounded-lg overflow-hidden border border-gray-200"
+                className="h-full w-full rounded-lg overflow-hidden border border-gray-200"
                 ref={mapRef}
             />
             
-            {isLoaded && (
-                <div className="absolute top-16 left-4 bg-white p-4 rounded-lg shadow-lg border max-w-xs">
+            {/* Mobile Legend Toggle Button */}
+            {isLoaded && isMobile && (
+                <button
+                    onClick={() => setShowLegend(!showLegend)}
+                    className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg border flex items-center gap-2 z-20"
+                >
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-gray-700">
+                        Localisations des contacts
+                    </span>
+                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {contactCounts.total}
+                    </span>
+                </button>
+            )}
+
+            {/* Desktop Legend - Left Side */}
+            {isLoaded && !isMobile && (
+                <div className="absolute top-16 left-3 bg-white p-4 rounded-lg shadow-lg border min-w-48 z-20">
                     <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
                         <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         </svg>
-                        {t('map.contact_locations_title')}
+                        Localisations des contacts
                     </h4>
                     
                     <div className="space-y-2 text-xs">
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600"></div>
-                            <span className="text-gray-600">    {t('map.legend_new_contacts')}</span>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                                <span className="text-gray-600">Nouveaux contacts</span>
+                            </div>
+                            <span className="font-medium text-blue-600">{contactCounts.new}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-green-500 to-green-600"></div>
-                            <span className="text-gray-600">{t('map.legend_viewed_contacts')}</span>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow"></div>
+                                <span className="text-gray-600">Contacts vus</span>
+                            </div>
+                            <span className="font-medium text-green-600">{contactCounts.viewed}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-gray-400 to-gray-500"></div>
-                            <span className="text-gray-600">{t('map.legend_archived_contacts')}</span>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 rounded-full bg-gray-500 border-2 border-white shadow"></div>
+                                <span className="text-gray-600">Contacts archivés</span>
+                            </div>
+                            <span className="font-medium text-gray-600">{contactCounts.archived}</span>
                         </div>
                     </div>
                     
                     <div className="mt-3 pt-3 border-t border-gray-200">
                         <div className="text-xs text-gray-500">
-                            {t('map.total_contacts_count')}: <span className="font-semibold text-gray-700">{contactsWithLocation.length}</span>     {t('map.total_contacts')} {contactsWithLocation.length !== 1 ? 's' : ''}
+                            Total : <span className="font-semibold text-gray-700">{contactCounts.total}</span> contact{contactCounts.total !== 1 ? 's' : ''}
                         </div>
                     </div>
                 </div>
             )}
 
-            {isLoaded && contactsWithLocation.length > 1 && (
-                <div className="absolute bottom-4 left-4 bg-white p-2 rounded-lg shadow border text-xs text-gray-500">
-                    💡 {t('map.click_marker_tip')}
+            {/* Mobile Legend Overlay */}
+            {isLoaded && isMobile && showLegend && (
+                <div className="absolute inset-x-4 top-16 bg-white p-4 rounded-lg shadow-lg border z-30">
+                    <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-sm">
+                            Localisations des contacts
+                        </h4>
+                        <button
+                            onClick={() => setShowLegend(false)}
+                            className="p-1 text-gray-400 hover:text-gray-600"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-3 text-xs">
+                        <div className="text-center">
+                            <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white shadow mx-auto mb-1"></div>
+                            <div className="font-medium text-blue-600">{contactCounts.new}</div>
+                            <div className="text-gray-600">Nouveaux contacts</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="w-6 h-6 rounded-full bg-green-500 border-2 border-white shadow mx-auto mb-1"></div>
+                            <div className="font-medium text-green-600">{contactCounts.viewed}</div>
+                            <div className="text-gray-600">Contacts vus</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="w-6 h-6 rounded-full bg-gray-500 border-2 border-white shadow mx-auto mb-1"></div>
+                            <div className="font-medium text-gray-600">{contactCounts.archived}</div>
+                            <div className="text-gray-600">Contacts archivés</div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-3 pt-3 border-t border-gray-200 text-center">
+                        <div className="text-xs text-gray-500">
+                            Total : <span className="font-semibold text-gray-700">{contactCounts.total}</span> contact{contactCounts.total !== 1 ? 's' : ''}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+
+            {/* Helper Text (Mobile) */}
+            {isLoaded && isMobile && contactsWithLocation.length > 1 && (
+                <div className="absolute bottom-4 left-4 right-4 bg-white p-2 rounded-lg shadow border text-xs text-gray-500 text-center">
+                    💡 Cliquez sur les marqueurs pour voir plus d'informations
+                </div>
+            )}
+
+            {/* Helper Text (Desktop) */}
+            {isLoaded && !isMobile && contactsWithLocation.length > 1 && (
+                <div className="absolute bottom-8 left-2 bg-white p-2 rounded-lg shadow border text-xs text-gray-500">
+                    💡 Cliquez sur les marqueurs pour voir plus d'informations
                 </div>
             )}
         </div>
