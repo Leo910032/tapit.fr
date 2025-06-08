@@ -14,6 +14,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
     const [error, setError] = useState(null);
     const [showLegend, setShowLegend] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    
 
     // Check if device is mobile
     useEffect(() => {
@@ -42,6 +43,61 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
         archived: contactsWithLocation.filter(c => c.status === 'archived').length,
         total: contactsWithLocation.length
     };
+// Updated component with max width
+function ExpandableHelpButtonFixed() {
+    const [isExpanded, setIsExpanded] = useState(false);
+    
+    return (
+        <div className="absolute bottom-8 left-2 z-30">
+            <div 
+                className={`bg-white rounded-lg shadow-lg border transition-all duration-300 ease-in-out overflow-hidden ${
+                    isExpanded 
+                        ? 'w-80 max-w-[calc(100vw-2rem)]' // 320px max width, but responsive to screen size
+                        : 'w-12 h-12'
+                }`}
+                style={{
+                    maxWidth: isExpanded ? '300px' : 'none'
+                }}
+            >
+                <div className="flex items-center h-12">
+                    {/* Icon Button */}
+                    <button
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className={`flex-shrink-0 w-12 h-12 flex items-center justify-center text-yellow-500 hover:bg-yellow-50 transition-all duration-200 ${
+                            isExpanded ? 'rounded-l-lg' : 'rounded-lg'
+                        }`}
+                        aria-label={isExpanded ? "Masquer l'aide" : "Afficher l'aide"}
+                    >
+                        <span className="text-lg">💡</span>
+                    </button>
+                    
+                    {/* Expandable Text */}
+                    <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                        isExpanded 
+                            ? 'opacity-100 flex-1 pr-2' 
+                            : 'opacity-0 w-0'
+                    }`}>
+                        {isExpanded && (
+                            <div className="text-xs text-gray-600 py-3 px-2 leading-relaxed">
+                                Cliquez sur les marqueurs pour voir plus d'informations
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Close button */}
+                    {isExpanded && (
+                        <button
+                            onClick={() => setIsExpanded(false)}
+                            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 mr-1 rounded"
+                        >
+                            ×
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
 
     useEffect(() => {
         let isMounted = true;
@@ -308,7 +364,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
 
             {/* Desktop Legend - Left Side */}
             {isLoaded && !isMobile && (
-                <div className="absolute top-16 left-3 bg-white p-4 rounded-lg shadow-lg border min-w-48 z-20">
+                <div className="absolute top-16 left- bg-white p-4 rounded-lg shadow-lg border min-w-48 z-20">
                     <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
                         <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -393,13 +449,10 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
 
 
 
-            {/* Helper Text (Mobile) */}
-            {isLoaded && isMobile && contactsWithLocation.length > 1 && (
-                <div className="absolute bottom-4 left-4 right-4 bg-white p-2 rounded-lg shadow border text-xs text-gray-500 text-center">
-                    💡 Cliquez sur les marqueurs pour voir plus d'informations
-                </div>
-            )}
-
+        {/* Helper Text (Mobile) - Simple Expandable Button */}
+{isLoaded && isMobile && contactsWithLocation.length > 1 && (
+    <ExpandableHelpButtonFixed />
+)}
             {/* Helper Text (Desktop) */}
             {isLoaded && !isMobile && contactsWithLocation.length > 1 && (
                 <div className="absolute bottom-8 left-2 bg-white p-2 rounded-lg shadow border text-xs text-gray-500">

@@ -262,7 +262,7 @@ export default function ContactsPage() {
             {showMap && (
                 <div className="fixed inset-0 bg-white z-[9999] flex flex-col md:bg-black md:bg-opacity-50 md:items-center md:justify-center md:p-2">
                     <div className="bg-white w-full h-full md:rounded-xl md:shadow-xl md:max-w-[98vw] md:max-h-[90vh] flex flex-col md:mt-[70px] ">
-                        <div className="flex items-center justify-between p-4 border-b flex-shrink-0 bg-white ">
+                        <div className="flex items-center justify-between p-4 border-b flex-shrink-0 bg-white mt-14 ">
                             <h2 className="text-lg font-semibold">
                                 {selectedContactForMap 
                                     ? t('contacts.location_for_contact', { name: selectedContactForMap.name })
