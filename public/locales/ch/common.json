@@ -28,7 +28,7 @@
   },
   "login": {
     "title": "登录您的Linktree",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "创建你的昵称",
     "password_placeholder": "密码",
     "forgot_password": "忘记密码？",
     "submit": "登录",
@@ -42,7 +42,7 @@
   },
   "signup": {
     "title": "创建您的账户",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "创建你的昵称",
     "email_placeholder": "电子邮箱",
     "password_placeholder": "密码",
     "submit": "注册",
@@ -78,7 +78,7 @@
   "landing": {
     "headline": "您唯一需要的链接",
     "subheadline": "通过一个链接将您的受众连接到您的所有内容",
-    "placeholder": "fabiconcept",
+    "placeholder": "创建你的昵称",
     "submit": "创建"
   },
   "settings": {

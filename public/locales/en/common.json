@@ -415,7 +415,7 @@
   },
    "signup": {
     "title": "Create your account",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "Create your nickname",
     "email_placeholder": "Email",
     "password_placeholder": "Password",
     "submit": "Submit",
@@ -481,7 +481,7 @@
   "landing": {
     "headline": "The Only Link You'll Ever Need",
     "subheadline": "Connect your audience to all of your content with one link",
-    "placeholder": "fabiconcept",
+    "placeholder": "Create your nickname",
     "submit": "Create"
   },
   "settings": {

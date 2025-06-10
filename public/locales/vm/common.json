@@ -28,7 +28,7 @@
   },
   "login": {
     "title": "Đăng nhập vào Linktree của bạn",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "Tạo biệt danh của bạn",
     "password_placeholder": "Mật khẩu",
     "forgot_password": "Quên mật khẩu?",
     "submit": "Đăng nhập",
@@ -42,7 +42,7 @@
   },
   "signup": {
     "title": "Tạo tài khoản của bạn",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "Tạo biệt danh của bạn",
     "email_placeholder": "Email",
     "password_placeholder": "Mật khẩu",
     "submit": "Đăng ký",
@@ -78,7 +78,7 @@
   "landing": {
     "headline": "Liên Kết Duy Nhất Bạn Cần",
     "subheadline": "Kết nối khán giả của bạn với tất cả nội dung của bạn bằng một liên kết",
-    "placeholder": "fabiconcept",
+    "placeholder": "Tạo biệt danh của bạn",
     "submit": "Tạo"
   },
   "settings": {

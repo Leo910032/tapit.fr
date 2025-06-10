@@ -7,8 +7,8 @@ import Preview from './general components/Preview'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-    title: 'Link Tree | Dashboard',
-    description: 'This is a Link tree Clone Web App Developed by Fabiconcept.',
+    title: 'Tapit.fr',
+    //description: 'This is a Link tree Clone Web App Developed by Fabiconcept.',
 }
 
 export default function RootLayout({ children }) {

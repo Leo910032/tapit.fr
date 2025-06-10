@@ -380,7 +380,7 @@
   },
   "signup": {
     "title": "Créez votre compte",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "Créez votre pseudo",
     "email_placeholder": "E-mail",
     "password_placeholder": "Mot de passe",
     "submit": "Soumettre",
@@ -445,7 +445,7 @@
   "landing": {
     "headline": "Le seul lien dont vous aurez jamais besoin",
     "subheadline": "Connectez votre audience à tout votre contenu avec un seul lien",
-    "placeholder": "fabiconcept",
+    "placeholder": "Créez votre pseudo",
     "submit": "Créer"
   },
   "settings": {

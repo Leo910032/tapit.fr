@@ -28,7 +28,7 @@
   },
   "login": {
     "title": "Inicia sesión en tu Linktree",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "Crea tu apodo",
     "password_placeholder": "Contraseña",
     "forgot_password": "¿Olvidaste tu contraseña?",
     "submit": "Iniciar sesión",
@@ -42,7 +42,7 @@
   },
   "signup": {
     "title": "Crea tu cuenta",
-    "username_placeholder": "fabiconcept",
+    "username_placeholder": "Crea tu apodo",
     "email_placeholder": "Email",
     "password_placeholder": "Contraseña",
     "submit": "Enviar",
@@ -78,7 +78,7 @@
   "landing": {
     "headline": "El Único Enlace Que Necesitarás",
     "subheadline": "Conecta tu audiencia con todo tu contenido con un solo enlace",
-    "placeholder": "fabiconcept",
+    "placeholder": "Crea tu apodo",
     "submit": "Crear"
   },
   "settings": {
