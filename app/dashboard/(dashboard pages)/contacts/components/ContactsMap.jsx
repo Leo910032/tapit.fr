@@ -468,7 +468,7 @@ export default function ContactsMap({ contacts = [], selectedContactId = null, o
                 <ExpandableHelpButtonFixed />
             )}
             
-            {/* Helper Text (Desktop) */}
+            {/* Helpr Text (Desktop) */}
             {isLoaded && !isMobile && contactsWithLocation.length > 1 && (
                 <div className="absolute bottom-8 left-2 bg-white p-2 rounded-lg shadow border text-xs text-gray-500">
                     💡 {t('contacts_map.click_markers_for_info') || 'Cliquez sur les marqueurs pour voir plus d&apos;informations'}

@@ -9,13 +9,13 @@ import { collection, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import { FaCheck, FaEye, FaEyeSlash, FaX } from "react-icons/fa6";
 
 export default function SignUpForm() {
     const router = useRouter();
-    const { t } = useTranslation();
+    const { t, isInitialized } = useTranslation();
     
     const [seePassord, setSeePassord] = useState(true);
     const [username, setUsername] = useState("");
@@ -31,14 +31,44 @@ export default function SignUpForm() {
     const [existingEmail, setExistingEmail] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    
+    // Use refs to prevent infinite loops
+    const isInitializedRef = useRef(false);
+    const unsubscribeRef = useRef(null);
+    
     const debouncedUsername = useDebounce(username, 500);
     const debouncedPassword = useDebounce(password, 500);
     const debouncedEmail = useDebounce(email, 500);
 
-    const handleSubmit = async(e) => {
+    // Memoize the translation function calls
+    const translations = useMemo(() => {
+        if (!isInitialized) return {};
+        
+        return {
+            cannotSubmit: t('signup.cannot_submit'),
+            somethingWentWrong: t('signup.something_went_wrong'),
+            settingUpAccount: t('signup.setting_up_account'),
+            couldNotComplete: t('signup.could_not_complete_registration'),
+            setupComplete: t('signup.setup_complete'),
+            usernameTaken: t('signup.username_taken'),
+            usernameTooShort: t('signup.username_too_short'),
+            invalidUsernameFormat: t('signup.invalid_username_format'),
+            accountExists: t('signup.account_exists'),
+            invalidEmailFormat: t('signup.invalid_email_format'),
+            title: t('signup.title'),
+            usernamePlaceholder: t('signup.username_placeholder'),
+            emailPlaceholder: t('signup.email_placeholder'),
+            passwordPlaceholder: t('signup.password_placeholder'),
+            submit: t('signup.submit'),
+            haveAccount: t('signup.have_account'),
+            logIn: t('signup.log_in')
+        };
+    }, [t, isInitialized]);
+
+    const handleSubmit = useCallback(async(e) => {
         e.preventDefault();
 
-        if (!canProceed || isLoading) throw new Error(t('signup.cannot_submit'));
+        if (!canProceed || isLoading) throw new Error(translations.cannotSubmit);
         
         setIsLoading(true);
         const data = {
@@ -57,20 +87,20 @@ export default function SignUpForm() {
         } catch (error) {
             setIsLoading(false);
             setCanProceed(false);
-            setErrorMessage(t('signup.something_went_wrong'));
+            setErrorMessage(translations.somethingWentWrong);
             throw new Error(`${error}`);
         }
-    }
+    }, [canProceed, isLoading, username, email, password, translations, router]);
 
-    const createAccountHandler = (e) => {
+    const createAccountHandler = useCallback((e) => {
         e.preventDefault();
         const promise = handleSubmit(e);
         toast.promise(
             promise,
             {
-                loading: t('signup.setting_up_account'),
-                error: t('signup.could_not_complete_registration'),
-                success: t('signup.setup_complete'),
+                loading: translations.settingUpAccount,
+                error: translations.couldNotComplete,
+                success: translations.setupComplete,
             },
             {
                 style: {
@@ -84,120 +114,150 @@ export default function SignUpForm() {
                 },
             }
         )
-    }
+    }, [handleSubmit, translations]);
 
+    // Initialize from session cookie only once
     useEffect(() => {
-        if (debouncedUsername !== "") {
-            if (existingUsernames.includes(String(debouncedUsername).toLowerCase())) {
-                setHasError((prevData) => ({ ...prevData, username: 1 }));
-                setErrorMessage(t('signup.username_taken'));
-                return;
+        if (!isInitializedRef.current) {
+            const sessionUsername = getSessionCookie("username");
+            if (sessionUsername) {
+                setUsername(sessionUsername);
             }
-
-            if (String(debouncedUsername).length < 3) {
-                setHasError((prevData) => ({ ...prevData, username: 1 }));
-                setErrorMessage(t('signup.username_too_short'));
-                return;
-            }
-
-            if (/[^a-zA-Z0-9\-_]/.test(debouncedUsername)) {
-                setHasError((prevData) => ({ ...prevData, username: 1 }));
-                setErrorMessage(t('signup.invalid_username_format'));
-                return;
-            }
-
-            setHasError((prevData) => ({ ...prevData, username: 2 }));
-            return;
-
-        } else {
-            setHasError((prevData) => ({ ...prevData, username: 0 }));
+            isInitializedRef.current = true;
         }
-    }, [debouncedUsername, existingUsernames, t]);
-
-    useEffect(() => {
-        if (debouncedEmail !== "") {
-            if (existingEmail.includes(String(debouncedEmail).toLowerCase())) {
-                setHasError((prevData) => ({ ...prevData, email: 1 }));
-                setErrorMessage(t('signup.account_exists'));
-                return;
-            }
-
-            if (!validateEmail(debouncedEmail)) {
-                setHasError((prevData) => ({ ...prevData, email: 1 }));
-                setErrorMessage(t('signup.invalid_email_format'));
-                return;
-            }
-
-            setHasError((prevData) => ({ ...prevData, email: 2 }));
-            return;
-        } else {
-            setHasError((prevData) => ({ ...prevData, email: 0 }));
-        }
-
-    }, [debouncedEmail, existingEmail, t]);
-
-    useEffect(() => {
-        if (debouncedPassword !== "") {
-            if (typeof (validatePassword(debouncedPassword)) !== "boolean") {
-                setHasError((prevData) => ({ ...prevData, password: 1 }));
-                setErrorMessage(validatePassword(debouncedPassword));
-                return;
-            }
-
-            setHasError((prevData) => ({ ...prevData, password: 2 }));
-            return;
-        } else {
-            setHasError((prevData) => ({ ...prevData, password: 0 }));
-        }
-    }, [debouncedPassword]);
-
-    useEffect(() => {
-        const sessionUsername = getSessionCookie("username");
-        if (sessionUsername !== undefined) {
-            setUsername(sessionUsername);
-        }
-
-        function fetchExistingUsername() {
-            const existingUsernames = [];
-            const existingEmails = [];
-        
-            const collectionRef = collection(fireApp, "accounts");
-        
-            onSnapshot(collectionRef, (querySnapshot) => {
-                querySnapshot.forEach((credential) => {
-                    const data = credential.data();
-                    const { username, email } = data;
-                    existingUsernames.push(String(username).toLowerCase());
-                    existingEmails.push(String(email).toLowerCase());
-                });
-                
-                setExistingUsernames(existingUsernames);
-                setExistingEmail(existingEmails);
-            });
-        }
-
-        fetchExistingUsername();
     }, []);
 
+    // Fetch existing usernames and emails - Fixed to prevent infinite loop
     useEffect(() => {
-        if (hasError.email <= 1) {
-            setCanProceed(false);
-            return
+        if (unsubscribeRef.current) return; // Prevent multiple subscriptions
+
+        const collectionRef = collection(fireApp, "accounts");
+        
+        const unsubscribe = onSnapshot(collectionRef, (querySnapshot) => {
+            const usernames = [];
+            const emails = [];
+            
+            querySnapshot.forEach((credential) => {
+                const data = credential.data();
+                if (data.username) {
+                    usernames.push(String(data.username).toLowerCase());
+                }
+                if (data.email) {
+                    emails.push(String(data.email).toLowerCase());
+                }
+            });
+            
+            setExistingUsernames(usernames);
+            setExistingEmail(emails);
+        });
+
+        unsubscribeRef.current = unsubscribe;
+        
+        // Cleanup function
+        return () => {
+            if (unsubscribeRef.current) {
+                unsubscribeRef.current();
+                unsubscribeRef.current = null;
+            }
+        };
+    }, []); // Empty dependency array
+
+    // Username validation - optimized
+    useEffect(() => {
+        if (!isInitialized || !translations.usernameTaken) return;
+
+        if (debouncedUsername === "") {
+            setHasError((prev) => ({ ...prev, username: 0 }));
+            return;
         }
 
-        if (hasError.username <= 1) {
-            setCanProceed(false);
-            return
+        const lowerUsername = String(debouncedUsername).toLowerCase();
+        
+        if (existingUsernames.includes(lowerUsername)) {
+            setHasError((prev) => ({ ...prev, username: 1 }));
+            setErrorMessage(translations.usernameTaken);
+            return;
         }
 
-        if (hasError.password <= 1) {
-            setCanProceed(false);
-            return
+        if (debouncedUsername.length < 3) {
+            setHasError((prev) => ({ ...prev, username: 1 }));
+            setErrorMessage(translations.usernameTooShort);
+            return;
         }
 
-        setCanProceed(true);
-        setErrorMessage("");
+        if (/[^a-zA-Z0-9\-_]/.test(debouncedUsername)) {
+            setHasError((prev) => ({ ...prev, username: 1 }));
+            setErrorMessage(translations.invalidUsernameFormat);
+            return;
+        }
+
+        setHasError((prev) => ({ ...prev, username: 2 }));
+    }, [debouncedUsername, existingUsernames, translations, isInitialized]);
+
+    // Email validation - optimized
+    useEffect(() => {
+        if (!isInitialized || !translations.accountExists) return;
+
+        if (debouncedEmail === "") {
+            setHasError((prev) => ({ ...prev, email: 0 }));
+            return;
+        }
+
+        const lowerEmail = String(debouncedEmail).toLowerCase();
+        
+        if (existingEmail.includes(lowerEmail)) {
+            setHasError((prev) => ({ ...prev, email: 1 }));
+            setErrorMessage(translations.accountExists);
+            return;
+        }
+
+        if (!validateEmail(debouncedEmail)) {
+            setHasError((prev) => ({ ...prev, email: 1 }));
+            setErrorMessage(translations.invalidEmailFormat);
+            return;
+        }
+
+        setHasError((prev) => ({ ...prev, email: 2 }));
+    }, [debouncedEmail, existingEmail, translations, isInitialized]);
+
+    // Password validation - optimized
+    useEffect(() => {
+        if (debouncedPassword === "") {
+            setHasError((prev) => ({ ...prev, password: 0 }));
+            return;
+        }
+
+        const passwordValidation = validatePassword(debouncedPassword);
+        
+        if (typeof passwordValidation !== "boolean") {
+            setHasError((prev) => ({ ...prev, password: 1 }));
+            setErrorMessage(passwordValidation);
+            return;
+        }
+
+        setHasError((prev) => ({ ...prev, password: 2 }));
+    }, [debouncedPassword]);
+
+    // Can proceed validation - optimized
+    useEffect(() => {
+        const allValid = hasError.email === 2 && hasError.username === 2 && hasError.password === 2;
+        setCanProceed(allValid);
+        
+        if (allValid) {
+            setErrorMessage("");
+        }
     }, [hasError]);
+
+    // Don't render until translations are loaded
+    if (!isInitialized) {
+        return (
+            <div className="flex-1 sm:p-12 py-8 p-2 flex flex-col overflow-y-auto">
+                <div className="flex justify-center items-center h-full">
+                    <div>Loading...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 sm:p-12 py-8 p-2 flex flex-col overflow-y-auto">
@@ -205,13 +265,13 @@ export default function SignUpForm() {
                 <Image priority src={"https://linktree.sirv.com/Images/full-logo.svg"} alt="logo" height={150} width={100} className="w-[7.05rem]" />
             </Link>
             <section className="mx-auto py-10 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-1/2 flex-1 flex flex-col justify-center">
-                <p className="text-2xl sm:text-5xl font-extrabold text-center">{t('signup.title')}</p>
+                <p className="text-2xl sm:text-5xl font-extrabold text-center">{translations.title}</p>
                 <form className="py-8 sm:py-12 flex flex-col gap-4 sm:gap-6 w-full" onSubmit={createAccountHandler}>
                     <div className={`flex items-center py-2 sm:py-3 px-2 sm:px-6 rounded-md myInput ${hasError.username === 1 ? "hasError" : hasError.username === 2 ? "good" : ""} bg-black bg-opacity-5 text-base sm:text-lg w-full`}>
                         <label className="opacity-40">mylinktree/</label>
                         <input
                             type="text"
-                            placeholder={t('signup.username_placeholder')}
+                            placeholder={translations.usernamePlaceholder}
                             className="outline-none border-none bg-transparent ml-1 py-3 flex-1 text-sm sm:text-base"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -229,7 +289,7 @@ export default function SignUpForm() {
                     <div className={`flex items-center py-2 sm:py-3 px-2 sm:px-6 rounded-md myInput ${hasError.email === 1 ? "hasError" : hasError.email === 2 ? "good" : ""} bg-black bg-opacity-5 text-base sm:text-lg w-full`}>
                         <input
                             type="text"
-                            placeholder={t('signup.email_placeholder')}
+                            placeholder={translations.emailPlaceholder}
                             className="outline-none border-none bg-transparent ml-1 py-3 flex-1 text-sm sm:text-base"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -247,7 +307,7 @@ export default function SignUpForm() {
                     <div className={`flex items-center relative py-2 sm:py-3 px-2 sm:px-6 rounded-md  ${hasError.password === 1 ? "hasError" : hasError.password === 2 ? "good" : ""} bg-black bg-opacity-5 text-base sm:text-lg myInput`}>
                         <input
                             type={`${seePassord ? "password" : "text"}`}
-                            placeholder={t('signup.password_placeholder')}
+                            placeholder={translations.passwordPlaceholder}
                             className="peer outline-none border-none bg-transparent py-3 ml-1 flex-1 text-sm sm:text-base"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -259,13 +319,13 @@ export default function SignUpForm() {
                     <button type="submit" className={
                         `rounded-md py-4 sm:py-5 grid place-items-center font-semibold ${canProceed ? "cursor-pointer active:scale-95 active:opacity-40 hover:scale-[1.025] bg-themeGreen mix-blend-screen" : "cursor-default opacity-50 "}`
                     }>
-                        {!isLoading && <span className="nopointer">{t('signup.submit')}</span>}
+                        {!isLoading && <span className="nopointer">{translations.submit}</span>}
                         {isLoading && <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className=" mix-blend-screen" />}
                     </button>
 
                     {!isLoading && <span className="text-sm text-red-500 text-center">{errorMessage}</span>}
                 </form>
-                <p className="text-center"><span className="opacity-60">{t('signup.have_account')}</span> <Link className="text-themeGreen" href={"/login"}>{t('signup.log_in')}</Link> </p>
+                <p className="text-center"><span className="opacity-60">{translations.haveAccount}</span> <Link className="text-themeGreen" href={"/login"}>{translations.logIn}</Link> </p>
             </section>
         </div>
     )
