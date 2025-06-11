@@ -15,7 +15,7 @@ import { FaCheck, FaEye, FaEyeSlash, FaX } from "react-icons/fa6";
 
 export default function SignUpForm() {
     const router = useRouter();
-    const { t, isInitialized } = useTranslation();
+    const { t, isInitialized, locale } = useTranslation(); // Get current locale from translation hook
     
     const [seePassord, setSeePassord] = useState(true);
     const [username, setUsername] = useState("");
@@ -80,11 +80,12 @@ export default function SignUpForm() {
         const data = {
             username,
             email,
-            password
+            password,
+            language: locale // ✅ Pass current language from translation hook
         }
 
         try {
-            console.log('📤 Calling createAccount with data:', { username, email, password: '***' });
+            console.log('📤 Calling createAccount with data:', { username, email, password: '***', language: locale });
             const userId = await createAccount(data);
             console.log('✅ Account created successfully! User ID:', userId);
 
@@ -120,7 +121,7 @@ export default function SignUpForm() {
             setErrorMessage(translations.somethingWentWrong || 'Something went wrong');
             throw error; // Re-throw for toast to handle
         }
-    }, [canProceed, isLoading, username, email, password, translations]);
+    }, [canProceed, isLoading, username, email, password, locale, translations]);
 
     const createAccountHandler = useCallback((e) => {
         e.preventDefault();

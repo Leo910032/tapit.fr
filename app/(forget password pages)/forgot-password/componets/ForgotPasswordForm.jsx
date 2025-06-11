@@ -12,10 +12,9 @@ import { toast } from "react-hot-toast";
 import { FaCheck, FaX } from "react-icons/fa6";
 import { useTranslation } from "@/lib/useTranslation";
 
-
 export default function ForgotPasswordForm() {
     const router = useRouter();
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation(); // Get current locale from translation hook
     const [emailText, setEmailText]= useState("");
     const [existingEmail, setExistingEmail] = useState([]);
     const [canProceed, setCanProceed] = useState(false);
@@ -62,6 +61,7 @@ export default function ForgotPasswordForm() {
             uid: uid,
             email: debouncedEmail,
             expiresIn: timestampOneHourLater,
+            language: locale // ✅ Pass current language from translation hook
         }
             
         const promise = sendResetUrl(payload);
@@ -105,7 +105,6 @@ export default function ForgotPasswordForm() {
         }
 
     }, [debouncedEmail, existingEmail]);
-
 
     useEffect(()=>{
         if (hasError.email <= 1) {
