@@ -1,169 +1,138 @@
-"use client"
-import { validatePassword } from "@/lib/utilities";
-import { useDebounce } from "@/LocalHooks/useDebounce";
-import { changePassword } from "@/lib/authentication/changePassword";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { FaEye, FaEyeSlash} from "react-icons/fa6";
-
-export default function ResetPasswordForm({user, resetKey}) {
-    const router = useRouter();
-    
-    const [seePassord, setSeePassord] = useState(true);
-    const [seePassord2, setSeePassord2] = useState(true);
-    const [mainPasswordText, setMainPasswordText]= useState("");
-    const [confirmPasswordText, setConfirmPasswordText]= useState("");
-    const [canProceed, setCanProceed] = useState(false);
-
-    const debouncedPassword_main = useDebounce(mainPasswordText, 500);
-    const debouncedPassword_confirm = useDebounce(confirmPasswordText, 500);
-
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    
-    const [hasError, setHasError]= useState({
-            password: 0,
-            password_confirm: 0,
-    });
-    
-    useEffect(() => {
-        if (debouncedPassword_main === "") {
-            setHasError((prevData) => ({ ...prevData, password: 0 }));
-            setErrorMessage("")
-            return;
-        }
-
-        if (typeof (validatePassword(debouncedPassword_main)) !== "boolean") {
-            setHasError((prevData) => ({ ...prevData, password: 1 }));
-            setErrorMessage(validatePassword(debouncedPassword_main));
-            return;
-        }
-
-        setHasError((prevData) => ({ ...prevData, password: 2 }));
-        setErrorMessage("");
-    }, [debouncedPassword_main]);
-
-    useEffect(() => {
-        if (debouncedPassword_confirm === "") {
-            setHasError((prevData) => ({ ...prevData, password_confirm: 0 }));
-            setErrorMessage("");
-            return;
-        }
-        
-
-        setHasError((prevData) => ({ ...prevData, password_confirm: 2 }));
-    }, [debouncedPassword_confirm]);
-    
-    useEffect(() => {
-        if (debouncedPassword_confirm === "") {
-            return;
-        }
-        if (debouncedPassword_confirm !== debouncedPassword_main) {
-            setHasError((prevData) => ({ ...prevData, password_confirm: 1 }));
-            setErrorMessage("Both password must match!");
-            return;
-        }
-    }, [debouncedPassword_confirm, debouncedPassword_main]);
-
-    const handleSubmit = async (e) =>{
-        e.preventDefault(); 
-        if (!canProceed) return;
-        if (isLoading) return;
-        setIsLoading(true);
-        setCanProceed(false);
-
-        const promise = changePassword(
-            resetKey,
-            debouncedPassword_main,
-            debouncedPassword_confirm,
-            user
-        );
-
-        toast.promise(promise, {
-            loading: "Setting up your new Password...",
-            error: "Oops! Something went wrong!",
-            success: "Password changed! ✨✔"
-        }).then(()=>{
-            setTimeout(() => {
-                router.push("/login");
-            }, 1000);
-        }).catch((error)=>{
-            setIsLoading(false);
-            setCanProceed(false);
-    
-            if (error.custom){
-                console.error(error.custom);
-                setHasError((prevData) => ({ ...prevData, password: 1 }));
-                setErrorMessage(`${error.custom}`);
-                return;
-            }
-            console.error(error);
-            setErrorMessage(`Oops! Something went wrong!`);
-        });
+export const resetPasswordEmail = (resetPasswordURL, language = 'en') => {
+  const emailTranslations = {
+    en: {
+      reset_title: "Password Reset",
+      reset_subtitle: "Secure your account",
+      reset_message: "You've requested to reset your password for your TapIt account. Click the button below to create a new password. This link will expire in 24 hours for security reasons.",
+      security_notice: "Security Notice",
+      reset_security_message: "If you didn't request this password reset, please ignore this email. Your account remains secure and no changes have been made.",
+      reset_button: "Reset My Password →",
+      reset_footer_message: "This email was sent from TapIt",
+      reset_footer_note: "If you're having trouble with the button above, copy and paste this URL into your browser:",
+      security_expire_note: "For your security, this link will expire in 24 hours. If you need assistance, please contact our support team."
+    },
+    fr: {
+      reset_title: "Réinitialisation du mot de passe",
+      reset_subtitle: "Sécurisez votre compte",
+      reset_message: "Vous avez demandé à réinitialiser votre mot de passe pour votre compte TapIt. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe. Ce lien expirera dans 24 heures pour des raisons de sécurité.",
+      security_notice: "Avis de sécurité",
+      reset_security_message: "Si vous n'avez pas demandé cette réinitialisation de mot de passe, veuillez ignorer cet e-mail. Votre compte reste sécurisé et aucune modification n'a été apportée.",
+      reset_button: "Réinitialiser mon mot de passe →",
+      reset_footer_message: "Cet e-mail a été envoyé depuis TapIt",
+      reset_footer_note: "Si vous rencontrez des problèmes avec le bouton ci-dessus, copiez et collez cette URL dans votre navigateur :",
+      security_expire_note: "Pour votre sécurité, ce lien expirera dans 24 heures. Si vous avez besoin d'aide, veuillez contacter notre équipe de support."
+    },
+    es: {
+      reset_title: "Restablecimiento de contraseña",
+      reset_subtitle: "Asegura tu cuenta",
+      reset_message: "Has solicitado restablecer tu contraseña para tu cuenta de TapIt. Haz clic en el botón de abajo para crear una nueva contraseña. Este enlace expirará en 24 horas por razones de seguridad.",
+      security_notice: "Aviso de seguridad",
+      reset_security_message: "Si no solicitaste este restablecimiento de contraseña, por favor ignora este correo. Tu cuenta permanece segura y no se han realizado cambios.",
+      reset_button: "Restablecer mi contraseña →",
+      reset_footer_message: "Este correo fue enviado desde TapIt",
+      reset_footer_note: "Si tienes problemas con el botón de arriba, copia y pega esta URL en tu navegador:",
+      security_expire_note: "Por tu seguridad, este enlace expirará en 24 horas. Si necesitas ayuda, por favor contacta a nuestro equipo de soporte."
+    },
+    vm: {
+      reset_title: "Đặt lại mật khẩu",
+      reset_subtitle: "Bảo mật tài khoản của bạn",
+      reset_message: "Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản TapIt của mình. Nhấp vào nút bên dưới để tạo mật khẩu mới. Liên kết này sẽ hết hạn sau 24 giờ vì lý do bảo mật.",
+      security_notice: "Thông báo bảo mật",
+      reset_security_message: "Nếu bạn không yêu cầu đặt lại mật khẩu này, vui lòng bỏ qua email này. Tài khoản của bạn vẫn an toàn và không có thay đổi nào được thực hiện.",
+      reset_button: "Đặt lại mật khẩu của tôi →",
+      reset_footer_message: "Email này được gửi từ TapIt",
+      reset_footer_note: "Nếu bạn gặp sự cố với nút ở trên, hãy sao chép và dán URL này vào trình duyệt của bạn:",
+      security_expire_note: "Vì lý do bảo mật, liên kết này sẽ hết hạn sau 24 giờ. Nếu bạn cần hỗ trợ, vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi."
+    },
+    zh: {
+      reset_title: "密码重置",
+      reset_subtitle: "保护您的账户",
+      reset_message: "您已请求重置您的 TapIt 账户密码。点击下面的按钮创建新密码。出于安全考虑，此链接将在 24 小时后过期。",
+      security_notice: "安全提醒",
+      reset_security_message: "如果您没有请求此密码重置，请忽略此邮件。您的账户仍然安全，没有进行任何更改。",
+      reset_button: "重置我的密码 →",
+      reset_footer_message: "此邮件来自 TapIt",
+      reset_footer_note: "如果您无法使用上面的按钮，请将此 URL 复制并粘贴到您的浏览器中：",
+      security_expire_note: "出于安全考虑，此链接将在 24 小时后过期。如果您需要帮助，请联系我们的支持团队。"
     }
+  };
 
-    useEffect(()=>{
-        if (hasError.password <= 1) {
-            setCanProceed(false);
-            return;
-        }
-        
-        if (hasError.password_confirm <= 1) {
-            setCanProceed(false);
-            return;
-        }
+  const t = emailTranslations[language] || emailTranslations.en;
+  
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${t.reset_title}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: Arial, sans-serif;">
 
-        setCanProceed(true);
-        setErrorMessage("");
-    }, [hasError]);
-    
-    return (
-        <div className="flex-1 sm:p-12 px-4 py-8 flex flex-col overflow-y-auto">
-            <Link href={'/'} className="sm:p-0 p-3">
-                <Image src={"https://linktree.sirv.com/Images/full-logo.svg"} alt="logo" height={150} width={100} className="w-[7.05rem]" />
-            </Link>
-            <section className="mx-auto py-10 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-1/2 flex-1 flex flex-col justify-center">
-                <p className="text-2xl sm:text-5xl md:text-3xl font-extrabold text-center">Enter your new password</p>
-                <p className="opacity-40 mt-4 max-w-sm mx-auto text-center">I&apos;ll advice that your new password be different from your previous password.</p>
-                <form className="py-8 sm:py-12 flex flex-col gap-4 sm:gap-6 w-full" onSubmit={handleSubmit}>
-                    <div className={`flex items-center relative py-2 sm:py-3 px-2 sm:px-6 rounded-md  ${hasError.password === 1 ? "hasError" : hasError.password === 2 ? "good" : ""} bg-black bg-opacity-5 text-base sm:text-lg myInput`}>
-                        <input
-                            type={`${seePassord ? "password" : "text"}`}
-                            placeholder="Password"
-                            className="peer outline-none border-none bg-transparent py-3 ml-1 flex-1 text-sm sm:text-base"
-                            value={mainPasswordText}
-                            onChange={(e) => setMainPasswordText(e.target.value)}
-                            required
-                        />
-                        {seePassord && <FaEyeSlash className="opacity-60 cursor-pointer" onClick={() => setSeePassord(!seePassord)} />}
-                        {!seePassord && <FaEye className="opacity-60 cursor-pointer text-themeGreen" onClick={() => setSeePassord(!seePassord)} />}
-                    </div>
-                    <div className={`flex items-center relative py-2 sm:py-3 px-2 sm:px-6 rounded-md  ${hasError.password_confirm === 1 ? "hasError" : hasError.password_confirm === 2 ? "good" : ""} bg-black bg-opacity-5 text-base sm:text-lg myInput`}>
-                        <input
-                            type={`${seePassord2 ? "password" : "text"}`}
-                            placeholder="Retype assword"
-                            className="peer outline-none border-none bg-transparent py-3 ml-1 flex-1 text-sm sm:text-base"
-                            value={confirmPasswordText}
-                            onChange={(e) => setConfirmPasswordText(e.target.value)}
-                            required
-                        />
-                        {seePassord2 && <FaEyeSlash className="opacity-60 cursor-pointer" onClick={() => setSeePassord2(!seePassord2)} />}
-                        {!seePassord2 && <FaEye className="opacity-60 cursor-pointer text-themeGreen" onClick={() => setSeePassord2(!seePassord2)} />}
-                    </div>
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; background-color: #ffffff; border-radius: 24px; overflow: hidden;">
+          
+          <tr>
+            <td style="background-color: #DC2626; padding: 48px 32px; text-align: center;">
+              <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 32px; background-color: rgba(255, 255, 255, 0.2); border-radius: 32px; padding: 24px;">
+                <tr>
+                  <td align="center">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/lintre-ffa96.firebasestorage.app/o/Logo%2Fimage-removebg-preview.png?alt=media&token=4ac6b2d0-463e-4ed7-952a-2fed14985fc0" 
+                         alt="TapIt Logo" 
+                         width="160" 
+                         height="100" 
+                         style="display: block; border: 0; filter: brightness(0) invert(1);">
+                  </td>
+                </tr>
+              </table>
+              <h1 style="color: #ffffff; font-size: 32px; font-weight: bold; margin: 0 0 8px 0; font-family: Arial, sans-serif;">${t.reset_title}</h1>
+              <p style="color: rgba(255, 255, 255, 0.9); font-size: 18px; margin: 0; font-family: Arial, sans-serif;">${t.reset_subtitle}</p>
+            </td>
+          </tr>
+          
+          <tr>
+            <td style="padding: 48px 32px;">
+              <p style="font-size: 16px; color: #6B7280; margin: 0 0 32px 0; line-height: 1.7; font-family: Arial, sans-serif;">${t.reset_message}</p>
+              
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 20px; margin: 32px 0;">
+                <tr>
+                  <td>
+                    <h3 style="color: #dc2626; font-size: 16px; font-weight: bold; margin: 0 0 8px 0; font-family: Arial, sans-serif;">🔒 ${t.security_notice}</h3>
+                    <p style="color: #b91c1c; font-size: 14px; margin: 0; font-family: Arial, sans-serif;">${t.reset_security_message}</p>
+                  </td>
+                </tr>
+              </table>
+              
+              <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 40px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${resetPasswordURL}" style="display: inline-block; background-color: #DC2626; color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: bold; font-size: 16px; font-family: Arial, sans-serif;">${t.reset_button}</a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="font-size: 16px; color: #6B7280; margin: 0; line-height: 1.7; font-family: Arial, sans-serif;">${t.security_expire_note}</p>
+            </td>
+          </tr>
+          
+          <tr>
+            <td style="background-color: #f8fafc; padding: 32px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="color: #6B7280; font-size: 14px; margin: 0 0 16px 0; font-family: Arial, sans-serif;">${t.reset_footer_message}</p>
+              <p style="font-size: 12px; color: #9CA3AF; margin: 0; font-family: Arial, sans-serif; word-break: break-all;">
+                ${t.reset_footer_note}<br>
+                <span style="color: #674299;">${resetPasswordURL}</span>
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
 
-                    <button type={canProceed ? "submit" : "button"} className={
-                        `border rounded-md py-4 sm:py-5 grid place-items-center font-semibold ${canProceed? "cursor-pointer active:scale-95 active:opacity-40 hover:scale-[1.025] bg-themeGreen mix-blend-screen border-transparent" : "cursor-default opacity-50 border-black/20"}`
-                    }>
-                        {!isLoading && <span className="nopointer">Change password</span>}
-                        {isLoading && <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className={canProceed? "mix-blend-multiply": "mix-blend-screen"} />}
-                    </button>
-                    {!isLoading && <span className="text-sm text-red-500 text-center">{errorMessage}</span>}
-                </form>
-            </section>
-
-        </div>
-    )
-}
+</body>
+</html>
+`;
+};

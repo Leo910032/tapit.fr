@@ -33,7 +33,7 @@ function getEmailSubject(language) {
         en: "Welcome to TapIt - Your account is ready! 🚀",
         fr: "Bienvenue sur TapIt - Votre compte est prêt ! 🚀",
         es: "¡Bienvenido a TapIt - Tu cuenta está lista! 🚀",
-        vm: "Chào mừng đến với TapIt - Tài khoản của bạn đã sẵn sàng! 🚀",
+        vi: "Chào mừng đến với TapIt - Tài khoản của bạn đã sẵn sàng! 🚀",
         zh: "欢迎来到 TapIt - 您的账户已准备就绪！🚀"
     };
     return subjects[language] || subjects.en;

@@ -9,13 +9,13 @@ import { collection, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 export default function LoginForm() {
     const router = useRouter();
-    const { t } = useTranslation();
+    const { t, isInitialized } = useTranslation();
     
     const [seePassword, setSeePassword] = useState(true);
     const [username, setUsername] = useState("");
@@ -24,48 +24,99 @@ export default function LoginForm() {
     const [existingUsernames, setExistingUsernames] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    
+    // Use refs to prevent infinite loops (same pattern as signup)
+    const unsubscribeRef = useRef(null);
+    
     const debouncedUsername = useDebounce(username, 500);
     const debouncedPassword = useDebounce(password, 500);
 
-    const handleLogin = async(e) => {
+    // Memoize translations
+    const translations = useMemo(() => {
+        if (!isInitialized) return {};
+        
+        return {
+            validating: t('login.validating'),
+            invalidCredentials: t('login.invalid_credentials'),
+            success: t('login.success'),
+            incorrectPassword: t('login.incorrect_password'),
+            usernameNotRegistered: t('login.username_not_registered'),
+            title: t('login.title'),
+            usernamePlaceholder: t('login.username_placeholder'),
+            passwordPlaceholder: t('login.password_placeholder'),
+            forgotPassword: t('login.forgot_password'),
+            submit: t('login.submit'),
+            noAccount: t('login.no_account'),
+            signUp: t('login.sign_up')
+        };
+    }, [t, isInitialized]);
+
+    const handleLogin = useCallback(async(e) => {
         e.preventDefault();
 
         if (!canProceed || isLoading) {
-            return;
+            console.log('❌ Cannot proceed - canProceed:', canProceed, 'isLoading:', isLoading);
+            throw new Error('Cannot proceed with login');
         }
         
+        console.log('🔐 Starting login process...');
         setIsLoading(true);
+        
         const data = {
             log_username: username,
             log_password: password
         }
 
         try {
+            console.log('📤 Attempting login for username:', username);
             const userId = await loginAccount(data);
+            console.log('✅ Login successful! User ID:', userId);
+            
+            console.log('🍪 Setting session cookie...');
             setSessionCookie("adminLinker", `${userId}`, (60 * 60));
+            
+            console.log('🎉 Login completed, redirecting to dashboard...');
             setTimeout(() => {
                 router.push("/dashboard");
             }, 1000);
+            
         } catch (error) {
+            console.error('❌ Login failed:', error);
+            
             setIsLoading(false);
-            setCanProceed(false);
+            // Don't set canProceed to false to avoid form validation issues
+            
+            // Determine specific error message
+            let errorMsg;
             if (existingUsernames.includes(String(username).toLowerCase())) {
-                setErrorMessage(t('login.incorrect_password'));
+                errorMsg = translations.incorrectPassword || 'Incorrect password';
             } else {
-                setErrorMessage(t('login.username_not_registered'));
+                errorMsg = translations.usernameNotRegistered || 'Username not registered';
             }
+            
+            setErrorMessage(errorMsg);
+            
+            // 🔧 IMPORTANT: Re-throw the error so toast.promise knows it failed
+            throw new Error(errorMsg);
         }
-    }
+    }, [canProceed, isLoading, username, password, existingUsernames, translations, router]);
 
-    const loginHandler = (e) => {
+    const loginHandler = useCallback((e) => {
         e.preventDefault();
+        
+        console.log('🎯 Login form submitted...');
+        
         const promise = handleLogin(e);
+        
         toast.promise(
             promise,
             {
-                loading: t('login.validating'),
-                error: t('login.invalid_credentials'),
-                success: t('login.success'),
+                loading: translations.validating || 'Validating...',
+                error: (error) => {
+                    console.error('Toast error handler:', error);
+                    return translations.invalidCredentials || 'Invalid credentials';
+                },
+                success: translations.success || 'Login successful!',
             },
             {
                 style: {
@@ -78,37 +129,66 @@ export default function LoginForm() {
                     secondary: '#FFFAEE',
                 },
             }
-        )
-    }
+        );
+    }, [handleLogin, translations]);
 
+    // Fixed Firebase listener (same pattern as signup)
     useEffect(() => {
-        function fetchExistingUsername() {
-            const existingUsernames = [];
+        if (unsubscribeRef.current) return; // Prevent multiple subscriptions
+
+        const collectionRef = collection(fireApp, "accounts");
         
-            const collectionRef = collection(fireApp, "accounts");
-        
-            onSnapshot(collectionRef, (querySnapshot) => {
-                querySnapshot.forEach((credential) => {
-                    const data = credential.data();
-                    const { username } = data;
-                    existingUsernames.push(String(username).toLowerCase());
-                });
-                
-                setExistingUsernames(existingUsernames);
+        const unsubscribe = onSnapshot(collectionRef, (querySnapshot) => {
+            const usernames = [];
+            
+            querySnapshot.forEach((credential) => {
+                const data = credential.data();
+                if (data.username) {
+                    usernames.push(String(data.username).toLowerCase());
+                }
             });
-        }
+            
+            setExistingUsernames(usernames);
+        });
 
-        fetchExistingUsername();
-    }, []);
+        unsubscribeRef.current = unsubscribe;
+        
+        // Cleanup function
+        return () => {
+            if (unsubscribeRef.current) {
+                unsubscribeRef.current();
+                unsubscribeRef.current = null;
+            }
+        };
+    }, []); // Empty dependency array
 
+    // Form validation
     useEffect(() => {
+        // Don't change form state during loading
+        if (isLoading) return;
+        
         if (username !== "" && password !== "") {
             setCanProceed(true);
-            setErrorMessage("");
+            // Only clear error message if it's not a server error
+            if (!errorMessage.includes(translations.incorrectPassword) && 
+                !errorMessage.includes(translations.usernameNotRegistered)) {
+                setErrorMessage("");
+            }
         } else {
             setCanProceed(false);
         }
-    }, [debouncedUsername, debouncedPassword]);
+    }, [debouncedUsername, debouncedPassword, isLoading, errorMessage, translations]);
+
+    // Don't render until translations are loaded
+    if (!isInitialized) {
+        return (
+            <div className="flex-1 sm:p-12 px-4 py-8 flex flex-col overflow-y-auto">
+                <div className="flex justify-center items-center h-full">
+                    <div>Loading...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 sm:p-12 px-4 py-8 flex flex-col overflow-y-auto">
@@ -116,43 +196,53 @@ export default function LoginForm() {
                 <Image src={"https://linktree.sirv.com/Images/full-logo.svg"} alt="logo" height={150} width={100} className="w-[7.05rem]" />
             </Link>
             <section className="mx-auto py-10 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-1/2 flex-1 flex flex-col justify-center">
-                <p className="text-2xl sm:text-5xl md:text-3xl font-extrabold text-center">{t('login.title')}</p>
+                <p className="text-2xl sm:text-5xl md:text-3xl font-extrabold text-center">{translations.title}</p>
                 <form className="py-8 sm:py-12 flex flex-col gap-4 sm:gap-6 w-full" onSubmit={loginHandler}>
                     <div className="flex items-center py-2 sm:py-3 px-2 sm:px-6 rounded-md myInput bg-black bg-opacity-5 text-base sm:text-lg w-full">
                         <input
                             type="text"
-                            placeholder={t('login.username_placeholder')}
+                            placeholder={translations.usernamePlaceholder}
                             className="outline-none border-none bg-transparent ml-1 py-3 flex-1 text-sm sm:text-base"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
+                            disabled={isLoading}
                         />
                     </div>
                     <div className="flex items-center relative py-2 sm:py-3 px-2 sm:px-6 rounded-md bg-black bg-opacity-5 text-base sm:text-lg myInput">
                         <input
                             type={`${seePassword ? "password" : "text"}`}
-                            placeholder={t('login.password_placeholder')}
+                            placeholder={translations.passwordPlaceholder}
                             className="peer outline-none border-none bg-transparent py-3 ml-1 flex-1 text-sm sm:text-base"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            disabled={isLoading}
                         />
-                        {seePassword && <FaEyeSlash className="opacity-60 cursor-pointer" onClick={() => setSeePassword(!seePassword)} />}
-                        {!seePassword && <FaEye className="opacity-60 cursor-pointer text-themeGreen" onClick={() => setSeePassword(!seePassword)} />}
+                        {seePassword && <FaEyeSlash className={`opacity-60 cursor-pointer ${isLoading ? 'pointer-events-none' : ''}`} onClick={() => !isLoading && setSeePassword(!seePassword)} />}
+                        {!seePassword && <FaEye className={`opacity-60 cursor-pointer text-themeGreen ${isLoading ? 'pointer-events-none' : ''}`} onClick={() => !isLoading && setSeePassword(!seePassword)} />}
                     </div>
 
-                    <Link href={"/forgot-password"} className="w-fit hover:rotate-2 hover:text-themeGreen origin-left">{t('login.forgot_password')}</Link>
+                    <Link href={"/forgot-password"} className="w-fit hover:rotate-2 hover:text-themeGreen origin-left">{translations.forgotPassword}</Link>
 
-                    <button type="submit" className={
-                        `rounded-md py-4 sm:py-5 grid place-items-center font-semibold ${canProceed? "cursor-pointer active:scale-95 active:opacity-40 hover:scale-[1.025] bg-themeGreen mix-blend-screen" : "cursor-default opacity-50 "}`
-                    }>
-                        {!isLoading && <span className="nopointer">{t('login.submit')}</span>}
-                        {isLoading && <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className=" mix-blend-screen" />}
+                    <button 
+                        type="submit" 
+                        disabled={!canProceed || isLoading}
+                        className={
+                            `rounded-md py-4 sm:py-5 grid place-items-center font-semibold transition-all duration-200 ${
+                                canProceed && !isLoading
+                                    ? "cursor-pointer active:scale-95 active:opacity-40 hover:scale-[1.025] bg-themeGreen mix-blend-screen" 
+                                    : "cursor-default opacity-50"
+                            }`
+                        }
+                    >
+                        {!isLoading && <span className="nopointer">{translations.submit}</span>}
+                        {isLoading && <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className="mix-blend-screen" />}
                     </button>
 
-                    {!isLoading && <span className="text-sm text-red-500 text-center">{errorMessage}</span>}
+                    {!isLoading && errorMessage && <span className="text-sm text-red-500 text-center">{errorMessage}</span>}
                 </form>
-                <p className="text-center sm:text-base text-sm"><span className="opacity-60">{t('login.no_account')}</span> <Link href={"/signup"} className="text-themeGreen">{t('login.sign_up')}</Link> </p>
+                <p className="text-center sm:text-base text-sm"><span className="opacity-60">{translations.noAccount}</span> <Link href={"/signup"} className="text-themeGreen">{translations.signUp}</Link> </p>
             </section>
         </div>
     )

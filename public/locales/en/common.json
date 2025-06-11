@@ -349,7 +349,7 @@
     "meta_description": "Meta description"
   },
   "email": {
-    "welcome": {
+     "welcome": {
       "subject": "Thanks for creating an account!",
       "title": "Welcome to My Linktree Clone!",
       "description": "This project is my attempt at recreating the amazing system that Linktree has developed.",
@@ -367,7 +367,18 @@
       "title": "Password Reset Email",
       "description": "You've requested to reset your password. Please use the following link to reset your password:",
       "button": "Reset Password",
-      "footer": "Thank you for using our service! ❤❤❤"
+      "footer": "Thank you for using our service! ❤❤❤",
+      "reset_title": "Password Reset",
+      "reset_subtitle": "Secure your account",
+      "greeting": "Hi there! 👋",
+      "reset_message": "You've requested to reset your password for your TapIt account. Click the button below to create a new password. This link will expire in 1 hour for security reasons.",
+      "security_notice": "Security Notice",
+      "reset_security_message": "If you didn't request this password reset, please ignore this email. Your account remains secure and no changes have been made.",
+      "reset_button": "Reset My Password →",
+      "additional_info": "For your security, this link will expire in 1 hour. If you need assistance, please contact our support team.",
+      "reset_footer_message": "This email was sent from TapIt",
+      "reset_footer_note": "If you're having trouble with the button above, copy and paste this URL into your browser:",
+      "contact_support": "If you have any questions or need help, feel free to contact our support team."
     }
   },
   "userId": {
@@ -874,6 +885,7 @@
     "last_clicked": "Last clicked",
     "total_interactions_description": "Total interactions with your links"
   }
+  
   
   
 
