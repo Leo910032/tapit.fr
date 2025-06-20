@@ -119,7 +119,7 @@ export default function ForgotPasswordForm() {
     return (
         <div className="flex-1 sm:p-12 px-4 py-8 flex flex-col overflow-y-auto">
             <Link href={'/'} className="sm:p-0 p-3">
-                <Image src={"https://linktree.sirv.com/Images/full-logo.svg"} alt="logo" height={150} width={100} className="w-[7.05rem]" />
+                <Image src={"https://firebasestorage.googleapis.com/v0/b/lintre-ffa96.firebasestorage.app/o/Logo%2Fimage-removebg-preview.png?alt=media&token=4ac6b2d0-463e-4ed7-952a-2fed14985fc0"} alt="logo" height={150} width={150} className="filter invert" priority />
             </Link>
             <section className="mx-auto py-10 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-1/2 flex-1 flex flex-col justify-center">
             <p className="text-2xl sm:text-5xl md:text-3xl font-extrabold text-center"> {t('forgot_password.rest_link_request')} </p>
