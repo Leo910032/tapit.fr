@@ -1,0 +1,95 @@
+{
+  "common": {
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "submit": "Enviar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir",
+    "remove": "Quitar",
+    "loading": "Cargando..."
+  },
+  "navbar": {
+    "links": "Enlaces",
+    "appearance": "Apariencia",
+    "analytics": "Analítica",
+    "settings": "Configuración"
+  },
+  "dashboard": {
+    "links": "Enlaces",
+    "appearance": "Apariencia",
+    "analytics": "Analítica",
+    "settings": "Configuración",
+    "your_linktree": "Tu Linktree está activo:",
+    "copy_url": "Copiar URL",
+    "copied": "¡Copiado!"
+  },
+  "login": {
+    "title": "Inicia sesión en tu Linktree",
+    "username_placeholder": "Crea tu apodo",
+    "password_placeholder": "Contraseña",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "submit": "Iniciar sesión",
+    "no_account": "¿No tienes una cuenta?",
+    "sign_up": "Regístrate",
+    "invalid_credentials": "¡Credenciales de inicio de sesión inválidas!",
+    "success": "Inicio de sesión exitoso",
+    "validating": "Validando credenciales...",
+    "incorrect_password": "¡Has introducido una contraseña incorrecta!",
+    "username_not_registered": "Este nombre de usuario no está registrado."
+  },
+  "signup": {
+    "title": "Crea tu cuenta",
+    "username_placeholder": "Crea tu apodo",
+    "email_placeholder": "Email",
+    "password_placeholder": "Contraseña",
+    "submit": "Enviar",
+    "have_account": "¿Ya tienes una cuenta?",
+    "login": "Iniciar sesión",
+    "setting_up": "Configurando tu cuenta.",
+    "registration_failed": "No se pudo completar el registro",
+    "setup_complete": "Configuración completada",
+    "cannot_submit": "¡No se puede enviar el formulario todavía!",
+    "error_message": "Algo salió mal",
+    "username_taken": "Este nombre de usuario ya está en uso.",
+    "username_too_short": "El nombre de usuario es demasiado corto.",
+    "invalid_username_format": "Formato de nombre de usuario inválido",
+    "email_exists": "¡Ya tienes una cuenta con nosotros!",
+    "invalid_email": "¡Formato de correo electrónico inválido!"
+  },
+  "forgot_password": {
+    "title": "Solicitar enlace de restablecimiento de contraseña",
+    "email_placeholder": "Proporciona tu dirección de correo electrónico",
+    "submit": "Enviar solicitud",
+    "remembered": "¿Recordaste tu contraseña?",
+    "not_registered": "¡No tienes una cuenta con nosotros!",
+    "invalid_email": "¡Formato de correo electrónico inválido!"
+  },
+  "reset_password": {
+    "title": "Ingresa tu nueva contraseña",
+    "advice": "Te aconsejo que tu nueva contraseña sea diferente de tu contraseña anterior.",
+    "password_placeholder": "Contraseña",
+    "confirm_placeholder": "Vuelve a escribir la contraseña",
+    "submit": "Cambiar contraseña",
+    "passwords_must_match": "¡Ambas contraseñas deben coincidir!"
+  },
+  "landing": {
+    "headline": "El Único Enlace Que Necesitarás",
+    "subheadline": "Conecta tu audiencia con todo tu contenido con un solo enlace",
+    "placeholder": "Crea tu apodo",
+    "submit": "Crear"
+  },
+  "settings": {
+    "social_icons": "Iconos sociales",
+    "support_banner": "Banner de apoyo",
+    "sensitive_material": "Material sensible",
+    "seo": "SEO",
+    "jump_to": "Ir a:"
+  },
+  "not_found": {
+    "title": "Ups. Página no encontrada",
+    "description": "Lo sentimos, la página que estabas buscando no existe o ha sido ocultada."
+  }
+}

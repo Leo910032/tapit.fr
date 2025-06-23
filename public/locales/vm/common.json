@@ -1,0 +1,95 @@
+{
+  "common": {
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "submit": "Gửi",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "add": "Thêm",
+    "remove": "Xóa bỏ",
+    "loading": "Đang tải..."
+  },
+  "navbar": {
+    "links": "Liên kết",
+    "appearance": "Giao diện",
+    "analytics": "Phân tích",
+    "settings": "Cài đặt"
+  },
+  "dashboard": {
+    "links": "Liên kết",
+    "appearance": "Giao diện",
+    "analytics": "Phân tích",
+    "settings": "Cài đặt",
+    "your_linktree": "Linktree của bạn đang hoạt động:",
+    "copy_url": "Sao chép URL",
+    "copied": "Đã sao chép!"
+  },
+  "login": {
+    "title": "Đăng nhập vào Linktree của bạn",
+    "username_placeholder": "Tạo biệt danh của bạn",
+    "password_placeholder": "Mật khẩu",
+    "forgot_password": "Quên mật khẩu?",
+    "submit": "Đăng nhập",
+    "no_account": "Chưa có tài khoản?",
+    "sign_up": "Đăng ký",
+    "invalid_credentials": "Thông tin đăng nhập không hợp lệ!",
+    "success": "Đăng nhập thành công",
+    "validating": "Đang xác thực thông tin...",
+    "incorrect_password": "Bạn đã nhập sai mật khẩu!",
+    "username_not_registered": "Tên người dùng này chưa được đăng ký."
+  },
+  "signup": {
+    "title": "Tạo tài khoản của bạn",
+    "username_placeholder": "Tạo biệt danh của bạn",
+    "email_placeholder": "Email",
+    "password_placeholder": "Mật khẩu",
+    "submit": "Đăng ký",
+    "have_account": "Đã có tài khoản?",
+    "login": "Đăng nhập",
+    "setting_up": "Đang thiết lập tài khoản của bạn.",
+    "registration_failed": "Không thể hoàn tất đăng ký",
+    "setup_complete": "Thiết lập hoàn tất",
+    "cannot_submit": "Chưa thể gửi biểu mẫu!",
+    "error_message": "Đã xảy ra lỗi",
+    "username_taken": "Tên người dùng này đã được sử dụng.",
+    "username_too_short": "Tên người dùng quá ngắn.",
+    "invalid_username_format": "Định dạng tên người dùng không hợp lệ",
+    "email_exists": "Bạn đã có tài khoản với chúng tôi!",
+    "invalid_email": "Định dạng Email không hợp lệ!"
+  },
+  "forgot_password": {
+    "title": "Yêu cầu liên kết đặt lại mật khẩu",
+    "email_placeholder": "Nhập địa chỉ email của bạn",
+    "submit": "Gửi yêu cầu",
+    "remembered": "Đã nhớ mật khẩu của bạn?",
+    "not_registered": "Bạn chưa có tài khoản với chúng tôi!",
+    "invalid_email": "Định dạng Email không hợp lệ!"
+  },
+  "reset_password": {
+    "title": "Nhập mật khẩu mới của bạn",
+    "advice": "Tôi khuyên bạn nên đặt mật khẩu mới khác với mật khẩu cũ của bạn.",
+    "password_placeholder": "Mật khẩu",
+    "confirm_placeholder": "Nhập lại mật khẩu",
+    "submit": "Thay đổi mật khẩu",
+    "passwords_must_match": "Hai mật khẩu phải trùng nhau!"
+  },
+  "landing": {
+    "headline": "Liên Kết Duy Nhất Bạn Cần",
+    "subheadline": "Kết nối khán giả của bạn với tất cả nội dung của bạn bằng một liên kết",
+    "placeholder": "Tạo biệt danh của bạn",
+    "submit": "Tạo"
+  },
+  "settings": {
+    "social_icons": "Biểu tượng mạng xã hội",
+    "support_banner": "Banner hỗ trợ",
+    "sensitive_material": "Nội dung nhạy cảm",
+    "seo": "SEO",
+    "jump_to": "Chuyển đến:"
+  },
+  "not_found": {
+    "title": "Ôi không. Không tìm thấy trang",
+    "description": "Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị ẩn."
+  }
+}

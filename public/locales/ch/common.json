@@ -1,0 +1,95 @@
+{
+  "common": {
+    "login": "登录",
+    "signup": "注册",
+    "submit": "提交",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "add": "添加",
+    "remove": "移除",
+    "loading": "加载中..."
+  },
+  "navbar": {
+    "links": "链接",
+    "appearance": "外观",
+    "analytics": "分析",
+    "settings": "设置"
+  },
+  "dashboard": {
+    "links": "链接",
+    "appearance": "外观",
+    "analytics": "分析",
+    "settings": "设置",
+    "your_linktree": "您的Linktree已上线：",
+    "copy_url": "复制链接",
+    "copied": "已复制！"
+  },
+  "login": {
+    "title": "登录您的Linktree",
+    "username_placeholder": "创建你的昵称",
+    "password_placeholder": "密码",
+    "forgot_password": "忘记密码？",
+    "submit": "登录",
+    "no_account": "还没有账号？",
+    "sign_up": "注册",
+    "invalid_credentials": "登录凭证无效！",
+    "success": "登录成功",
+    "validating": "验证凭证中...",
+    "incorrect_password": "您输入的密码不正确！",
+    "username_not_registered": "此用户名未注册。"
+  },
+  "signup": {
+    "title": "创建您的账户",
+    "username_placeholder": "创建你的昵称",
+    "email_placeholder": "电子邮箱",
+    "password_placeholder": "密码",
+    "submit": "注册",
+    "have_account": "已有账户？",
+    "login": "登录",
+    "setting_up": "正在设置您的账户。",
+    "registration_failed": "无法完成注册",
+    "setup_complete": "设置完成",
+    "cannot_submit": "暂时无法提交表单！",
+    "error_message": "发生错误",
+    "username_taken": "此用户名已被使用。",
+    "username_too_short": "用户名太短。",
+    "invalid_username_format": "用户名格式无效",
+    "email_exists": "您已经拥有一个账户！",
+    "invalid_email": "电子邮箱格式无效！"
+  },
+  "forgot_password": {
+    "title": "请求密码重置链接",
+    "email_placeholder": "提供您的电子邮箱地址",
+    "submit": "发送请求",
+    "remembered": "记起密码了？",
+    "not_registered": "您还没有账户！",
+    "invalid_email": "电子邮箱格式无效！"
+  },
+  "reset_password": {
+    "title": "输入您的新密码",
+    "advice": "建议您的新密码与旧密码不同。",
+    "password_placeholder": "密码",
+    "confirm_placeholder": "重新输入密码",
+    "submit": "更改密码",
+    "passwords_must_match": "两个密码必须匹配！"
+  },
+  "landing": {
+    "headline": "您唯一需要的链接",
+    "subheadline": "通过一个链接将您的受众连接到您的所有内容",
+    "placeholder": "创建你的昵称",
+    "submit": "创建"
+  },
+  "settings": {
+    "social_icons": "社交图标",
+    "support_banner": "支持横幅",
+    "sensitive_material": "敏感内容",
+    "seo": "搜索引擎优化",
+    "jump_to": "跳转至："
+  },
+  "not_found": {
+    "title": "哎呀。找不到页面",
+    "description": "抱歉，您查找的页面不存在或已被隐藏。"
+  }
+}

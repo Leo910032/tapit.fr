@@ -1,0 +1,811 @@
+{
+  "exchange": {
+    "title": "Échanger Contact",
+    "description": "Partagez vos informations de contact pour vous connecter avec le propriétaire de ce profil.",
+    "close_modal": "Fermer la modale",
+    "name_label": "Nom complet",
+    "name_placeholder": "Saisissez votre nom complet",
+    "name_required": "Le nom est requis",
+    "email_label": "Adresse e-mail",
+    "email_placeholder": "Saisissez votre adresse e-mail",
+    "email_required": "L'e-mail est requis",
+    "email_invalid": "Veuillez saisir un e-mail valide",
+    "phone_label": "Numéro de téléphone",
+    "phone_placeholder": "Saisissez votre numéro de téléphone",
+    "company_label": "Entreprise/Organisation",
+    "company_placeholder": "Saisissez votre entreprise ou organisation",
+    "message_label": "Message (Optionnel)",
+    "message_placeholder": "Ajoutez un message personnel...",
+    "location_share_title": "Partager votre localisation ?",
+    "location_share_description": "Pour aider à visualiser où les connexions se font, vous pouvez partager votre localisation approximative. C'est optionnel.",
+    "share_location_button": "Partager la localisation",
+    "location_granted_message": "Accès à la localisation accordé. Merci !",
+    "geolocation_not_supported": "La géolocalisation n'est pas prise en charge par votre navigateur.",
+    "location_permission_denied": "L'accès à la localisation a été refusé. Vous pouvez l'activer dans les paramètres de votre navigateur.",
+    "location_retrieval_failed": "Impossible de récupérer votre localisation.",
+    "cancel": "Annuler",
+    "submit": "Partager Contact",
+    "submitting": "Partage en cours...",
+    "success_message": "Informations de contact partagées avec succès !",
+    "error_message": "Échec du partage des informations de contact. Veuillez réessayer."
+  },
+  "contacts": {
+    "edit_contact": "Modifier Contact",
+    "edit": "Modifier",
+    "modified": "Modifié",
+    "last_modified": "Dernière modification",
+    "contact_updated_successfully": "Contact mis à jour avec succès",
+    "failed_to_update_contact": "Échec de la mise à jour du contact",
+    "name": "Nom",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "company": "Entreprise",
+    "message": "Message",
+    "status": "Statut",
+    "contact_info": "Informations de contact",
+    "submitted_at": "Soumis le",
+    "contact_id": "ID du contact",
+    "save_changes": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "location_for_contact": "Localisation pour {name}",
+    "all_contact_locations": "Toutes les localisations de contacts",
+    "title": "Liste des contacts",
+    "subtitle": "Gérez les contacts qui ont partagé leurs informations via votre profil",
+    "loading": "Chargement des contacts...",
+    "loading_map": "Chargement de la carte...",
+    "live_updates_enabled": "Mises à jour en direct activées",
+    "contacts_with_location": "{count} contacts avec localisation",
+    "new_contacts_notification": "{count} nouveau{plural} contact{plural} reçu{plural} !{location}",
+    "failed_to_load": "Échec du chargement des contacts",
+    "status_updated": "Statut du contact mis à jour",
+    "failed_to_update_status": "Échec de la mise à jour du statut du contact",
+    "bulk_update_success": "{count} contacts mis à jour",
+    "failed_to_update_contacts": "Échec de la mise à jour des contacts",
+    "filter_by_status": "Filtrer par statut",
+    "filter_all": "Tous",
+    "filter_new": "Nouveaux",
+    "filter_viewed": "Vus",
+    "filter_archived": "Archivés",
+    "search_placeholder": "Rechercher des contacts...",
+    "no_location_data": "Aucun contact avec données de localisation",
+    "view_all_locations": "Voir toutes les localisations de contacts",
+    "map_button": "Carte",
+    "selected_contacts": "{count} contact(s) sélectionné(s)",
+    "mark_as_viewed": "Marquer comme vu",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "no_contacts_found": "Aucun contact trouvé",
+    "no_contacts_yet": "Aucun contact pour le moment",
+    "try_adjusting_filters": "Essayez d'ajuster votre recherche ou vos filtres",
+    "contacts_will_appear_here": "Les contacts apparaîtront ici lorsque les visiteurs partageront leurs informations via votre profil",
+    "status_new": "nouveau",
+    "status_viewed": "vu",
+    "status_archived": "archivé",
+    "located": "Localisé",
+    "send_email": "Envoyer un e-mail",
+    "call": "Appeler",
+    "view_location_on_map": "Voir la localisation sur la carte",
+    "export_contacts": "Exporter les contacts",
+    "export_headers": {
+      "name": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "company": "Entreprise",
+      "message": "Message",
+      "status": "Statut",
+      "submitted_at": "Soumis le",
+      "has_location": "A une localisation",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "location_accuracy": "Précision de la localisation"
+    },
+    "contact_locations": "Localisations des contacts",
+    "viewing_location_for": "Affichage de la localisation pour {name}",
+    "showing_contacts_with_location": "Affichage de {count} contacts avec données de localisation",
+    "coordinates": "Coordonnées",
+    "accuracy": "Précision",
+    "selected_contact": "{name} sélectionné",
+    "contact_location": "Localisation du contact",
+    "show_all_contacts": "Afficher tous les contacts",
+    "open_in_google_maps": "Ouvrir dans Google Maps",
+    "copy_coordinates": "Copier les coordonnées",
+    "coordinates_copied": "Coordonnées copiées dans le presse-papiers !"
+  },
+  "common": {
+    "login": "Se connecter",
+    "signup": "S'inscrire",
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "remove": "Retirer",
+    "loading": "Chargement...",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "controller": {
+    "jump_to": "Aller à :"
+  },
+  "textDetails": {
+    "profile_title": "Titre du profil",
+    "bio": "Bio"
+  },
+  "dropdown": {
+    "social_icons": "Icônes sociales",
+    "support_banner": "Bannière de soutien",
+    "sensitive_material": "Contenu sensible",
+    "seo": "SEO"
+  },
+  "add_icon_modal": {
+    "title": "Ajouter une icône",
+    "search_placeholder": "Rechercher",
+    "search_label": "Rechercher",
+    "already_added": "Déjà ajouté",
+    "no_icons_found": "Aucune icône trouvée. Essayez autre chose ?",
+    "all_category": "Toutes"
+  },
+  "supportbanner": {
+    "support_banner": "Bannière de soutien"
+  },
+  "support": {
+    "act_now": "Agissez maintenant",
+    "show_your_support": "Montrez votre soutien",
+    "support_banner_description": "Montrez votre soutien pour des causes importantes avec une bannière de profil. Une seule bannière peut être active à la fois."
+  },
+  "social": {
+    "social_icons": "Icônes sociales",
+    "be_iconic": "Soyez iconique",
+    "add_icons_description": "Ajoutez des icônes reliant à vos profils sociaux, e-mail et plus.",
+    "add_icon": "Ajouter une icône",
+    "drag_drop_reorder": "Glissez-déposez les icônes ci-dessus pour les réorganiser.",
+    "position": "Position",
+    "display_icons_at": "Afficher les icônes à :",
+    "see_analytics": "Voir les analyses"
+  },
+  "map": {
+    "failed_to_load": "Échec du chargement de Google Maps : {{error}}",
+    "no_location_data_title": "Aucune donnée de localisation disponible",
+    "no_location_data_description": "Aucun contact n'a encore partagé sa localisation. Lorsque les visiteurs soumettent des formulaires de contact avec autorisation de localisation accordée, leurs localisations apparaîtront sur cette carte.",
+    "location_tracking_tip": "Conseil : Le suivi de localisation vous aide à comprendre la distribution géographique de votre audience et peut être utile pour le réseautage local ou les événements.",
+    "loading_error_title": "Erreur de chargement de la carte",
+    "loading_error_description": "Veuillez vérifier la configuration de votre clé API Google Maps ou essayez de rafraîchir la page.",
+    "loading_message": "Chargement de la carte avec {{count}} contact{{plural}}...",
+    "contact_locations_title": "Localisations des contacts",
+    "legend_new_contacts": "Nouveaux contacts",
+    "legend_viewed_contacts": "Contacts vus",
+    "legend_archived_contacts": "Contacts archivés",
+    "total_contacts_count": "Total :",
+    "total_contacts": "contact localisé",
+    "click_marker_tip": "Cliquez sur n'importe quel marqueur pour vous concentrer sur la localisation de ce contact"
+  },
+  "themes": {
+    "custom": "Personnalisé",
+    "create_your_own": "Créez le vôtre",
+    "matrix": "Matrix",
+    "new_mario": "Nouveau Mario",
+    "pebble_blue": "Galet Bleu",
+    "pebble_yellow": "Galet Jaune",
+    "pebble_pink": "Galet Rose",
+    "cloud_red": "Nuage Rouge",
+    "cloud_green": "Nuage Vert",
+    "cloud_blue": "Nuage Bleu",
+    "breeze_pink": "Brise Rose",
+    "breeze_orange": "Brise Orange",
+    "breeze_green": "Brise Verte",
+    "rainbow": "Arc-en-ciel",
+    "confetti": "Confettis",
+    "3d_blocks": "Blocs 3D",
+    "starry_night": "Nuit étoilée",
+    "lake_white": "Lac Blanc",
+    "lake_black": "Lac Noir"
+  },
+  "fontsoptions": {
+    "fontsoptions": "Polices"
+  },
+  "appearance": {
+    "profile": "Profil",
+    "themes": "Thèmes",
+    "custom_appearance": "Apparence personnalisée",
+    "custom_appearance_description": "Personnalisez complètement votre profil Linktree. Changez votre arrière-plan avec des couleurs, gradients et images. Choisissez un style de bouton, changez la police et plus.",
+    "backgrounds": "Arrière-plans",
+    "christmas_accessories": "Accessoires de Noël",
+    "new_badge": "Nouveau",
+    "buttons": "Boutons",
+    "fonts": "Polices"
+  },
+  "backgrounds": {
+    "flat_colour": "Couleur unie",
+    "gradient": "Dégradé",
+    "image": "Image",
+    "video": "Vidéo",
+    "polka": "Pois",
+    "stripe": "Rayures",
+    "waves": "Vagues",
+    "zig_zag": "Zigzag"
+  },
+  "christmas": {
+    "snow_fall": "Chute de neige"
+  },
+  "fonts": {
+    "select_font": "Sélectionner une police",
+    "search_by_font_name": "Rechercher par nom de police",
+    "classic": "Classique",
+    "selected": "Sélectionné",
+    "no_fonts_found": "Aucune police trouvée."
+  },
+  "buttons": {
+    "fill": "Remplissage",
+    "outline": "Contour",
+    "hard_shadow": "Ombre dure",
+    "soft_shadow": "Ombre douce",
+    "special": "Spécial",
+    "theme_text_color": "Couleur du texte du thème",
+    "button_color": "Couleur du bouton",
+    "button_font_color": "Couleur de la police du bouton",
+    "shadow_color": "Couleur de l'ombre"
+  },
+  "button": {
+    "copy_link_button": "Lien copié",
+    "link_copied": "Lien copié"
+  },
+  "mylinkdiv": {
+    "linktree": "Votre Linktree est en ligne :",
+    "copy": "Copié !",
+    "copy_url": "Copier l'URL"
+  },
+  "profile": {
+    "add_social_icons": "Ajouter des icônes sociales",
+    "my_account": "Mon compte",
+    "sign_out": "Se déconnecter"
+  },
+  "share": {
+    "share_your_linktree": "Partagez votre Linktree",
+    "get_more_visitors": "Obtenez plus de visiteurs sur votre Linktree en le partageant avec votre audience.",
+    "add_to_socials": "Ajouter à vos réseaux sociaux",
+    "add_linktree_to_socials": "Ajoutez Linktree à vos réseaux sociaux",
+    "add_linktree_url_description": "Ajoutez votre URL Linktree à vos profils sociaux pour que le monde puisse facilement trouver votre Linktree.",
+    "share_linktree_to": "Partager mon Linktree vers...",
+    "share_to": "Partager vers...",
+    "share_linktree_connections": "Partagez votre Linktree à toutes vos connexions pour que tout le monde le connaisse.",
+    "linktree_qr_code": "Mon code QR Linktree",
+    "qr_code": "Code QR",
+    "qr_code_description": "Voici votre code QR Linktree unique qui dirigera les gens vers votre Linktree lorsqu'il est scanné.",
+    "open_my_linktree": "Ouvrir mon Linktree",
+    "snapchat": "Snapchat",
+    "instagram": "Instagram",
+    "facebook_profile": "Profil Facebook",
+    "tiktok_profile": "Profil TikTok",
+    "twitch_profile": "Profil Twitch",
+    "facebook_page": "Page Facebook",
+    "youtube": "YouTube",
+    "linkedin": "LinkedIn",
+    "pinterest": "Pinterest",
+    "twitter": "Twitter",
+    "share_on_snapchat": "Partager sur Snapchat",
+    "share_on_facebook": "Partager sur Facebook",
+    "share_on_linkedin": "Partager sur LinkedIn",
+    "share_on_twitter": "Partager sur Twitter",
+    "share_via_whatsapp": "Partager via WhatsApp",
+    "share_via_messenger": "Partager via Messenger",
+    "share_via_email": "Partager via e-mail",
+    "snapchat_description": "Ajoutez votre Linktree à votre profil public Snapchat. Copiez simplement votre URL Linktree, ouvrez Snapchat, allez à Mon profil public, appuyez sur Modifier, puis sélectionnez Linktree ou Site Web, puis Ajouter votre Linktree et collez votre URL Linktree dans le champ Ajouter Linktree.",
+    "instagram_description": "Ajoutez votre Linktree à votre profil Instagram. Copiez simplement votre URL Linktree, allez à Modifier le profil, et collez-le dans le champ Site Web.",
+    "facebook_description": "Ajoutez votre Linktree à votre profil Facebook. Copiez simplement votre URL Linktree, allez à la page À propos de votre profil, cliquez sur Coordonnées et informations de base, puis cliquez sur + Ajouter un site Web, collez votre URL Linktree dans le champ Adresse du site Web, et cliquez sur Enregistrer.",
+    "tiktok_description": "Ajoutez votre Linktree à votre profil TikTok. Copiez simplement votre URL Linktree, allez sur votre profil TikTok, cliquez sur Gérer le compte, cliquez sur Modifier le profil, et collez votre URL Linktree dans le champ Site Web, puis cliquez sur Enregistrer. (Notez que vous pourriez avoir besoin de passer à un compte professionnel TikTok pour activer cette fonction).",
+    "twitch_description": "Ajoutez votre Linktree à votre chaîne Twitch. Copiez simplement votre URL Linktree, allez sur votre chaîne Twitch, cliquez sur À propos, puis cliquez sur Modifier les paramètres à propos et liens, faites défiler jusqu'à Liens sociaux, ajoutez Linktree dans le premier champ de texte, et collez votre URL Linktree dans le deuxième champ de texte, puis cliquez sur Ajouter.",
+    "facebook_page_description": "Ajoutez votre Linktree à votre page Facebook. Copiez simplement votre URL Linktree, allez à la page À propos, faites défiler jusqu'à Informations de contact supplémentaires, cliquez sur Entrer le site Web, et collez votre URL Linktree dans le champ Site Web.",
+    "youtube_description": "Ajoutez votre Linktree à votre chaîne YouTube. Copiez simplement votre URL Linktree, allez sur votre chaîne YouTube, cliquez sur Personnaliser la chaîne, puis cliquez sur Informations de base, et sous Liens, ajoutez un titre de lien et collez votre URL Linktree dans le champ URL, puis cliquez sur Publier.",
+    "linkedin_description": "Ajoutez votre Linktree à votre profil LinkedIn. Copiez simplement votre URL Linktree, allez sur votre profil LinkedIn, cliquez sur l'icône crayon, faites défiler jusqu'à Coordonnées, collez votre URL Linktree dans le champ URL du site Web, puis cliquez sur Appliquer.",
+    "pinterest_description": "Ajoutez votre Linktree à votre profil Pinterest. Copiez simplement votre URL Linktree, allez dans vos paramètres Pinterest, collez votre URL Linktree dans le champ URL du site Web, puis cliquez sur Enregistrer.",
+    "twitter_description": "Ajoutez votre Linktree à votre profil Twitter. Copiez simplement votre URL Linktree, allez sur votre profil, cliquez sur Modifier le profil, et collez votre URL Linktree dans le champ Site Web."
+  },
+  "qrcode": {
+    "download_jpg": "Télécharger JPG",
+    "high_quality_image": "Image haute qualité"
+  },
+  "seo": {
+    "title": "SEO",
+    "custom_metadata": "Métadonnées personnalisées",
+    "metadata_notice": "Les modifications des métadonnées peuvent prendre du temps avant d'apparaître sur d'autres plateformes.",
+    "meta_title": "Titre méta",
+    "meta_description": "Description méta"
+  },
+  "email": {
+    "welcome": {
+      "subject": "Merci d'avoir créé un compte !",
+      "title": "Bienvenue dans Mon Clone Linktree !",
+      "description": "Ce projet est ma tentative de recréer le système incroyable que Linktree a développé.",
+      "disclaimer_title": "Avertissement : ",
+      "disclaimer_text": "Ce n'est pas le vrai Linktree, et n'a aucune affiliation avec Linktree, c'est juste un projet personnel.",
+      "credentials_intro": "Vos identifiants de connexion sont fournis ci-dessous :",
+      "email_label": "E-mail :",
+      "password_label": "Mot de passe :",
+      "login_button": "Connectez-vous à votre compte",
+      "footer": "Merci d'avoir consulté mon projet. ❤❤❤",
+      "see_more": "voir plus"
+    },
+    "reset": {
+      "subject": "E-mail de réinitialisation du mot de passe",
+      "title": "E-mail de réinitialisation du mot de passe",
+      "description": "Vous avez demandé à réinitialiser votre mot de passe. Veuillez utiliser le lien suivant pour réinitialiser votre mot de passe :",
+      "button": "Réinitialiser le mot de passe",
+      "footer": "Merci d'utiliser notre service ! ❤❤❤"
+    }
+  },
+  "userId": {
+    "sensitive_content": "Contenu sensible",
+    "profile.warning": "Ce profil peut contenir du contenu qui n'est pas approprié pour tous les publics",
+    "Continue": "continuer",
+    "sensitiveType2": "J'ai plus de 25 ans",
+    "sensitiveType18": "J'ai plus de 18 ans",
+    "sensitiveType21": "J'ai plus de 21 ans",
+    "go_back": "Retour",
+    "sensitiveType2_under": "J'ai moins de 25 ans",
+    "sensitiveType1_21": "J'ai moins de 21 ans",
+    "sensitiveType1_18": "J'ai moins de 18 ans",
+    "act_now": "Agissez maintenant"
+  },
+  "navbar": {
+    "links": "Liens",
+    "appearance": "Apparence",
+    "analytics": "Analyses",
+    "settings": "Paramètres"
+  },
+  "dashboard": {
+    "links": "Liens",
+    "appearance": "Apparence",
+    "analytics": "Analyses",
+    "settings": "Paramètres",
+    "your_linktree": "Votre Linktree est en ligne :",
+    "copy_url": "Copier l'URL",
+    "copied": "Copié !",
+    "contacts": "Contacts"
+  },
+  "login": {
+    "title": "Connectez-vous à votre Linktree",
+    "username_placeholder": "Saisissez votre nom d'utilisateur",
+    "password_placeholder": "Mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "submit": "Soumettre",
+    "no_account": "Vous n'avez pas de compte ?",
+    "sign_up": "S'inscrire",
+    "invalid_credentials": "Identifiants de connexion invalides !",
+    "success": "Connexion réussie",
+    "validating": "Validation des identifiants...",
+    "incorrect_password": "Vous avez saisi un mot de passe incorrect !",
+    "username_not_registered": "Ce nom d'utilisateur n'est enregistré à aucun utilisateur."
+  },
+  "signup": {
+    "title": "Créez votre compte",
+    "username_placeholder": "Créez votre pseudo",
+    "email_placeholder": "E-mail",
+    "password_placeholder": "Mot de passe",
+    "submit": "Soumettre",
+    "have_account": "Vous avez déjà un compte ?",
+    "log_in": "Se connecter",
+    "cannot_submit": "Impossible de soumettre le formulaire pour le moment !",
+    "something_went_wrong": "Quelque chose s'est mal passé",
+    "setting_up_account": "Configuration de votre compte.",
+    "could_not_complete_registration": "Impossible de terminer l'inscription",
+    "setup_complete": "Configuration terminée",
+    "username_taken": "Ce nom d'utilisateur est déjà pris.",
+    "username_too_short": "Le nom d'utilisateur est trop court.",
+    "invalid_username_format": "Format de nom d'utilisateur invalide",
+    "account_exists": "Vous avez déjà un compte chez nous !",
+    "invalid_email_format": "Format d'e-mail invalide !"
+  },
+  "forgot_password": {
+    "page_title": "Link Tree | Mot de passe oublié",
+    "title": "Demander un lien de réinitialisation du mot de passe",
+    "email_placeholder": "Fournissez votre adresse e-mail",
+    "submit": "Envoyer la demande",
+    "remembered": "Vous vous souvenez de votre mot de passe ?",
+    "not_registered": "Vous n'avez pas de compte chez nous !",
+    "invalid_email": "Format d'e-mail invalide !",
+    "rest_link_request": "Demander un lien de réinitialisation du mot de passe",
+    "reset_link_sent": "Lien de réinitialisation du mot de passe envoyé",
+    "error_link_sent": "Oups ! Une erreur s'est produite !",
+    "sending_request": "Envoi de la demande...",
+    "error_occurred": "Oups ! Une erreur s'est produite !",
+    "provide_email": "Fournissez votre adresse e-mail",
+    "remenber_password": "Vous vous souvenez de votre mot de passe ?",
+    "sign_up": " S'inscrire"
+  },
+  "sensitive": {
+    "title": "Contenu sensible",
+    "description": "Ce profil peut contenir du contenu qui n'est pas approprié pour tous les publics",
+    "continue": "Continuer",
+    "go_back": "Retour",
+    "over_18": "J'ai plus de 18 ans",
+    "over_21": "J'ai plus de 21 ans",
+    "over_25": "J'ai plus de 25 ans",
+    "under_18": "J'ai moins de 18 ans",
+    "under_21": "J'ai moins de 21 ans",
+    "under_25": "J'ai moins de 25 ans"
+  },
+  "reset_password": {
+    "title": "Saisissez votre nouveau mot de passe",
+    "advice": "Je conseille que votre nouveau mot de passe soit différent de votre mot de passe précédent.",
+    "password_placeholder": "Mot de passe",
+    "confirm_placeholder": "Retapez le mot de passe",
+    "submit": "Changer le mot de passe",
+    "passwords_must_match": "Les deux mots de passe doivent correspondre !",
+    "password_setup": "Configuration de votre nouveau mot de passe...",
+    "password_error": "Oups ! Quelque chose s'est mal passé",
+    "password_succes": "Mot de passe changé ! ✨✔",
+    "password_placeholder_retype": "Retapez le mot de passe",
+    "password_change": "Changer le mot de passe",
+    "login": "Retour à la connexion",
+    "homepage": "Aller à l'accueil",
+    "page": "page"
+  },
+  "landing": {
+    "headline": "Le seul lien dont vous aurez jamais besoin",
+    "subheadline": "Connectez votre audience à tout votre contenu avec un seul lien",
+    "placeholder": "Créez votre pseudo",
+    "submit": "Créer"
+  },
+  "settings": {
+    "social_icons": "Icônes sociales",
+    "support_banner": "Bannière de soutien",
+    "sensitive_material": "Contenu sensible",
+    "seo": "SEO",
+    "jump_to": "Aller à :",
+    "sensitive_material_description": "Afficher un avertissement de contenu sensible avant que les visiteurs puissent voir votre profil."
+  },
+  "not_found": {
+    "title": "Oh oh. Page introuvable",
+    "description": "Désolé, la page que vous recherchiez n'existe pas ou a été masquée."
+  },
+  "addBtn": {
+    "add_link": "Ajouter un lien",
+    "enter_url": "Saisir l'URL",
+    "url": "URL",
+    "add": "Ajouter",
+    "inspired_by_interest": "Inspiré par votre intérêt",
+    "view_all": "Voir tout",
+    "twitter_handle": "Identifiant Twitter",
+    "tiktok_profile": "Profil TikTok",
+    "instagram_handle": "Identifiant Instagram",
+    "video_link": "Lien vidéo",
+    "music_link": "Lien musical"
+  },
+  "manageLinks": {
+    "add_header": "Ajouter un en-tête",
+    "show_world_who_you_are": "Montrez au monde qui vous êtes.",
+    "add_link_to_get_started": "Ajoutez un lien pour commencer."
+  },
+  "pickBrandModal": {
+    "add_to_linktree": "Ajouter à Linktree",
+    "share_your_content": "Partagez votre contenu",
+    "share_content_directly": "Partagez le contenu directement sur votre Linktree"
+  },
+  "brandLinks": {
+    "music": "Musique",
+    "music_description": "Partagez de la musique et obtenez plus d'écoutes",
+    "video": "Vidéo",
+    "video_description": "Ajoutez des vidéos directement à votre Linktree",
+    "header": "En-tête",
+    "header_description": "Organisez vos liens et applications",
+    "youtube": "YouTube",
+    "youtube_description": "Partagez YouTube sur votre Linktree",
+    "spotify": "Spotify",
+    "spotify_description": "Partagez votre musique récente ou favorite",
+    "pinterest": "Pinterest",
+    "pinterest_description": "Mettez en valeur les épingles, tableaux et plus",
+    "twitter": "Twitter",
+    "twitter_description": "Mettez en valeur vos tweets et fils 🤣",
+    "reddit": "Reddit",
+    "reddit_description": "Mettez en valeur votre profil Reddit",
+    "tiktok_profile": "Profil TikTok",
+    "tiktok_description": "Obtenez plus d'abonnés TikTok",
+    "audiomack": "Audiomack",
+    "audiomack_description": "Ajoutez un lecteur Audiomack à votre Linktree",
+    "link": "Lien"
+  },
+  "special": {
+    "enter_text": "Saisir le texte",
+    "headline_title": "Titre principal",
+    "url": "URL",
+    "please_enter_valid_url": "veuillez saisir une URL valide",
+    "delete": "Supprimer",
+    "delete_forever_question": "Supprimer ceci définitivement ?",
+    "cancel": "Annuler",
+    "enter_url_setup": "Saisissez votre URL {{urlKind}}, puis configurez votre lien",
+    "custom": "Personnalisé"
+  },
+  "socials": {
+    "threads": {
+      "title": "Threads",
+      "placeholder": "Nom d'utilisateur*",
+      "example": "@utilisateurthreads",
+      "error": "Veuillez saisir un nom d'utilisateur valide."
+    },
+    "instagram": {
+      "title": "Instagram",
+      "placeholder": "Saisir l'URL Instagram*",
+      "example": "https://www.instagram.com/votrenom/",
+      "error": "Veuillez saisir une URL Instagram valide."
+    },
+    "email": {
+      "title": "E-mail",
+      "placeholder": "Adresse*",
+      "example": "votreemail@exemple.com",
+      "error": "Veuillez saisir une adresse e-mail valide."
+    },
+    "youtube": {
+      "title": "YouTube",
+      "placeholder": "Saisir l'URL YouTube*",
+      "example": "https://www.youtube.com/user/votrechaine",
+      "error": "Veuillez saisir une URL YouTube valide."
+    },
+    "twitter_jack": {
+      "title": "Twitter (version de Jack)",
+      "placeholder": "Saisir l'URL Twitter*",
+      "example": "https://twitter.com/votrenom",
+      "error": "Veuillez saisir une URL Twitter valide."
+    },
+    "twitter_elon": {
+      "title": "Twitter (version d'Elon)",
+      "placeholder": "Saisir l'URL Twitter*",
+      "example": "https://twitter.com/votrenom",
+      "error": "Veuillez saisir une URL Twitter valide."
+    },
+    "tiktok": {
+      "title": "TikTok",
+      "placeholder": "Saisir le nom d'utilisateur TikTok*",
+      "example": "@votrenom",
+      "error": "Veuillez saisir un nom d'utilisateur TikTok valide."
+    },
+    "whatsapp": {
+      "title": "WhatsApp",
+      "placeholder": "Saisir le numéro WhatsApp*",
+      "example": "+1234567890",
+      "error": "Veuillez saisir un numéro WhatsApp valide."
+    },
+    "snapchat": {
+      "title": "Snapchat",
+      "placeholder": "Saisir le nom d'utilisateur Snapchat*",
+      "example": "votrenom",
+      "error": "Veuillez saisir un nom d'utilisateur Snapchat valide."
+    },
+    "amazon": {
+      "title": "Amazon",
+      "placeholder": "Saisir l'URL Amazon*",
+      "example": "https://www.amazon.com/votreproduit",
+      "error": "Veuillez saisir une URL Amazon valide."
+    },
+    "android": {
+      "title": "Google Play Store",
+      "placeholder": "Saisir l'URL Google Play Store*",
+      "example": "https://play.google.com/store/apps/details?id=votre.nom.package",
+      "error": "Veuillez saisir une URL Google Play Store valide."
+    },
+    "apple_store": {
+      "title": "Apple App Store",
+      "placeholder": "Saisir l'URL Apple App Store*",
+      "example": "https://apps.apple.com/us/app/votre-app/id1234567890",
+      "error": "Veuillez saisir une URL Apple App Store valide."
+    },
+    "apple_music": {
+      "title": "Apple Music",
+      "placeholder": "Saisir l'URL Apple Music*",
+      "example": "https://music.apple.com/us/album/votre-album/1234567890",
+      "error": "Veuillez saisir une URL Apple Music valide."
+    },
+    "apple_podcast": {
+      "title": "Apple Podcast",
+      "placeholder": "Saisir l'URL Apple Podcast*",
+      "example": "https://podcasts.apple.com/us/podcast/votre-podcast/id1234567890",
+      "error": "Veuillez saisir une URL Apple Podcast valide."
+    },
+    "bandcamp": {
+      "title": "Bandcamp",
+      "placeholder": "Saisir l'URL Bandcamp*",
+      "example": "https://votregroupe.bandcamp.com",
+      "error": "Veuillez saisir une URL Bandcamp valide."
+    },
+    "bereal": {
+      "title": "BeReal",
+      "placeholder": "Saisir l'URL BeReal*",
+      "example": "https://bereal.com/votreprofil",
+      "error": "Veuillez saisir une URL BeReal valide."
+    },
+    "cameo": {
+      "title": "Cameo",
+      "placeholder": "Saisir l'URL Cameo*",
+      "example": "https://www.cameo.com/votrenom",
+      "error": "Veuillez saisir une URL Cameo valide."
+    },
+    "clubhouse": {
+      "title": "Clubhouse",
+      "placeholder": "Saisir l'URL Clubhouse*",
+      "example": "https://www.joinclubhouse.com/room/123456",
+      "error": "Veuillez saisir une URL Clubhouse valide."
+    },
+    "discord": {
+      "title": "Discord",
+      "placeholder": "Saisir l'URL Discord*",
+      "example": "https://discord.gg/votreinvitation",
+      "error": "Veuillez saisir une URL Discord valide."
+    },
+    "etsy": {
+      "title": "Etsy",
+      "placeholder": "Saisir l'URL Etsy*",
+      "example": "https://www.etsy.com/shop/votreboutique",
+      "error": "Veuillez saisir une URL Etsy valide."
+    },
+    "linkedin": {
+      "title": "LinkedIn",
+      "placeholder": "Saisir l'URL LinkedIn*",
+      "example": "https://www.linkedin.com/in/votreprofil",
+      "error": "Veuillez saisir une URL LinkedIn valide."
+    },
+    "patreon": {
+      "title": "Patreon",
+      "placeholder": "Saisir l'URL Patreon*",
+      "example": "https://www.patreon.com/votrenom",
+      "error": "Veuillez saisir une URL Patreon valide."
+    },
+    "payment": {
+      "title": "Paiement",
+      "placeholder": "Saisir l'URL de paiement*",
+      "example": "https://www.paypal.me/vous",
+      "error": "Veuillez saisir une URL de paiement valide."
+    },
+    "pinterest": {
+      "title": "Pinterest",
+      "placeholder": "Saisir l'URL Pinterest*",
+      "example": "https://www.pinterest.com/votreprofil",
+      "error": "Veuillez saisir une URL Pinterest valide."
+    },
+    "poshmark": {
+      "title": "Poshmark",
+      "placeholder": "Saisir l'URL Poshmark*",
+      "example": "https://poshmark.com/closet/votrenom",
+      "error": "Veuillez saisir une URL Poshmark valide."
+    },
+    "signal": {
+      "title": "Signal",
+      "placeholder": "Saisir l'URL Signal*",
+      "example": "https://signal.app/votrenom",
+      "error": "Veuillez saisir une URL Signal valide."
+    },
+    "soundcloud": {
+      "title": "SoundCloud",
+      "placeholder": "Saisir l'URL SoundCloud*",
+      "example": "https://soundcloud.com/votrenom",
+      "error": "Veuillez saisir une URL SoundCloud valide."
+    },
+    "spotify": {
+      "title": "Spotify",
+      "placeholder": "Saisir l'URL Spotify*",
+      "example": "https://open.spotify.com/artist/votreid",
+      "error": "Veuillez saisir une URL Spotify valide."
+    },
+    "substack": {
+      "title": "Substack",
+      "placeholder": "Saisir l'URL Substack*",
+      "example": "https://votrepublication.substack.com",
+      "error": "Veuillez saisir une URL Substack valide."
+    },
+    "telegram": {
+      "title": "Telegram",
+      "placeholder": "Saisir l'URL Telegram*",
+      "example": "https://t.me/votrenom",
+      "error": "Veuillez saisir une URL Telegram valide."
+    },
+    "twitch": {
+      "title": "Twitch",
+      "placeholder": "Saisir l'URL Twitch*",
+      "example": "https://www.twitch.tv/votrechaine",
+      "error": "Veuillez saisir une URL Twitch valide."
+    }
+  },
+  "support_groups": {
+    "choose_cause": "Choisir une cause",
+    "banner_link_text": "Votre bannière sera liée à ceci",
+    "support_creator": {
+      "caption": "Soutenir le créateur",
+      "card_title": "Explorez plus de mes projets.",
+      "card_message": "Jetez un œil à mes projets et aux choses que j'ai ajoutées à GitHub. Vous trouverez un mélange de différentes choses sur lesquelles j'ai travaillé, et je suis ravi de les partager avec vous !",
+      "title": "Découvrez mes projets GitHub",
+      "message": "Je vous invite à explorer mon profil GitHub, où vous pouvez trouver une gamme de projets excitants et de contributions. N'hésitez pas à jeter un œil, et si vous trouvez quelque chose qui vous plaît, n'hésitez pas à montrer votre soutien en laissant une étoile ⭐"
+    },
+    "free_palestine": {
+      "caption": "#FreePalestine",
+      "card_title": "La guerre n'est jamais la réponse.",
+      "card_message": "Affichez une bannière de soutien pour encourager vos visiteurs à #FreePalestine, faire des dons et découvrir des ressources, et soutenir le droit des gens partout à vivre en paix.",
+      "title": "La guerre n'est pas la réponse.",
+      "message": "Je sensibilise, encourage les dons et soutiens à #FreePalestine, et le droit des gens partout à vivre en paix. Voulez-vous vous joindre à moi ?"
+    },
+    "stand_with_ukraine": {
+      "caption": "#StandWithUkraine",
+      "card_title": "La guerre n'est jamais la réponse.",
+      "card_message": "Affichez une bannière de soutien pour encourager vos visiteurs à #StandWithUkraine, faire des dons et découvrir des ressources, et soutenir le droit des gens partout à vivre en paix.",
+      "title": "La guerre n'est pas la réponse.",
+      "message": "Je sensibilise, encourage les dons et soutiens à #StandWithUkraine, et le droit des gens partout à vivre en paix. Voulez-vous vous joindre à moi ?"
+    },
+    "anti_racism": {
+      "caption": "Anti-racisme",
+      "card_title": "Le racisme est une urgence internationale.",
+      "card_message": "Affichez une bannière de soutien sur votre Linktree permettant à vos visiteurs de faire des dons et découvrir des ressources en soutien à l'anti-racisme, la justice et l'égalité.",
+      "title": "Soutenir l'anti-racisme",
+      "message": "Je sensibilise, encourage les dons et partage des informations en soutien à la justice raciale et l'égalité. Voulez-vous vous joindre à moi ?"
+    },
+    "pride": {
+      "caption": "Fierté",
+      "card_title": "Soutenir la communauté LGBTQIA+",
+      "card_message": "Affichez une bannière de soutien pour sensibiliser et collecter des fonds pour la communauté LGBTQIA+ pendant le mois de la Fierté.",
+      "title": "Protéger les droits LGBTQIA+",
+      "message": "En célébration de la Fierté, je sensibilise et collecte des fonds pour soutenir la communauté LGBTQIA+. Rejoignez-moi."
+    }
+  },
+  "age_restriction": {
+    "please_select_one": "Veuillez en sélectionner un :",
+    "eighteen_plus": "18+",
+    "twenty_one_plus": "21+",
+    "twenty_five_plus": "25+",
+    "sensitive_content": "Contenu sensible"
+  },
+  "analytics": {
+    "title": "Tableau de bord Analytics",
+    "subtitle": "Suivez les vues de votre profil et les clics sur les liens",
+    "profile": "Profil :",
+    "loading": "Chargement des analyses...",
+    "not_authenticated": "Non authentifié",
+    "user_data_not_found": "Données utilisateur non trouvées",
+    "failed_to_connect": "Échec de la connexion aux analyses",
+    "failed_to_load": "Échec du chargement des données d'analyse",
+    "error_loading": "Erreur de chargement des analyses",
+    "live_connection": "En direct",
+    "disconnected": "Déconnecté",
+    "real_time_updates": "Mises à jour en temps réel",
+    "profile_views": "Vues du profil",
+    "link_clicks": "Clics sur les liens",
+    "recent_activity": "Activité récente",
+    "last_updated": "Dernière mise à jour",
+    "total": "Total",
+    "no_activity_yet": "Aucune activité pour le moment",
+    "share_to_track": "Partagez votre profil pour commencer à suivre les vues et les clics !",
+    "link_performance": "Performance des liens",
+    "clicks_by_link": "Clics par lien",
+    "click_distribution": "Distribution des clics",
+    "total_links": "Total des liens",
+    "total_clicks": "Total des clics",
+    "avg_clicks_per_link": "Clics moyens par lien",
+    "created": "Créé",
+    "today": "Aujourd'hui",
+    "this_week": "Cette semaine",
+    "legend": "Légende",
+    "nav": {
+      "today": "Aujourd'hui",
+      "week": "Semaine",
+      "month": "Mois",
+      "all_time": "Tout le temps"
+    },
+    "period": {
+      "today": "Aujourd'hui",
+      "this_week": "Cette semaine",
+      "this_month": "Ce mois",
+      "all_time": "Tout le temps"
+    },
+    "overview_title": "Aperçu",
+    "complete_statistics": "Statistiques complètes",
+    "stats": {
+      "today": "Aujourd'hui",
+      "this_week": "Cette semaine",
+      "this_month": "Ce mois",
+      "all_time": "Tout le temps",
+      "views": "vues",
+      "clicks": "clics"
+    },
+    "top_clicked_links": "Liens les plus cliqués",
+    "untitled_link": "Lien sans titre",
+    "last_clicked": "Dernier clic",
+    "total_interactions_description": "Total des interactions avec vos liens"
+  }
+}
