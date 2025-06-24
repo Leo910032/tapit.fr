@@ -4,7 +4,7 @@ import { useState } from "react";
 import { fireApp } from "@/important/firebase";
 import { collection, doc, setDoc, getDocs } from "firebase/firestore";
 
-// Inline migration function to avoid import issues
+// Fixed migration function that handles undefined values
 async function migrateUsersToLookupTable() {
     try {
         console.log("🚀 Starting user migration to lookup table...");
@@ -26,6 +26,7 @@ async function migrateUsersToLookupTable() {
         
         const lookupRef = collection(fireApp, "UserLookup");
         let count = 0;
+        let successCount = 0;
         
         // Process each user one by one to avoid batch issues
         for (const accountDoc of accountsSnapshot.docs) {
@@ -33,51 +34,54 @@ async function migrateUsersToLookupTable() {
             const accountData = accountDoc.data();
             const accountDetails = accountDataMap.get(userId);
             
-            console.log(`🔄 Processing user ${count + 1}/${accountsSnapshot.size}: ${accountData.username}`);
+            console.log(`🔄 Processing user ${count + 1}/${accountsSnapshot.size}: ${accountData.username || 'No Username'}`);
             
+            // ✅ FIXED: Handle undefined values properly
             const lookupData = {
                 userId,
-                username: accountData.username,
-                displayName: accountDetails?.displayName || accountData.displayName || accountData.username,
-                email: accountData.email,
+                username: accountData.username || null,
+                displayName: accountDetails?.displayName || accountData.displayName || accountData.username || null,
+                email: accountData.email || null, // ✅ Handle undefined email
                 updatedAt: new Date()
             };
             
             try {
-                // Create lookup entries one by one
+                // Create lookup entries one by one - only if data exists
                 await setDoc(doc(lookupRef, userId), { ...lookupData, type: 'userId' });
                 
-                if (accountData.username) {
-                    await setDoc(doc(lookupRef, `username_${accountData.username.toLowerCase()}`), { 
+                if (lookupData.username) {
+                    await setDoc(doc(lookupRef, `username_${lookupData.username.toLowerCase()}`), { 
                         ...lookupData, type: 'username' 
                     });
                 }
                 
-                if (lookupData.displayName && lookupData.displayName !== accountData.username) {
+                if (lookupData.displayName && lookupData.displayName !== lookupData.username) {
                     await setDoc(doc(lookupRef, `displayName_${lookupData.displayName}`), { 
                         ...lookupData, type: 'displayName' 
                     });
                 }
                 
-                if (accountData.email) {
-                    await setDoc(doc(lookupRef, `email_${accountData.email.toLowerCase()}`), { 
+                if (lookupData.email) { // ✅ Only create email lookup if email exists
+                    await setDoc(doc(lookupRef, `email_${lookupData.email.toLowerCase()}`), { 
                         ...lookupData, type: 'email' 
                     });
                 }
                 
-                count++;
-                console.log(`✅ Processed user: ${accountData.username}`);
+                successCount++;
+                console.log(`✅ Processed user: ${lookupData.username || 'No Username'}`);
                 
                 // Small delay to be nice to Firestore
-                await new Promise(resolve => setTimeout(resolve, 200));
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
             } catch (userError) {
-                console.error(`❌ Failed to process user ${accountData.username}:`, userError);
+                console.error(`❌ Failed to process user ${lookupData.username || 'No Username'}:`, userError);
                 // Continue with next user
             }
+            
+            count++;
         }
         
-        console.log(`✅ Successfully migrated ${count} users to lookup table`);
+        console.log(`✅ Successfully migrated ${successCount}/${count} users to lookup table`);
         
     } catch (error) {
         console.error("❌ Error migrating users to lookup table:", error);
