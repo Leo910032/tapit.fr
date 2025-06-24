@@ -1,4 +1,4 @@
-// app/dashboard/(dashboard pages)/analytics/components/LinkAnalyticsChart.jsx
+// app/dashboard/(dashboard pages)/analytics/components/LinkAnalyticsChart.jsx - FIXED FOR TOPLINKS
 "use client"
 import { useTranslation } from "@/lib/useTranslation";
 import Image from "next/image";
@@ -6,7 +6,93 @@ import Image from "next/image";
 export default function LinkAnalyticsChart({ analytics, isConnected }) {
     const { t } = useTranslation();
     
-    if (!analytics?.topLinks?.length) {
+    console.log("🔍 Analytics structure check:", {
+        hasAnalytics: !!analytics,
+        hasLinkClicks: !!analytics?.linkClicks,
+        hasTopLinks: !!analytics?.topLinks,
+        topLinksLength: analytics?.topLinks?.length || 0,
+        topLinksData: analytics?.topLinks
+    });
+    
+    // ✅ FIX: Use topLinks array instead of linkClicks object
+    const processLinkData = () => {
+        // Check both possible data sources
+        let linkData = null;
+        
+        if (analytics?.topLinks && Array.isArray(analytics.topLinks)) {
+            console.log("✅ Using topLinks array data");
+            linkData = analytics.topLinks;
+        } else if (analytics?.linkClicks && typeof analytics.linkClicks === 'object') {
+            console.log("✅ Using linkClicks object data");
+            linkData = Object.entries(analytics.linkClicks).map(([linkId, data]) => ({
+                linkId,
+                ...data
+            }));
+        } else {
+            console.log("❌ No link data found in analytics");
+            return [];
+        }
+        
+        console.log("📊 Processing link data:", linkData);
+        
+        const processedLinks = linkData
+            .map((link) => {
+                console.log("🔗 Processing link:", link);
+                
+                // Handle both array and object formats
+                const linkId = link.linkId;
+                const title = link.title || 'Untitled Link';
+                const url = link.url || '';
+                const type = link.type || 'custom';
+                const totalClicks = link.totalClicks || 0;
+                const lastClicked = link.lastClicked;
+                
+                // Clean up display title
+                let displayTitle = title;
+                
+                // Handle file downloads
+                if (linkId && linkId.startsWith('file_download_')) {
+                    displayTitle = linkId.replace('file_download_', '').trim();
+                    if (displayTitle.length > 25) {
+                        displayTitle = displayTitle.substring(0, 25) + '...';
+                    }
+                } else if (displayTitle.length > 30) {
+                    displayTitle = displayTitle.substring(0, 30) + '...';
+                }
+                
+                const processedLink = {
+                    linkId,
+                    title: displayTitle,
+                    fullTitle: title,
+                    url,
+                    type: linkId && linkId.startsWith('file_download_') ? 'File' : (type || 'Custom'),
+                    totalClicks,
+                    lastClicked,
+                    createdAt: link.createdAt || new Date().toISOString(),
+                    todayClicks: link.todayClicks || 0,
+                    weekClicks: link.weekClicks || 0,
+                    monthClicks: link.monthClicks || 0,
+                };
+                
+                console.log("✅ Processed link:", processedLink);
+                return processedLink;
+            })
+            .filter(link => {
+                const hasClicks = link.totalClicks > 0;
+                console.log(`🔗 Link ${link.linkId}: ${link.totalClicks} clicks, included: ${hasClicks}`);
+                return hasClicks;
+            })
+            .sort((a, b) => (b.totalClicks || 0) - (a.totalClicks || 0));
+            
+        console.log("✅ Final processed links:", processedLinks);
+        return processedLinks;
+    };
+
+    const topLinks = processLinkData();
+    console.log("🎯 Top links for display:", topLinks);
+    
+    if (!topLinks.length) {
+        console.log("🚫 No links with clicks to display");
         return (
             <div className="mb-8">
                 <div className="bg-white rounded-xl shadow-sm border p-6">
@@ -31,23 +117,48 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
                             className="mx-auto mb-4 opacity-50"
                         />
                         <p className="text-gray-600 mb-2">
-                            {t('analytics.no_link_data') || 'No link data yet'}
+                            {analytics?.topLinks?.length ? 'No links with clicks yet' : 'No link data available'}
                         </p>
-                        <p className="text-sm text-gray-500">
-                            {t('analytics.add_links_to_track') || 'Add links to your profile to track their performance!'}
+                        <p className="text-sm text-gray-500 mb-4">
+                            {analytics?.topLinks?.length 
+                                ? 'Share your profile to start getting clicks on your links!' 
+                                : 'Add links to your profile to track their performance!'
+                            }
                         </p>
+                        
+                        {/* Show available links without clicks */}
+                        {analytics?.topLinks?.length > 0 && (
+                            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                                <h4 className="text-sm font-medium text-blue-900 mb-2">
+                                    Available Links ({analytics.topLinks.length})
+                                </h4>
+                                <div className="space-y-2">
+                                    {analytics.topLinks.slice(0, 5).map((link, index) => (
+                                        <div key={link.linkId || index} className="flex items-center justify-between text-xs">
+                                            <span className="text-blue-700 truncate">
+                                                {getTypeIcon(link.type)} {link.title || 'Untitled'}
+                                            </span>
+                                            <span className="text-blue-600 font-medium">
+                                                {link.totalClicks || 0} clicks
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
         );
     }
 
-    // Prepare data for charts
-    const chartData = analytics.topLinks.slice(0, 8).map((link, index) => ({
-        name: link.title?.length > 15 ? `${link.title.substring(0, 15)}...` : link.title || 'Untitled',
+    // Prepare data for charts - take top 8 links
+    const chartData = topLinks.slice(0, 8).map((link, index) => ({
+        name: link.title,
         clicks: link.totalClicks || 0,
-        fullTitle: link.title || 'Untitled Link',
-        type: link.type || 'custom',
+        fullTitle: link.fullTitle,
+        type: link.type,
+        linkId: link.linkId,
         percentage: 0 // Will be calculated below
     }));
 
@@ -57,38 +168,18 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
         item.percentage = totalClicks > 0 ? (item.clicks / totalClicks) * 100 : 0;
     });
 
+    console.log("📊 Chart data prepared:", chartData);
+
     // Colors for the charts
     const colors = [
         '#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', 
         '#EF4444', '#EC4899', '#14B8A6', '#F97316'
     ];
 
-    // Get link type color
-    const getLinkTypeColor = (type) => {
-        switch (type?.toLowerCase()) {
-            case 'instagram':
-                return 'from-purple-500 to-pink-500';
-            case 'twitter':
-                return 'from-blue-400 to-blue-500';
-            case 'tiktok':
-                return 'from-gray-800 to-black';
-            case 'youtube':
-                return 'from-red-500 to-red-600';
-            case 'spotify':
-                return 'from-green-500 to-green-600';
-            case 'social':
-                return 'from-purple-500 to-purple-600';
-            case 'video':
-                return 'from-red-400 to-red-500';
-            case 'music':
-                return 'from-indigo-500 to-indigo-600';
-            default:
-                return 'from-gray-500 to-gray-600';
-        }
-    };
-
     // Find max clicks for scaling
     const maxClicks = Math.max(...chartData.map(item => item.clicks));
+    
+    console.log("🎨 Rendering full analytics component with", chartData.length, "links");
 
     return (
         <div className="mb-8">
@@ -113,12 +204,15 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
                         </h3>
                         <div className="space-y-3">
                             {chartData.map((item, index) => (
-                                <div key={index} className="group">
+                                <div key={item.linkId} className="group">
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className="text-sm font-medium text-gray-700 truncate max-w-32">
-                                            {item.name}
-                                        </span>
-                                        <span className="text-sm font-bold text-gray-900">
+                                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                                            <span className="text-lg">{getTypeIcon(item.type)}</span>
+                                            <span className="text-sm font-medium text-gray-700 truncate">
+                                                {item.name}
+                                            </span>
+                                        </div>
+                                        <span className="text-sm font-bold text-gray-900 ml-2">
                                             {item.clicks}
                                         </span>
                                     </div>
@@ -143,7 +237,7 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
                         </div>
                     </div>
 
-                    {/* Pie Chart Alternative - Donut Progress */}
+                    {/* Distribution Chart */}
                     <div>
                         <h3 className="text-lg font-medium text-gray-800 mb-4">
                             {t('analytics.click_distribution') || 'Click Distribution'}
@@ -152,16 +246,19 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
                         {/* Top Links with Visual Indicators */}
                         <div className="space-y-3">
                             {chartData.slice(0, 6).map((item, index) => (
-                                <div key={index} className="flex items-center gap-3">
+                                <div key={item.linkId} className="flex items-center gap-3">
                                     <div 
                                         className="w-4 h-4 rounded-full flex-shrink-0"
                                         style={{ backgroundColor: colors[index % colors.length] }}
                                     ></div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium text-gray-700 truncate">
-                                                {item.name}
-                                            </span>
+                                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                <span className="text-sm">{getTypeIcon(item.type)}</span>
+                                                <span className="text-sm font-medium text-gray-700 truncate">
+                                                    {item.name}
+                                                </span>
+                                            </div>
                                             <span className="text-sm font-bold text-gray-900 ml-2">
                                                 {item.clicks}
                                             </span>
@@ -176,27 +273,24 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
                                             ></div>
                                         </div>
                                         <span className="text-xs text-gray-500">
-                                            {item.percentage.toFixed(1)}% {t('analytics.total_clicks_analytics')}
+                                            {item.percentage.toFixed(1)}% of total
                                         </span>
                                     </div>
                                 </div>
                             ))}
                         </div>
-
-                        {/* Legend */}
-                      
                     </div>
                 </div>
 
                 {/* Summary Stats */}
                 <div className="mt-8 pt-6 border-t border-gray-100">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="text-center">
                             <p className="text-2xl font-bold text-blue-600">
-                                {analytics.topLinks.length}
+                                {topLinks.length}
                             </p>
                             <p className="text-sm text-gray-600">
-                                {t('analytics.total_links') || 'Total Links'}
+                                Active Links
                             </p>
                         </div>
                         <div className="text-center">
@@ -204,15 +298,23 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
                                 {analytics.totalClicks || 0}
                             </p>
                             <p className="text-sm text-gray-600">
-                                {t('analytics.total_clicks') || 'Total Clicks'}
+                                Total Clicks
                             </p>
                         </div>
                         <div className="text-center">
                             <p className="text-2xl font-bold text-purple-600">
-                                {analytics.topLinks.length > 0 ? Math.round((analytics.totalClicks || 0) / analytics.topLinks.length) : 0}
+                                {topLinks.length > 0 ? Math.round((analytics.totalClicks || 0) / topLinks.length) : 0}
                             </p>
                             <p className="text-sm text-gray-600">
-                                {t('analytics.avg_clicks_per_link') || 'Avg. Clicks per Link'}
+                                Avg. per Link
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-2xl font-bold text-orange-600">
+                                {topLinks.filter(link => link.type === 'File').length}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                                File Downloads
                             </p>
                         </div>
                     </div>
@@ -220,4 +322,24 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
             </div>
         </div>
     );
+}
+
+// ✅ Helper function for type icons
+function getTypeIcon(type) {
+    const iconMap = {
+        'file': '📄',
+        'File': '📄',
+        'file_download': '📥',
+        'instagram': '📸',
+        'twitter': '🐦',
+        'tiktok': '🎵',
+        'youtube': '📺',
+        'spotify': '🎵',
+        'social': '👥',
+        'video': '🎥',
+        'music': '🎶',
+        'custom': '🔗',
+        'Custom': '🔗'
+    };
+    return iconMap[type?.toLowerCase()] || '🔗';
 }

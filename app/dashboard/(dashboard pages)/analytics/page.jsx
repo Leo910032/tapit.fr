@@ -234,43 +234,7 @@ export default function AnalyticsPage() {
                     </div>
                 </div>
 
-                {/* Compact Top Links (inlined) */}
-                <div className="bg-white rounded-lg border p-4">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('analytics.Top_Links')}</h3>
-                    <div className="space-y-2">
-                        {analytics?.topLinks?.slice(0, 5).map((link, index) => (
-                            <div key={link.linkId} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <span className="text-xs font-bold text-blue-600">#{index + 1}</span>
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="text-xs font-medium text-gray-900 truncate">
-                                            {link.title}
-                                        </p>
-                                        <p className="text-xs text-gray-500 truncate">
-                                            {link.type}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="text-right flex-shrink-0">
-                                    <p className="text-xs font-bold text-gray-900">{link.totalClicks}</p>
-                                    <p className="text-xs text-gray-500">{t('analytics.clicks')}</p>
-                                </div>
-                            </div>
-                        )) || (
-                            <div className="text-center py-4">
-                                <p className="text-xs text-gray-500">{t('analytics.link_NA')}</p>
-                            </div>
-                            
-                        )}
-                        
-                    </div>
-                    
-
-                    
-                </div>
-
+         
                 {/* Main Link Analytics Chart */}
                 <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm">
                     <div className="h-81"> 

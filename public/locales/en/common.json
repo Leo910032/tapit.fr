@@ -801,7 +801,56 @@
     "twenty_five_plus": "25+",
     "sensitive_content": "Sensitive Content"
   },
-  
+    "file_manager": {
+    "curriculum_documents": "Curriculum / Documents",
+    "upload_file": "Upload File",
+    "replace_file": "Replace File", 
+    "remove": "Remove File",
+    "download": "Download",
+    "remove": "Remove",
+    "confirm_upload": "Confirm Upload",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "uploading_file": "Uploading file...",
+    "file_uploaded": "File uploaded successfully!",
+    "file_uploaded_success": "File uploaded successfully!",
+    "file_removed_success": "File removed successfully!",
+    "error_occurred": "An error occurred",
+    "upload_error": "Failed to upload file",
+    "remove_error": "Failed to remove file",
+    "file_too_large": "File is too large. Maximum size is {maxSize}",
+    "supported_formats": "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT",
+    "max_size_50mb": "Max 50MB"
+  },
+   "file_download": {
+    "download_file": "Download File",
+    "download_document": "Download Document",
+    "download_curriculum": "Download CV/Resume",
+    "download_portfolio": "Download Portfolio",
+    "view_document": "View Document",
+    "file_not_available": "File not available"
+  },
+   "file_manager": {
+    "curriculum_documents": "Curriculum / Documents",
+    "upload_file": "Upload File",
+    "replace_file": "Replace File", 
+    "remove": "Remove",
+    "download": "Download",
+    "confirm_upload": "Confirm Upload",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "uploading_file": "Uploading file...",
+    "file_uploaded": "File uploaded!",
+    "upload_failed": "Upload failed",
+    "file_uploaded_success": "File uploaded successfully!",
+    "file_removed_success": "File removed successfully!",
+    "error_occurred": "An error occurred",
+    "upload_error": "Failed to upload file",
+    "remove_error": "Failed to remove file",
+    "file_too_large": "File is too large. Maximum size is {maxSize}",
+    "supported_formats": "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT",
+    "max_size_50mb": "Max 50MB"
+  },
   
 
 

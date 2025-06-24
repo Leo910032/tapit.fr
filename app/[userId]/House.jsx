@@ -6,6 +6,7 @@ import BgDiv from "./components/BgDiv";
 import MyLinks from "./components/MyLinks";
 import SupportBanner from "./components/SupportBanner";
 import ExchangeButton from "./components/ExchangeButton";
+import FileDownloadButton from "./components/FileDownloadButton"; // ✅ Import the new component
 import React, { useEffect, useState } from "react";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { fireApp } from "@/important/firebase";
@@ -85,6 +86,9 @@ export default function House({ userId }) {
                             <ProfilePic userId={userId} />
                             <UserInfo userId={userId} hasSensitiveContent={hasSensitiveContent} />
                             <MyLinks userId={userId} hasSensitiveContent={hasSensitiveContent} />
+                            
+                            {/* ✅ File Download Button - Only shows if user has uploaded a file */}
+                            <FileDownloadButton userId={userId} />
                             
                             {/* Exchange Button */}
                             <div className="w-full px-5 mb-4">

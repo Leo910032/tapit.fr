@@ -13,8 +13,15 @@ export default function ColorPicker({colorFor}) {
     const debounceColor = useDebounce(colorText, 500);
     const [validColor, setValidColor] = useState(1);
     const [colorHasLoaded, setColorHasLoaded] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false); // ✅ Add hydration state
     const colorPickRef = useRef();
 
+    // ✅ Fix hydration by ensuring client-side only rendering
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
+
+    
     const handleUpdateTheme = async(text) => {
         switch (colorFor) {
             case 0:
@@ -53,7 +60,7 @@ export default function ColorPicker({colorFor}) {
     
             handleUpdateTheme(colorText);
         }
-    }, [debounceColor]);
+    }, [debounceColor, colorHasLoaded, colorText]);
 
     useEffect(() => {
         if (!validColor) {
@@ -61,44 +68,71 @@ export default function ColorPicker({colorFor}) {
         }
 
         handleUpdateTheme(colorText);
-    }, [validColor]);
+    }, [validColor, colorText]);
 
     useEffect(() => {
+        // ✅ Only fetch theme after hydration
+        if (!isHydrated) return;
+        
         function fetchTheme() {
             const currentUser = testForActiveSession();
+            if (!currentUser) return;
+            
             const collectionRef = collection(fireApp, "AccountData");
             const docRef = doc(collectionRef, `${currentUser}`);
         
-            onSnapshot(docRef, (docSnap) => {
+            const unsubscribe = onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const { backgroundColor, btnShadowColor, btnFontColor, btnColor, themeTextColour } = docSnap.data();
+                    let newColor;
+                    
                     switch (colorFor) {
                         case 0:
-                            setColorText(backgroundColor ? backgroundColor : "#e8edf5");
+                            newColor = backgroundColor || "#e8edf5";
                             break;
                         case 1:
-                            setColorText(btnColor ? btnColor : "#e8edf5");
+                            newColor = btnColor || "#e8edf5";
                             break;
                         case 2:
-                            setColorText(btnFontColor ? btnFontColor : "#e8edf5");
+                            newColor = btnFontColor || "#e8edf5";
                             break;
                         case 3:
-                            setColorText(btnShadowColor ? btnShadowColor : "#e8edf5");
+                            newColor = btnShadowColor || "#e8edf5";
                             break;
                         case 4:
-                            setColorText(themeTextColour ? themeTextColour : "#000000");
+                            newColor = themeTextColour || "#000000";
                             break;
-                    
                         default:
-                            setColorText(backgroundColor ? backgroundColor : "#e8edf5");
+                            newColor = backgroundColor || "#e8edf5";
                             break;
                     }
+                    
+                    setColorText(newColor);
                 }
+            }, (error) => {
+                console.error("Error fetching theme:", error);
             });
+            
+            return unsubscribe;
         }
         
-        fetchTheme();
-    }, [colorFor]);
+        const unsubscribe = fetchTheme();
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [colorFor, isHydrated]);
+
+    // ✅ Show loading state until hydrated
+    if (!isHydrated) {
+        return (
+            <div className="pt-6 flex items-center">
+                <div className="h-12 w-12 mr-4 rounded-lg bg-gray-200 animate-pulse"></div>
+                <div className="w-auto relative pt-2 flex items-center hover:border rounded-lg bg-black bg-opacity-[0.05] border-transparent border">
+                    <div className="sm:flex-1 sm:w-auto w-[200px] px-4 py-2 bg-gray-100 animate-pulse h-10 rounded"></div>
+                </div>
+            </div>
+        );
+    }
     
     return (
         <div className="pt-6 flex items-center">
@@ -109,7 +143,11 @@ export default function ColorPicker({colorFor}) {
                 ref={colorPickRef}
                 onChange={(e) => setColorText(e.target.value)} 
             />
-            <div className="h-12 w-12 mr-4 rounded-lg cursor-pointer hover:scale-[1.05] active:scale-90" style={{ background: `${colorText}` }} onClick={()=>colorPickRef.current.click()}></div>
+            <div 
+                className="h-12 w-12 mr-4 rounded-lg cursor-pointer hover:scale-[1.05] active:scale-90 transition-transform" 
+                style={{ background: colorText }} 
+                onClick={() => colorPickRef.current?.click()}
+            ></div>
             <div className={`w-auto relative pt-2 flex items-center hover:border rounded-lg bg-black bg-opacity-[0.05] ${validColor ? "focus-within:border-black border-transparent": "border-red-500" } focus-within:border-2 border`}>
                 <input 
                     type="text"
