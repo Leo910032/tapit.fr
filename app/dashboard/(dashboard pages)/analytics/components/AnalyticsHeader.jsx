@@ -1,3 +1,4 @@
+// app/dashboard/(dashboard pages)/analytics/components/AnalyticsHeader
 "use client"
 import Image from "next/image";
 import { useTranslation } from "@/lib/useTranslation";

@@ -1,3 +1,4 @@
+// app/dashboard/(dashboard pages)/analytics/components/PeriodNavigation
 "use client"
 import { useTranslation } from "@/lib/useTranslation";
 

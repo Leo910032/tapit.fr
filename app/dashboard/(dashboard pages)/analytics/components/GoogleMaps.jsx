@@ -1,5 +1,5 @@
+// app/dashboard/(dashboard pages)/analytics/components/GoogleMaps
 'use client';
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 

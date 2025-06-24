@@ -1,16 +1,25 @@
-// app/dashboard/(dashboard pages)/analytics/page.jsx - Mobile Optimized Version
+// app/dashboard/(dashboard pages)/analytics/page.jsx - OPTIMIZED VERSION
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { useTranslation } from "@/lib/useTranslation";
 import Image from "next/image";
 import { fireApp } from "@/important/firebase";
 import { collection, doc, onSnapshot } from "firebase/firestore";
+import { fastUserLookup } from "@/lib/userLookup"; // ✅ Import fast lookup
 
 // Mobile-Optimized Analytics Header Component
-function MobileAnalyticsHeader({ username, isConnected }) {
+function MobileAnalyticsHeader({ username, isConnected, userId }) {
     const { t } = useTranslation();
+    const [lastUpdateTime, setLastUpdateTime] = useState(new Date());
+
+    useEffect(() => {
+        if (isConnected) {
+            const timer = setInterval(() => setLastUpdateTime(new Date()), 1000);
+            return () => clearInterval(timer);
+        }
+    }, [isConnected]);
     
     return (
         <div className="mb-4">
@@ -27,17 +36,29 @@ function MobileAnalyticsHeader({ username, isConnected }) {
                             {t('analytics.profile') || 'Profile:'} @{username}
                         </p>
                     )}
+                    {/* ✅ Show user ID for debugging in dev mode */}
+                    {process.env.NODE_ENV === 'development' && userId && (
+                        <p className="text-xs text-blue-500 mt-1 font-mono">
+                            ID: {userId}
+                        </p>
+                    )}
                 </div>
                 
                 {/* Real-time connection indicator */}
                 <div className="flex items-center gap-2 self-start">
-                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
                     <span className="text-xs text-gray-500">
                         {isConnected ? 
-                            (t("analytics.live_connection") || "Live") : 
-                            (t("analytics.disconnected") || "Disconnected")
+                            (t("analytics.live_connection") || "Live Analytics") : 
+                            (t("analytics.disconnected") || "Reconnecting...")
                         }
                     </span>
+                    {/* ✅ Connection timestamp */}
+                    {isConnected && (
+                        <span className="text-xs text-green-600">
+                            • Updated {lastUpdateTime.toLocaleTimeString()}
+                        </span>
+                    )}
                 </div>
             </div>
         </div>
@@ -65,7 +86,7 @@ function MobilePeriodNavigation({ selectedPeriod, setSelectedPeriod }) {
                             onClick={() => setSelectedPeriod(item.id)}
                             className={`flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-md text-xs font-medium transition-all duration-200 ${
                                 selectedPeriod === item.id
-                                    ? 'bg-blue-500 text-white shadow-md'
+                                    ? 'bg-blue-500 text-white shadow-md transform scale-105'
                                     : 'text-gray-600 hover:bg-gray-100'
                             }`}
                         >
@@ -79,8 +100,8 @@ function MobilePeriodNavigation({ selectedPeriod, setSelectedPeriod }) {
     );
 }
 
-// Mobile Overview Cards Component
-function MobileOverviewCards({ analyticsData, selectedPeriod, analytics, isConnected }) {
+// ✅ Enhanced Mobile Overview Cards Component
+function MobileOverviewCards({ analyticsData, selectedPeriod, isConnected, lastUpdate }) {
     const { t } = useTranslation();
     
     const getCurrentData = () => {
@@ -99,14 +120,26 @@ function MobileOverviewCards({ analyticsData, selectedPeriod, analytics, isConne
 
     const currentData = getCurrentData();
 
+    // ✅ Calculate engagement rate (CTR)
+    const engagementRate = currentData.views > 0 ? ((currentData.clicks / currentData.views) * 100) : 0;
+
     return (
         <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                {getPeriodLabel()} {t('analytics.overview_title') || 'Overview'}
-            </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold text-gray-900">
+                    {getPeriodLabel()} {t('analytics.overview_title') || 'Overview'}
+                </h2>
+                {lastUpdate && (
+                    <span className="text-xs text-gray-500">
+                        {new Date(lastUpdate).toLocaleTimeString()}
+                    </span>
+                )}
+            </div>
+            
+            {/* Main Metrics Grid */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
                 {/* Views Card */}
-                <div className="bg-white rounded-lg shadow-sm border p-4 relative">
+                <div className="bg-white rounded-lg shadow-sm border p-4 relative overflow-hidden">
                     {isConnected && (
                         <div className="absolute top-2 right-2 animate-pulse bg-blue-500 w-2 h-2 rounded-full"></div>
                     )}
@@ -127,7 +160,7 @@ function MobileOverviewCards({ analyticsData, selectedPeriod, analytics, isConne
                 </div>
 
                 {/* Clicks Card */}
-                <div className="bg-white rounded-lg shadow-sm border p-4 relative">
+                <div className="bg-white rounded-lg shadow-sm border p-4 relative overflow-hidden">
                     {isConnected && (
                         <div className="absolute top-2 right-2 animate-pulse bg-indigo-500 w-2 h-2 rounded-full"></div>
                     )}
@@ -146,99 +179,131 @@ function MobileOverviewCards({ analyticsData, selectedPeriod, analytics, isConne
                     </p>
                 </div>
             </div>
-        </div>
-    );
-}
 
-// Mobile Statistics Grid Component
-function MobileStatisticsGrid({ analytics }) {
-    const { t } = useTranslation();
-
-    return (
-        <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                {t('analytics.complete_statistics') || 'All Statistics'}
-            </h2>
-            <div className="grid grid-cols-2 gap-3">
-                {/* Today */}
-                <div className="bg-white rounded-lg shadow-sm border p-3">
-                    <h3 className="text-xs font-medium text-gray-600 mb-2">
-                        {t('analytics.stats.today') || 'Today'}
-                    </h3>
-                    <div className="space-y-1">
-                        <p className="text-sm font-bold text-blue-600">
-                            {analytics?.todayViews || 0} {t('analytics.stats.views') || 'views'}
+            {/* ✅ Engagement Rate Card */}
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 text-white shadow-lg">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <p className="text-sm opacity-90 mb-1">
+                            {t('analytics.engagement_rate') || 'Engagement Rate'}
                         </p>
-                        <p className="text-sm font-bold text-indigo-600">
-                            {analytics?.todayClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
+                        <p className="text-2xl font-bold">
+                            {engagementRate.toFixed(1)}%
                         </p>
                     </div>
-                </div>
-
-                {/* This Week */}
-                <div className="bg-white rounded-lg shadow-sm border p-3">
-                    <h3 className="text-xs font-medium text-gray-600 mb-2">
-                        {t('analytics.stats.this_week') || 'This Week'}
-                    </h3>
-                    <div className="space-y-1">
-                        <p className="text-sm font-bold text-blue-600">
-                            {analytics?.thisWeekViews || 0} {t('analytics.stats.views') || 'views'}
-                        </p>
-                        <p className="text-sm font-bold text-indigo-600">
-                            {analytics?.thisWeekClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
-                        </p>
+                    <div className="bg-white bg-opacity-20 rounded-full p-3">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
                 </div>
-
-                {/* This Month */}
-                <div className="bg-white rounded-lg shadow-sm border p-3">
-                    <h3 className="text-xs font-medium text-gray-600 mb-2">
-                        {t('analytics.stats.this_month') || 'This Month'}
-                    </h3>
-                    <div className="space-y-1">
-                        <p className="text-sm font-bold text-blue-600">
-                            {analytics?.thisMonthViews || 0} {t('analytics.stats.views') || 'views'}
-                        </p>
-                        <p className="text-sm font-bold text-indigo-600">
-                            {analytics?.thisMonthClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
-                        </p>
-                    </div>
-                </div>
-
-                {/* All Time */}
-                <div className="bg-white rounded-lg shadow-sm border p-3">
-                    <h3 className="text-xs font-medium text-gray-600 mb-2">
-                        {t('analytics.stats.all_time') || 'All Time'}
-                    </h3>
-                    <div className="space-y-1">
-                        <p className="text-sm font-bold text-blue-600">
-                            {analytics?.totalViews || 0} {t('analytics.stats.views') || 'views'}
-                        </p>
-                        <p className="text-sm font-bold text-indigo-600">
-                            {analytics?.totalClicks || 0} {t('analytics.stats.clicks') || 'clicks'}
-                        </p>
-                    </div>
-                </div>
+                <p className="text-xs opacity-75 mt-2">
+                    {t('analytics.engagement_description') || 'Clicks per view ratio for the period'}
+                </p>
             </div>
         </div>
     );
 }
 
-// Mobile Top Links Component
+// ✅ Enhanced Mobile Statistics Grid Component
+function MobileStatisticsGrid({ analytics, isConnected }) {
+    const { t } = useTranslation();
+
+    const statisticsCards = [
+        {
+            title: t('analytics.stats.today') || 'Today',
+            views: analytics?.todayViews || 0,
+            clicks: analytics?.todayClicks || 0,
+            color: 'blue'
+        },
+        {
+            title: t('analytics.stats.this_week') || 'This Week',
+            views: analytics?.thisWeekViews || 0,
+            clicks: analytics?.thisWeekClicks || 0,
+            color: 'green'
+        },
+        {
+            title: t('analytics.stats.this_month') || 'This Month',
+            views: analytics?.thisMonthViews || 0,
+            clicks: analytics?.thisMonthClicks || 0,
+            color: 'purple'
+        },
+        {
+            title: t('analytics.stats.all_time') || 'All Time',
+            views: analytics?.totalViews || 0,
+            clicks: analytics?.totalClicks || 0,
+            color: 'orange'
+        }
+    ];
+
+    return (
+        <div className="mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                {t('analytics.complete_statistics') || 'Complete Statistics'}
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+                {statisticsCards.map((card, index) => (
+                    <div key={index} className={`bg-white rounded-lg shadow-sm border p-3 border-l-4 border-l-${card.color}-500`}>
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-semibold text-gray-700">
+                                {card.title}
+                            </h3>
+                            {isConnected && (
+                                <div className={`animate-pulse bg-${card.color}-500 w-1.5 h-1.5 rounded-full`}></div>
+                            )}
+                        </div>
+                        <div className="space-y-1 text-xs">
+                            <p>Views: <span className="font-bold text-gray-900">{card.views.toLocaleString()}</span></p>
+                            <p>Clicks: <span className="font-bold text-gray-900">{card.clicks.toLocaleString()}</span></p>
+                            <p className="pt-1 border-t border-gray-100 mt-1">CTR: <span className="font-bold text-gray-900">{card.views > 0 ? ((card.clicks / card.views) * 100).toFixed(1) : '0.0'}%</span></p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+
+// ✅ Enhanced Mobile Top Links Component with Real-time Updates
 function MobileTopClickedLinks({ analytics, isConnected }) {
     const { t } = useTranslation();
     const [showAll, setShowAll] = useState(false);
+    const [recentlyUpdated, setRecentlyUpdated] = useState(new Set());
+    const prevClicksRef = useRef({});
+
+    useEffect(() => {
+        if (!analytics?.topLinks) return;
+    
+        const newUpdated = new Set();
+        const currentClicks = {};
+    
+        analytics.topLinks.forEach(link => {
+            currentClicks[link.linkId] = link.totalClicks || 0;
+            if (prevClicksRef.current[link.linkId] < currentClicks[link.linkId]) {
+                newUpdated.add(link.linkId);
+            }
+        });
+    
+        if (newUpdated.size > 0) {
+            setRecentlyUpdated(newUpdated);
+            const timer = setTimeout(() => setRecentlyUpdated(new Set()), 3000);
+            return () => clearTimeout(timer);
+        }
+    
+        prevClicksRef.current = currentClicks;
+    }, [analytics?.topLinks]);
+
 
     if (!analytics?.topLinks?.length) {
-        return null;
+        return null; // Don't render an empty state here, let MobileRecentActivity handle it.
     }
 
     // Function to get the root domain from URL
     function getRootNameFromUrl(url) {
         try {
             const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-            const rootName = urlObj.hostname;
-            return rootName;
+            return urlObj.hostname.replace('www.', '');
         } catch (error) {
             return '';
         }
@@ -249,13 +314,14 @@ function MobileTopClickedLinks({ analytics, isConnected }) {
         if (!url) return 'https://linktree.sirv.com/Images/brands/link-svgrepo-com.svg';
         const rootName = getRootNameFromUrl(url);
         
-        // Simple mapping for common domains
         const iconMap = {
             'instagram.com': 'https://linktree.sirv.com/Images/brands/instagram.svg',
             'twitter.com': 'https://linktree.sirv.com/Images/brands/twitter.svg',
             'tiktok.com': 'https://linktree.sirv.com/Images/brands/tiktok.svg',
             'youtube.com': 'https://linktree.sirv.com/Images/brands/youtube.svg',
             'spotify.com': 'https://linktree.sirv.com/Images/brands/spotify.svg',
+            'facebook.com': 'https://linktree.sirv.com/Images/brands/facebook.svg',
+            'linkedin.com': 'https://linktree.sirv.com/Images/brands/linkedin.svg',
         };
         
         return iconMap[rootName] || 'https://linktree.sirv.com/Images/brands/link-svgrepo-com.svg';
@@ -280,25 +346,32 @@ function MobileTopClickedLinks({ analytics, isConnected }) {
                 
                 <div className="space-y-3">
                     {displayedLinks.map((link, index) => (
-                        <div key={link.linkId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div 
+                            key={link.linkId} 
+                            className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-500 ${
+                                recentlyUpdated.has(link.linkId) 
+                                    ? 'bg-green-50 border border-green-200 shadow-md transform scale-105' 
+                                    : 'bg-gray-50'
+                            }`}
+                        >
                             {/* Rank Badge */}
-                            <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${
-                                index === 0 ? 'bg-yellow-500' :
-                                index === 1 ? 'bg-gray-400' :
-                                index === 2 ? 'bg-amber-600' :
-                                'bg-blue-500'
+                            <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                index === 0 ? 'bg-yellow-400 text-yellow-800' :
+                                index === 1 ? 'bg-gray-300 text-gray-700' :
+                                index === 2 ? 'bg-amber-500 text-amber-900' :
+                                'bg-blue-100 text-blue-600'
                             }`}>
                                 {index < 3 ? ['🥇', '🥈', '🥉'][index] : index + 1}
                             </div>
 
                             {/* Link Icon */}
-                            <div className="flex-shrink-0 h-8 w-8 rounded-lg p-1 bg-white border">
+                            <div className="flex-shrink-0 h-8 w-8 rounded-lg p-1 bg-white border flex items-center justify-center">
                                 <Image 
                                     src={getLinkIcon(link.url)}
                                     alt={link.type || 'link'}
                                     width={24}
                                     height={24}
-                                    className="object-fit h-full w-full"
+                                    className="object-contain h-full w-full"
                                 />
                             </div>
 
@@ -308,14 +381,19 @@ function MobileTopClickedLinks({ analytics, isConnected }) {
                                     {link.title || t('analytics.untitled_link') || 'Untitled Link'}
                                 </p>
                                 <p className="text-xs text-gray-500 truncate">
-                                    {link.url}
+                                    {getRootNameFromUrl(link.url) || link.url}
                                 </p>
                             </div>
 
-                            {/* Click Count */}
+                            {/* Click Count with Animation */}
                             <div className="text-right flex-shrink-0">
-                                <p className="text-lg font-bold text-gray-900">
+                                <p className={`text-lg font-bold transition-colors duration-300 ${
+                                    recentlyUpdated.has(link.linkId) ? 'text-green-600' : 'text-gray-900'
+                                }`}>
                                     {link.totalClicks || 0}
+                                    {recentlyUpdated.has(link.linkId) && (
+                                        <span className="ml-1 animate-ping absolute opacity-75 h-2 w-2 rounded-full bg-green-400"></span>
+                                    )}
                                 </p>
                                 <p className="text-xs text-gray-500">clicks</p>
                             </div>
@@ -325,10 +403,10 @@ function MobileTopClickedLinks({ analytics, isConnected }) {
 
                 {/* Show More/Less Button */}
                 {analytics.topLinks.length > 5 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200 text-center">
+                    <div className="mt-4 pt-3 border-t border-gray-200 text-center">
                         <button 
                             onClick={() => setShowAll(!showAll)}
-                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                            className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
                         >
                             {showAll 
                                 ? t('analytics.show_less') || 'Show Less'
@@ -342,255 +420,60 @@ function MobileTopClickedLinks({ analytics, isConnected }) {
     );
 }
 
-// Mobile Link Analytics Chart Component
-function MobileLinkAnalyticsChart({ analytics, isConnected }) {
-    const { t } = useTranslation();
-    
-    if (!analytics?.topLinks?.length) {
-        return (
-            <div className="mb-4">
-                <div className="bg-white rounded-lg shadow-sm border p-4">
-                    <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-lg font-semibold text-gray-900">
-                            {t('analytics.link_performance') || 'Link Performance'}
-                        </h2>
-                        {isConnected && (
-                            <div className="flex items-center gap-1">
-                                <div className="animate-pulse bg-green-500 w-2 h-2 rounded-full"></div>
-                                <span className="text-xs text-green-600">Live</span>
-                            </div>
-                        )}
-                    </div>
-                    
-                    <div className="text-center py-6">
-                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                            </svg>
-                        </div>
-                        <p className="text-gray-600 mb-2 text-sm">
-                            {t('analytics.no_link_data') || 'No link data yet'}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                            {t('analytics.add_links_to_track') || 'Add links to your profile to track their performance!'}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
-    // Prepare data for charts
-    const chartData = analytics.topLinks.slice(0, 5).map((link, index) => ({
-        name: link.title?.length > 12 ? `${link.title.substring(0, 12)}...` : link.title || 'Untitled',
-        clicks: link.totalClicks || 0,
-        fullTitle: link.title || 'Untitled Link',
-        type: link.type || 'custom',
-        percentage: 0
-    }));
-
-    // Calculate percentages
-    const totalClicks = chartData.reduce((sum, item) => sum + item.clicks, 0);
-    chartData.forEach(item => {
-        item.percentage = totalClicks > 0 ? (item.clicks / totalClicks) * 100 : 0;
-    });
-
-    // Find max clicks for scaling
-    const maxClicks = Math.max(...chartData.map(item => item.clicks));
-
-    return (
-        <div className="mb-4">
-            <div className="bg-white rounded-lg shadow-sm border p-4">
-                <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-lg font-semibold text-gray-900">
-                        {t('analytics.link_performance') || 'Performance'}
-                    </h2>
-                    {isConnected && (
-                        <div className="flex items-center gap-1">
-                            <div className="animate-pulse bg-green-500 w-2 h-2 rounded-full"></div>
-                            <span className="text-xs text-green-600">Live</span>
-                        </div>
-                    )}
-                </div>
-
-                {/* Mobile Chart */}
-                <div className="space-y-3">
-                    {chartData.map((item, index) => (
-                        <div key={index} className="group">
-                            <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-medium text-gray-700 truncate max-w-24">
-                                    {item.name}
-                                </span>
-                                <span className="text-sm font-bold text-gray-900">
-                                    {item.clicks}
-                                </span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2 relative overflow-hidden">
-                                <div 
-                                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-1000 ease-out"
-                                    style={{ 
-                                        width: maxClicks > 0 ? `${(item.clicks / maxClicks) * 100}%` : '0%' 
-                                    }}
-                                ></div>
-                            </div>
-                            <div className="flex items-center justify-between mt-1">
-                                <span className="text-xs text-gray-500 capitalize">
-                                    {item.type}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                    {item.percentage.toFixed(1)}%
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Summary Stats */}
-                <div className="mt-4 pt-3 border-t border-gray-100">
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                        <div>
-                            <p className="text-lg font-bold text-blue-600">
-                                {analytics.topLinks.length}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                                {t('analytics.total_links') || 'Links'}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-lg font-bold text-green-600">
-                                {analytics.totalClicks || 0}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                                {t('analytics.total_clicks') || 'Clicks'}
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-lg font-bold text-purple-600">
-                                {analytics.topLinks.length > 0 ? Math.round((analytics.totalClicks || 0) / analytics.topLinks.length) : 0}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                                {t('analytics.avg_clicks_per_link') || 'Avg/Link'}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// Mobile Recent Activity Component
+// ✅ Enhanced Recent Activity Component (for users with no links/activity)
 function MobileRecentActivity({ analytics, isConnected, username }) {
     const { t } = useTranslation();
+
+    // This component now primarily serves as a placeholder for new users
+    // or users who haven't added any links yet.
+    if (analytics && analytics.topLinks && analytics.topLinks.length > 0) {
+        return null;
+    }
     
     return (
         <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-semibold text-gray-900">
-                    {t('analytics.recent_activity') || 'Recent Activity'}
-                </h2>
-                {isConnected && (
-                    <div className="flex items-center gap-1">
-                        <div className="animate-pulse bg-green-500 w-2 h-2 rounded-full"></div>
-                        <span className="text-xs text-green-600">Live</span>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                {t('analytics.get_started') || 'Get Started'}
+            </h2>
+            <div className="text-center py-6">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                </div>
+                <p className="text-gray-600 mb-2 text-sm font-medium">
+                    {t('analytics.no_link_data') || 'No link data to display'}
+                </p>
+                <p className="text-xs text-gray-500 mb-4">
+                    {t('analytics.add_links_to_track') || 'Add some links to your profile to see your analytics here!'}
+                </p>
+                {username && (
+                    <div className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs text-gray-600 mb-2">
+                            {t('analytics.your_profile_url') || 'Your profile URL:'}
+                        </p>
+                        <div className="flex items-center justify-between gap-2 bg-white rounded p-2 border">
+                            <p className="text-xs font-mono text-blue-600 truncate flex-1">
+                                tapit.fr/{username}
+                            </p>
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(`https://www.tapit.fr/${username}`);
+                                    // Simple feedback without extra libraries
+                                    alert('URL copied to clipboard!');
+                                }}
+                                className="p-1 text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0"
+                                title={t('analytics.copy_url') || 'Copy URL'}
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
-            
-            {analytics && (analytics.totalViews > 0 || analytics.totalClicks > 0) ? (
-                <div className="space-y-3">
-                    {analytics.totalViews > 0 && (
-                        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-blue-100 p-2 rounded-lg">
-                                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-900 text-sm">
-                                        {t('analytics.profile_views') || 'Profile Views'}
-                                    </p>
-                                    <p className="text-xs text-gray-600">
-                                        {analytics?.lastUpdated ? 
-                                            `Updated: ${new Date(analytics.lastUpdated.seconds * 1000).toLocaleDateString()}` :
-                                            'No recent activity'
-                                        }
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <p className="font-bold text-gray-900 text-lg">
-                                    {analytics?.totalViews?.toLocaleString()}
-                                </p>
-                                <p className="text-xs text-gray-600">Total</p>
-                            </div>
-                        </div>
-                    )}
-                    
-                    {analytics.totalClicks > 0 && (
-                        <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-indigo-100 p-2 rounded-lg">
-                                    <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-900 text-sm">
-                                        {t('analytics.link_clicks') || 'Link Clicks'}
-                                    </p>
-                                    <p className="text-xs text-gray-600">
-                                        {t('analytics.total_interactions_description') || 'Total interactions'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <p className="font-bold text-gray-900 text-lg">
-                                    {analytics?.totalClicks?.toLocaleString()}
-                                </p>
-                                <p className="text-xs text-gray-600">Total</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            ) : (
-                <div className="text-center py-6">
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                    </div>
-                    <p className="text-gray-600 mb-2 text-sm">
-                        {t('analytics.no_activity_yet') || 'No activity yet'}
-                    </p>
-                    <p className="text-xs text-gray-500 mb-3">
-                        {t('analytics.share_to_track') || 'Share your profile to start tracking!'}
-                    </p>
-                    {username && (
-                        <div className="bg-gray-50 rounded-lg p-3">
-                            <p className="text-xs text-gray-600 mb-2">
-                                {t('analytics.your_profile_url') || 'Your profile URL:'}
-                            </p>
-                            <div className="flex items-center justify-between gap-2 bg-white rounded p-2 border">
-                                <p className="text-xs font-mono text-blue-600 truncate flex-1">
-                                    tapit.fr/{username}
-                                </p>
-                                <button
-                                    onClick={() => navigator.clipboard.writeText(`https://www.tapit.fr/${username}`)}
-                                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0"
-                                    title={t('analytics.copy_url') || 'Copy URL'}
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
         </div>
     );
 }
@@ -601,12 +484,11 @@ export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [username, setUsername] = useState("");
+    const [userId, setUserId] = useState("");
     const [isConnected, setIsConnected] = useState(false);
-    
-    // Date range selector state
-    const [selectedPeriod, setSelectedPeriod] = useState('today'); // 'today', 'week', 'month', 'all'
-
-    // Analytics data organized by periods
+    const [lastUpdate, setLastUpdate] = useState(null);
+    const [connectionRetries, setConnectionRetries] = useState(0);
+    const [selectedPeriod, setSelectedPeriod] = useState('today');
     const [analyticsData, setAnalyticsData] = useState({
         today: { views: 0, clicks: 0 },
         week: { views: 0, clicks: 0 },
@@ -616,11 +498,12 @@ export default function AnalyticsPage() {
 
     useEffect(() => {
         let unsubscribe = null;
+        let retryTimeout = null;
 
-        async function setupRealtimeAnalytics() {
+        const setupRealtimeAnalytics = async (retryCount = 0) => {
             try {
+                if (retryCount === 0) setLoading(true);
                 const currentUser = testForActiveSession();
-                console.log("Setting up real-time analytics for user:", currentUser);
                 
                 if (!currentUser) {
                     setError(t("analytics.not_authenticated") || "Not authenticated");
@@ -628,203 +511,156 @@ export default function AnalyticsPage() {
                     return;
                 }
 
-                const userData = await fetchUserData(currentUser);
-                
-                if (!userData) {
-                    setError(t("analytics.user_data_not_found") || "User data not found");
-                    setLoading(false);
-                    return;
+                setUserId(currentUser);
+
+                if (!username) {
+                    const userInfo = await fastUserLookup(currentUser);
+                    if (userInfo?.username) {
+                        setUsername(userInfo.username);
+                    } else {
+                        const userData = await fetchUserData(currentUser);
+                        if (!userData) {
+                            setError(t("analytics.user_data_not_found") || "User data not found");
+                            setLoading(false);
+                            return;
+                        }
+                        setUsername(userData.username || currentUser);
+                    }
                 }
 
-                setUsername(userData.username);
-
-                // Set up real-time listener for analytics document
                 const analyticsRef = doc(collection(fireApp, "Analytics"), currentUser);
                 
                 unsubscribe = onSnapshot(analyticsRef, (docSnapshot) => {
-                    console.log("📊 Analytics update received!");
                     setIsConnected(true);
+                    setLastUpdate(new Date());
+                    setConnectionRetries(0);
                     
-                    if (docSnapshot.exists()) {
-                        const data = docSnapshot.data();
-                        console.log("Analytics data updated:", data);
-                        
-                        // Calculate derived metrics
-                        const today = new Date().toISOString().split('T')[0];
-                        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-                        
-                        // Process link clicks data with enhanced information
-                        const linkClicks = data.linkClicks || {};
-                        const topLinks = Object.entries(linkClicks)
-                            .map(([linkId, linkData]) => ({
-                                linkId,
-                                title: linkData.title || 'Untitled Link',
-                                url: linkData.url || '',
-                                type: linkData.type || 'custom',
-                                totalClicks: linkData.totalClicks || 0,
-                                todayClicks: linkData.dailyClicks?.[today] || 0,
-                                weekClicks: linkData.weeklyClicks?.[getWeekKey()] || 0,
-                                monthClicks: linkData.monthlyClicks?.[getMonthKey()] || 0,
-                                createdAt: linkData.createdAt || new Date().toISOString(),
-                                lastClicked: linkData.lastClicked,
-                                ...linkData
-                            }))
-                            .sort((a, b) => (b.totalClicks || 0) - (a.totalClicks || 0));
-                        
-                        const processedAnalytics = {
-                            // Views data
-                            totalViews: data.totalViews || 0,
-                            todayViews: data.dailyViews?.[today] || 0,
-                            yesterdayViews: data.dailyViews?.[yesterday] || 0,
-                            thisWeekViews: data.weeklyViews?.[getWeekKey()] || 0,
-                            thisMonthViews: data.monthlyViews?.[getMonthKey()] || 0,
-                            
-                            // Clicks data
-                            totalClicks: data.totalClicks || 0,
-                            todayClicks: data.dailyClicks?.[today] || 0,
-                            yesterdayClicks: data.dailyClicks?.[yesterday] || 0,
-                            thisWeekClicks: data.weeklyClicks?.[getWeekKey()] || 0,
-                            thisMonthClicks: data.monthlyClicks?.[getMonthKey()] || 0,
-                            
-                            // Detailed data
-                            dailyViews: data.dailyViews || {},
-                            dailyClicks: data.dailyClicks || {},
-                            weeklyViews: data.weeklyViews || {},
-                            weeklyClicks: data.weeklyClicks || {},
-                            monthlyViews: data.monthlyViews || {},
-                            monthlyClicks: data.monthlyClicks || {},
-                            linkClicks: data.linkClicks || {},
-                            topLinks,
-                            
-                            lastUpdated: data.lastUpdated,
-                            username: data.username
-                        };
-                        
-                        // Update organized analytics data
-                        setAnalyticsData({
-                            today: {
-                                views: processedAnalytics.todayViews,
-                                clicks: processedAnalytics.todayClicks
-                            },
-                            week: {
-                                views: processedAnalytics.thisWeekViews,
-                                clicks: processedAnalytics.thisWeekClicks
-                            },
-                            month: {
-                                views: processedAnalytics.thisMonthViews,
-                                clicks: processedAnalytics.thisMonthClicks
-                            },
-                            all: {
-                                views: processedAnalytics.totalViews,
-                                clicks: processedAnalytics.totalClicks
-                            }
-                        });
-                        
-                        setAnalytics(processedAnalytics);
-                    } else {
-                        console.log("No analytics document found - initializing with zeros");
-                        // Document doesn't exist yet, show zeros
-                        const emptyAnalytics = {
-                            totalViews: 0,
-                            todayViews: 0,
-                            yesterdayViews: 0,
-                            thisWeekViews: 0,
-                            thisMonthViews: 0,
-                            totalClicks: 0,
-                            todayClicks: 0,
-                            yesterdayClicks: 0,
-                            thisWeekClicks: 0,
-                            thisMonthClicks: 0,
-                            dailyViews: {},
-                            dailyClicks: {},
-                            weeklyViews: {},
-                            weeklyClicks: {},
-                            monthlyViews: {},
-                            monthlyClicks: {},
-                            linkClicks: {},
-                            topLinks: [],
-                            username: userData.username
-                        };
-                        
-                        setAnalytics(emptyAnalytics);
-                        setAnalyticsData({
-                            today: { views: 0, clicks: 0 },
-                            week: { views: 0, clicks: 0 },
-                            month: { views: 0, clicks: 0 },
-                            all: { views: 0, clicks: 0 }
-                        });
-                    }
+                    const data = docSnapshot.exists() ? docSnapshot.data() : {};
+                    const processedAnalytics = processAnalyticsData(data, username);
                     
+                    setAnalyticsData({
+                        today: { views: processedAnalytics.todayViews, clicks: processedAnalytics.todayClicks },
+                        week: { views: processedAnalytics.thisWeekViews, clicks: processedAnalytics.thisWeekClicks },
+                        month: { views: processedAnalytics.thisMonthViews, clicks: processedAnalytics.thisMonthClicks },
+                        all: { views: processedAnalytics.totalViews, clicks: processedAnalytics.totalClicks }
+                    });
+                    
+                    setAnalytics(processedAnalytics);
                     setLoading(false);
+
                 }, (error) => {
-                    console.error("Error in analytics listener:", error);
-                    setError(t("analytics.failed_to_connect") || "Failed to connect to analytics");
+                    console.error("❌ Analytics listener error:", error);
                     setIsConnected(false);
-                    setLoading(false);
+                    const newRetryCount = retryCount + 1;
+                    setConnectionRetries(newRetryCount);
+                    
+                    if (newRetryCount < 5) {
+                        const retryDelay = Math.min(1000 * Math.pow(2, newRetryCount), 30000);
+                        retryTimeout = setTimeout(() => setupRealtimeAnalytics(newRetryCount), retryDelay);
+                    } else {
+                        setError(t("analytics.connection_failed") || "Connection failed after multiple attempts");
+                        setLoading(false);
+                    }
                 });
 
             } catch (err) {
-                console.error("Error setting up analytics:", err);
-                setError(t("analytics.failed_to_load") || "Failed to load analytics data");
+                console.error("❌ Error setting up analytics:", err);
+                setError(t("analytics.setup_failed") || "Failed to setup analytics");
                 setLoading(false);
+                setIsConnected(false);
             }
-        }
+        };
 
         setupRealtimeAnalytics();
 
-        // Cleanup function to unsubscribe from listener
         return () => {
-            if (unsubscribe) {
-                console.log("🔌 Disconnecting analytics listener");
-                unsubscribe();
-            }
+            if (unsubscribe) unsubscribe();
+            if (retryTimeout) clearTimeout(retryTimeout);
         };
-    }, [t]);
+    }, [t, username]);
 
-    // Helper functions for date calculations
-    function getWeekKey() {
+    const getWeekKey = () => {
         const now = new Date();
         const yearStart = new Date(now.getFullYear(), 0, 1);
         const weekNumber = Math.ceil(((now - yearStart) / 86400000 + yearStart.getDay() + 1) / 7);
         return `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`;
-    }
+    };
 
-    function getMonthKey() {
+    const getMonthKey = () => {
         const now = new Date();
         return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-    }
+    };
 
-    // Loading state
+    const processAnalyticsData = (data, currentUsername) => {
+        const today = new Date().toISOString().split('T')[0];
+        const weekKey = getWeekKey();
+        const monthKey = getMonthKey();
+
+        const topLinks = Object.entries(data.linkClicks || {})
+            .map(([linkId, linkData]) => ({
+                linkId,
+                title: linkData.title || 'Untitled Link',
+                url: linkData.url || '',
+                type: linkData.type || 'custom',
+                totalClicks: linkData.totalClicks || 0,
+                ...linkData
+            }))
+            .sort((a, b) => (b.totalClicks || 0) - (a.totalClicks || 0));
+        
+        return {
+            totalViews: data.totalViews || 0,
+            todayViews: data.dailyViews?.[today] || 0,
+            thisWeekViews: data.weeklyViews?.[weekKey] || 0,
+            thisMonthViews: data.monthlyViews?.[monthKey] || 0,
+            totalClicks: data.totalClicks || 0,
+            todayClicks: data.dailyTotalClicks?.[today] || 0,
+            thisWeekClicks: data.weeklyTotalClicks?.[weekKey] || 0,
+            thisMonthClicks: data.monthlyTotalClicks?.[monthKey] || 0,
+            topLinks,
+            lastUpdated: data.lastUpdated,
+            username: currentUsername
+        };
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center p-8 min-h-[400px]">
-                <div className="flex flex-col items-center space-y-3">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                    <span className="text-gray-500 text-sm">{t("analytics.loading") || "Loading analytics..."}</span>
+                <div className="flex flex-col items-center space-y-4">
+                    <div className="relative">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                        <div className="absolute inset-0 rounded-full h-12 w-12 border-t-2 border-purple-500 animate-pulse"></div>
+                    </div>
+                    <div className="text-center">
+                        <span className="text-gray-700 text-sm font-medium">
+                            {t("analytics.loading") || "Loading analytics..."}
+                        </span>
+                        {connectionRetries > 0 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Retrying connection... (attempt {connectionRetries})
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
         );
     }
 
-    // Error state
     if (error) {
         return (
-            <div className="flex items-center justify-center p-8 text-red-600 min-h-[400px]">
-                <div className="text-center">
-                    <div className="mb-4">
-                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-                            <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                            </svg>
-                        </div>
+            <div className="flex items-center justify-center p-8 min-h-[400px]">
+                <div className="text-center max-w-md bg-white p-6 rounded-lg shadow-md">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
                     </div>
-                    <p className="text-lg font-semibold mb-2">
-                        {t("analytics.error_loading") || "Error Loading Analytics"}
-                    </p>
-                    <p className="text-sm mb-4">{error}</p>
+                    <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                        {t("analytics.error_loading") || "Analytics Unavailable"}
+                    </h3>
+                    <p className="text-sm mb-4 text-gray-600">{error}</p>
                     <button 
                         onClick={() => window.location.reload()}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         {t("analytics.retry") || "Retry"}
                     </button>
@@ -834,56 +670,35 @@ export default function AnalyticsPage() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 pb-20">
-            {/* Mobile Analytics Header */}
+        <div className="flex-1 overflow-y-auto p-4 pb-20 bg-gray-50">
             <MobileAnalyticsHeader 
                 username={username} 
                 isConnected={isConnected} 
+                userId={userId}
             />
-
-            {/* Mobile Period Navigation */}
             <MobilePeriodNavigation 
                 selectedPeriod={selectedPeriod} 
                 setSelectedPeriod={setSelectedPeriod} 
             />
-
-            {/* Mobile Overview Cards */}
             <MobileOverviewCards 
                 analyticsData={analyticsData}
                 selectedPeriod={selectedPeriod}
+                isConnected={isConnected}
+                lastUpdate={lastUpdate}
+            />
+            <MobileStatisticsGrid 
                 analytics={analytics}
                 isConnected={isConnected}
             />
-
-            {/* Mobile Statistics Grid */}
-            <MobileStatisticsGrid 
-                analytics={analytics} 
-            />
-
-            {/* Mobile Link Analytics Chart - Only show if there are links */}
-            {analytics?.topLinks?.length > 0 && (
-                <MobileLinkAnalyticsChart 
-                    analytics={analytics} 
-                    isConnected={isConnected} 
-                />
-            )}
-
-            {/* Mobile Top Clicked Links */}
             <MobileTopClickedLinks 
                 analytics={analytics} 
                 isConnected={isConnected} 
             />
-
-            {/* Mobile Recent Activity - Fallback section for users with no links */}
-            {(!analytics?.topLinks?.length || analytics.topLinks.length === 0) && (
-                <MobileRecentActivity 
-                    analytics={analytics} 
-                    isConnected={isConnected} 
-                    username={username} 
-                />
-            )}
-
-            {/* Bottom Spacing for Mobile Navigation */}
+            <MobileRecentActivity 
+                analytics={analytics} 
+                isConnected={isConnected} 
+                username={username}
+            />
             <div className="h-4"></div>
         </div>
     );
