@@ -1,4 +1,4 @@
-// Fixed Button.jsx - Corrected username extraction
+// Fixed Button.jsx - OPTIMIZED VERSION WITH USER ID
 "use client"
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
@@ -16,7 +16,7 @@ import ButtonText from "./ButtonText";
 import { FaCopy } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "@/lib/useTranslation";
-import { recordLinkClick } from "@/lib/analytics/linkClickTracker";
+import { recordLinkClickByUserId } from "@/lib/analytics/linkClickTracker"; // ✅ Use the optimized version
 
 export default function Button({ url, content, userId, linkId, linkType = "custom" }) {
     const [modifierClass, setModifierClass] = useState("");
@@ -30,8 +30,7 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
     const [accentColor, setAccentColor] = useState([]);
     const [btnFontStyle, setBtnFontStyle] = useState(null);
     const [selectedFontClass, setSelectedFontClass] = useState("");
-    const [username, setUsername] = useState(""); // Store actual username for analytics
-    const [currentUserId, setCurrentUserId] = useState(""); // Store user ID
+    const [currentUserId, setCurrentUserId] = useState(""); // Only store user ID
     const router = useRouter();
     const { t } = useTranslation();
 
@@ -46,15 +45,15 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
     });
 
     /**
-     * Handles link click tracking - FIXED VERSION
+     * OPTIMIZED link click handler - uses user ID directly
      */
     const handleLinkClick = async (e) => {
         // Don't prevent default navigation, just track the click
         console.log("🔥 Link clicked:", content);
-        console.log("📊 Tracking data:", { username, linkId, content, url, linkType });
+        console.log("📊 Tracking data:", { userId: currentUserId, linkId, content, url, linkType });
         
-        if (!username) {
-            console.warn("⚠️ No username available for click tracking");
+        if (!currentUserId) {
+            console.warn("⚠️ No user ID available for click tracking");
             return;
         }
 
@@ -64,8 +63,8 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
         }
 
         try {
-            // Record the click using the actual username (not user ID)
-            recordLinkClick(username, {
+            // ✅ Use the super fast user ID method - single lookup table read
+            recordLinkClickByUserId(currentUserId, {
                 linkId: linkId || `link_${Date.now()}`,
                 linkTitle: content,
                 linkUrl: url,
@@ -137,16 +136,17 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
 
                 console.log("👤 Current user data:", currentUser);
 
-                // FIXED: Properly extract username and userId
-                let actualUsername = '';
+                // ✅ SIMPLIFIED: Just store the user ID - we don't need username anymore
                 let actualUserId = '';
 
                 // Check if currentUser is a string (user ID) or object (user data)
                 if (typeof currentUser === 'string') {
-                    // currentUser is the user ID, we need to get the username from AccountData
+                    // currentUser is the user ID
                     actualUserId = currentUser;
+                    console.log("🆔 Using user ID directly:", actualUserId);
+                    setCurrentUserId(actualUserId);
                     
-                    // Get username from AccountData collection
+                    // Get styling data from AccountData collection
                     const collectionRef = collection(fireApp, "AccountData");
                     const docRef = doc(collectionRef, currentUser);
                     
@@ -155,21 +155,7 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
                             const accountData = docSnapshot.data();
                             console.log("📋 Account data:", accountData);
                             
-                            // Try to get username from different possible fields
-                            if (accountData.username) {
-                                actualUsername = accountData.username;
-                            } else if (accountData.displayName) {
-                                actualUsername = accountData.displayName;
-                            } else {
-                                // Fallback: use the userId from URL parameter
-                                actualUsername = userId;
-                            }
-                            
-                            console.log("🎯 Setting username to:", actualUsername);
-                            setUsername(actualUsername);
-                            setCurrentUserId(actualUserId);
-                            
-                            // Apply other styling data
+                            // Apply styling data
                             const { btnType, btnShadowColor, btnFontColor, themeFontColor, btnColor, selectedTheme, fontType } = accountData;
                             const fontName = availableFonts_Classic[fontType ? fontType - 1 : 0];
                             setSelectedFontClass(fontName?.class || '');
@@ -181,17 +167,16 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
                             setBtnType(btnType);
                         }
                     });
-                } else if (currentUser.username) {
-                    // currentUser is an object with username
-                    actualUsername = currentUser.username;
+                } else if (currentUser.userId || currentUser.id) {
+                    // currentUser is an object with user ID
                     actualUserId = currentUser.userId || currentUser.id;
-                    setUsername(actualUsername);
+                    console.log("🆔 Extracted user ID from object:", actualUserId);
                     setCurrentUserId(actualUserId);
                 } else {
-                    // Fallback: use the userId parameter as username
-                    actualUsername = userId;
-                    setUsername(actualUsername);
-                    setCurrentUserId(userId);
+                    // Fallback: use the userId parameter as user ID
+                    actualUserId = userId;
+                    console.log("🆔 Fallback to userId parameter:", actualUserId);
+                    setCurrentUserId(actualUserId);
                 }
 
             } catch (error) {
@@ -205,7 +190,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
     // Log for debugging
     useEffect(() => {
         console.log("🔍 Button debug info:", {
-            username,
             currentUserId,
             linkId,
             content,
@@ -213,9 +197,9 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
             linkType,
             userId
         });
-    }, [username, currentUserId, linkId, content, url, linkType, userId]);
+    }, [currentUserId, linkId, content, url, linkType, userId]);
 
-    // Rest of your styling useEffects remain the same...
+    // Rest of your styling useEffects remain exactly the same...
     useEffect(() => {
         if (selectedTheme === "3D Blocks") {
             const rootName = getRootNameFromUrl(url);
