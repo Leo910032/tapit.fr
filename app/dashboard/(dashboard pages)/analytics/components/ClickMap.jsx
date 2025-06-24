@@ -10,18 +10,22 @@ export default function ClickMap({ analytics }) {
     const [error, setError] = useState(null);
     const { t } = useTranslation();
 
-    // TODO: Your analytics data needs a 'locations' array.
-    // Example: analytics.locations = [{ lat: 48.85, lng: 2.35, weight: 3 }, ...]
     const locations = analytics?.locations || [];
 
     useEffect(() => {
+        // Do not run if the API key is missing
+        if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+            setError("Google Maps API key is missing.");
+            return;
+        }
+
         let isMounted = true;
         const initializeMap = async () => {
             try {
                 const loader = new Loader({
-                    apiKey: "AIzaSyATAmD5lVb1jZe6pGoeZGF5OU-8-hrLeF4", // <-- IMPORTANT: USE YOUR KEY
+                    apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY, // ✅ Using environment variable
                     version: 'weekly',
-                    libraries: ['maps', 'visualization'], // <-- Visualization library is needed for heatmap
+                    libraries: ['maps', 'visualization'],
                 });
 
                 const google = await loader.load();
@@ -30,9 +34,20 @@ export default function ClickMap({ analytics }) {
                 const map = new google.maps.Map(mapRef.current, {
                     center: { lat: 20, lng: 0 },
                     zoom: 2,
-                    mapId: 'DEMO_MAP_ID',
+                    mapId: '1c9bde193bda6c49', // Use a real map ID or remove for default
                     disableDefaultUI: true,
-                    styles: [/* Optional: Add custom map styles here */]
+                    styles: [
+                        { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+                        { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+                        { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+                        { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+                        { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
+                        { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#bdbdbd" }] },
+                        { featureType: "poi", stylers: [{ visibility: "off" }] },
+                        { featureType: "road", stylers: [{ visibility: "off" }] },
+                        { featureType: "transit", stylers: [{ visibility: "off" }] },
+                        { featureType: "water", stylers: [{ color: "#c9c9c9" }] },
+                    ]
                 });
 
                 if (locations.length > 0) {
@@ -41,27 +56,44 @@ export default function ClickMap({ analytics }) {
                         weight: loc.weight || 1
                     }));
 
-                    const heatmap = new google.maps.visualization.HeatmapLayer({
-                        data: heatmapData,
-                        map: map,
-                    });
-                    
-                    heatmap.set('radius', 20);
-                    heatmap.set('opacity', 0.6);
+                    const heatmap = new google.maps.visualization.HeatmapLayer({ data: heatmapData, map: map });
+                    heatmap.set('radius', 30);
+                    heatmap.set('opacity', 0.7);
                 }
 
                 map.addListener('idle', () => isMounted && setIsLoaded(true));
 
             } catch (e) {
                 console.error('Error loading Google Maps:', e);
-                setError(`Failed to load maps: ${e.message}`);
+                // Display specific error messages
+                if (e.message.includes("API key")) {
+                    setError("Invalid or missing Google Maps API Key.");
+                } else {
+                    setError("Could not load the map.");
+                }
             }
         };
 
-        initializeMap();
+        if (locations.length > 0) {
+            initializeMap();
+        }
+
         return () => { isMounted = false; };
     }, [locations]);
 
+    // Show error state if something went wrong
+    if (error) {
+        return (
+            <div className="mb-8">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                     <h2 className="text-xl font-semibold text-red-800 mb-4">{t('analytics.map_error', 'Map Error')}</h2>
+                    <p className="text-red-600">{t('analytics.map_error_message', error)}</p>
+                </div>
+            </div>
+        );
+    }
+    
+    // Show placeholder if no location data exists
     if (locations.length === 0) {
         return (
             <div className="mb-8">
@@ -73,6 +105,7 @@ export default function ClickMap({ analytics }) {
         );
     }
     
+    // Render the map
     return (
         <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('analytics.click_map', 'Click Map')}</h2>
