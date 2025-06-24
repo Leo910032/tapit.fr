@@ -1,8 +1,10 @@
+// lib/authentication/createAccount.jsx - UPDATED WITH LOOKUP TABLE
 import { fireApp } from "@/important/firebase";
 import { generateId, realEscapeString} from "../utilities";
 import { collection, doc, setDoc } from "firebase/firestore";
 import { generateSalt, hashPassword } from "./encryption";
 import { EmailJs } from "../EmailJs";
+import { updateUserLookup } from "../userLookup"; // ✅ Import lookup function
 
 // Import the email templates using require for CommonJS compatibility
 const { welcomeEmail } = require("../emailTemplate");
@@ -99,6 +101,7 @@ export const createAccount = async (data) => {
             userId: userId,
             email: cleanEmail,
             username: cleanUsername,
+            displayName: cleanUsername, // ✅ Add displayName field
             password: hashedPasword,
             mySalt: salt,
             createdAt: new Date().toISOString()
@@ -109,6 +112,7 @@ export const createAccount = async (data) => {
         // Save account details/profile WITHOUT language preference
         await setDoc(doc(accountDetailsRef, `${userId}`), {
             displayName: cleanUsername,
+            username: cleanUsername, // ✅ Add username to AccountData too
             links: [],
             profilePhoto: "",
             selectedTheme: "Lake White",
@@ -116,6 +120,17 @@ export const createAccount = async (data) => {
         });
 
         console.log('✅ Account profile created');
+
+        // ✅ CREATE LOOKUP TABLE ENTRIES
+        console.log('🔍 Creating lookup table entries...');
+        try {
+            await updateUserLookup(userId, cleanUsername, cleanUsername, cleanEmail);
+            console.log('✅ Lookup table entries created');
+        } catch (lookupError) {
+            console.error('❌ Failed to create lookup entries:', lookupError);
+            // Don't fail account creation for lookup errors
+            console.warn('⚠️ Continuing without lookup entries...');
+        }
 
         console.log('🎉 Account creation completed successfully for userId:', generatedUserId);
         return generatedUserId;
