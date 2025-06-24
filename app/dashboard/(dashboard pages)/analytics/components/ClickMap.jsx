@@ -19,7 +19,7 @@ export default function ClickMap({ analytics }) {
         const initializeMap = async () => {
             try {
                 const loader = new Loader({
-                    apiKey: "YOUR_GOOGLE_MAPS_API_KEY", // <-- IMPORTANT: USE YOUR KEY
+                    apiKey: "AIzaSyATAmD5lVb1jZe6pGoeZGF5OU-8-hrLeF4", // <-- IMPORTANT: USE YOUR KEY
                     version: 'weekly',
                     libraries: ['maps', 'visualization'], // <-- Visualization library is needed for heatmap
                 });
