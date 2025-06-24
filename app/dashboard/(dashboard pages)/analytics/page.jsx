@@ -613,9 +613,9 @@ export default function AnalyticsPage() {
             thisWeekViews: data.weeklyViews?.[weekKey] || 0,
             thisMonthViews: data.monthlyViews?.[monthKey] || 0,
             totalClicks: data.totalClicks || 0,
-            todayClicks: data.dailyTotalClicks?.[today] || 0,
-            thisWeekClicks: data.weeklyTotalClicks?.[weekKey] || 0,
-            thisMonthClicks: data.monthlyTotalClicks?.[monthKey] || 0,
+            todayClicks: data.dailyClicks?.[today] || 0,
+            thisWeekClicks: data.weeklyClicks?.[weekKey] || 0,
+            thisMonthClicks: data.monthlyClicks?.[monthKey] || 0,
             topLinks,
             lastUpdated: data.lastUpdated,
             username: currentUsername
