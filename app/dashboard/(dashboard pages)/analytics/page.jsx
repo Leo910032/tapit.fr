@@ -1,4 +1,3 @@
-// app/dashboard/(dashboard pages)/analytics/page.jsx - COMPLETE VERSION
 "use client"
 import React, { useEffect, useState } from "react";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
@@ -8,15 +7,13 @@ import { fireApp } from "@/important/firebase";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { fastUserLookup } from "@/lib/userLookup";
 
-// Import all analytics components
+// Import components
 import AnalyticsHeader from "./components/AnalyticsHeader";
 import PeriodNavigation from "./components/PeriodNavigation";
 import OverviewCards from "./components/OverviewCards";
-import StatisticsGrid from "./components/StatisticsGrid";
-import TopClickedLinks from "./components/TopClickedLinks";
-import LinkAnalyticsChart from "./components/LinkAnalyticsChart";
 import PerformanceChart from "./components/PerformanceChart";
 import LinkTypeDistribution from "./components/LinkTypeDistribution";
+import LinkAnalyticsChart from "./components/LinkAnalyticsChart";
 
 export default function AnalyticsPage() {
     const { t } = useTranslation();
@@ -25,23 +22,24 @@ export default function AnalyticsPage() {
     const [error, setError] = useState(null);
     const [username, setUsername] = useState("");
     const [isConnected, setIsConnected] = useState(false);
-
-    // This state is controlled by PeriodNavigation and read by OverviewCards
     const [selectedPeriod, setSelectedPeriod] = useState('all');
+    
+    // analyticsData state is no longer needed here, as OverviewCards will calculate dynamically
+    // based on the full 'analytics' object. Removed it for clarity in the explanation,
+    // but the actual code doesn't strictly need its removal if you prefer to keep it.
+    // However, it will not be used by OverviewCards anymore.
 
-    // This state holds the pre-calculated data for each period
-    const [analyticsData, setAnalyticsData] = useState({
-        today: { views: 0, clicks: 0 },
-        week: { views: 0, clicks: 0 },
-        month: { views: 0, clicks: 0 },
-        all: { views: 0, clicks: 0 }
-    });
+    const getWeekKey = () => { 
+        const now = new Date(); 
+        const yearStart = new Date(now.getFullYear(), 0, 1); 
+        const weekNumber = Math.ceil(((now - yearStart) / 86400000 + yearStart.getDay() + 1) / 7); 
+        return `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`; 
+    };
+    const getMonthKey = () => { 
+        const now = new Date(); 
+        return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`; 
+    };
 
-    // Helper functions for date keys
-    const getWeekKey = () => { const now = new Date(); const yearStart = new Date(now.getFullYear(), 0, 1); const weekNumber = Math.ceil(((now - yearStart) / 86400000 + yearStart.getDay() + 1) / 7); return `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`; };
-    const getMonthKey = () => { const now = new Date(); return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`; };
-
-    // Function to process raw data from Firestore
     const processAnalyticsData = (data) => {
         const today = new Date().toISOString().split('T')[0];
         const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -55,9 +53,11 @@ export default function AnalyticsPage() {
                 url: linkData.url || '',
                 type: linkData.type || 'custom',
                 totalClicks: linkData.totalClicks || 0,
+                // These 'todayClicks', 'weekClicks', 'monthClicks' are based on the CURRENT period keys,
+                // not historical aggregation for the charts.
                 todayClicks: linkData.dailyClicks?.[today] || 0,
-                weekClicks: linkData.weeklyClicks?.[weekKey] || 0,
-                monthClicks: linkData.monthlyClicks?.[monthKey] || 0,
+                weekClicks: data.weeklyClicks?.[weekKey] || 0,
+                monthClicks: data.monthlyClicks?.[monthKey] || 0,
                 createdAt: linkData.createdAt || new Date().toISOString(),
                 lastClicked: linkData.lastClicked,
             }))
@@ -74,8 +74,8 @@ export default function AnalyticsPage() {
             yesterdayClicks: data.dailyClicks?.[yesterday] || 0,
             thisWeekClicks: data.weeklyClicks?.[weekKey] || 0,
             thisMonthClicks: data.monthlyClicks?.[monthKey] || 0,
-            dailyViews: data.dailyViews || {},
-            dailyClicks: data.dailyClicks || {},
+            dailyViews: data.dailyViews || {}, // Pass full daily data
+            dailyClicks: data.dailyClicks || {}, // Pass full daily data
             topLinks,
         };
     };
@@ -91,21 +91,16 @@ export default function AnalyticsPage() {
                 }
 
                 const userInfo = await fastUserLookup(currentUser) || await fetchUserData(currentUser);
-                if (userInfo) setUsername(userInfo.username);
+                if (userInfo?.username) setUsername(userInfo.username);
 
                 const analyticsRef = doc(collection(fireApp, "Analytics"), currentUser);
                 const unsubscribe = onSnapshot(analyticsRef, (docSnapshot) => {
                     setIsConnected(true);
                     const data = docSnapshot.exists() ? docSnapshot.data() : {};
                     const processed = processAnalyticsData(data);
-
+                    
                     setAnalytics(processed);
-                    setAnalyticsData({
-                        today: { views: processed.todayViews, clicks: processed.todayClicks },
-                        week: { views: processed.thisWeekViews, clicks: processed.thisWeekClicks },
-                        month: { views: processed.thisMonthViews, clicks: processed.thisMonthClicks },
-                        all: { views: processed.totalViews, clicks: processed.totalClicks }
-                    });
+                    // analyticsData state is no longer set here, as OverviewCards will derive directly from 'analytics'
                     setLoading(false);
                 }, (err) => {
                     console.error("Firebase listener error:", err);
@@ -123,42 +118,196 @@ export default function AnalyticsPage() {
     }, []);
 
     if (loading) {
-        return <div className="flex items-center justify-center h-screen"><div className="text-lg">Loading Analytics...</div></div>;
+        return (
+            <div className="flex-1 flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+                <span className="ml-3 text-sm">Loading Analytics...</span>
+            </div>
+        );
     }
+
     if (error) {
-        return <div className="flex items-center justify-center h-screen"><div className="text-lg text-red-500">Error: {error}</div></div>;
+        return (
+            <div className="flex-1 flex items-center justify-center h-full">
+                <div className="text-center">
+                    <div className="text-red-500 text-sm mb-2">⚠️ Error</div>
+                    <div className="text-gray-600 text-xs">{error}</div>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-gray-50">
-            <AnalyticsHeader username={username} isConnected={isConnected} />
-
-            <PeriodNavigation
-                selectedPeriod={selectedPeriod}
-                setSelectedPeriod={setSelectedPeriod}
-            />
-
-            <OverviewCards
-                analyticsData={analyticsData}
-                selectedPeriod={selectedPeriod}
-                analytics={analytics}
-                isConnected={isConnected}
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8">
-                <div className="lg:col-span-3">
-                    <PerformanceChart analytics={analytics} />
+        <div className="flex-1 py-2 flex flex-col max-h-full overflow-y-auto pb-20">
+            <div className="p-4 space-y-4">
+                {/* Compact Header */}
+                <div className="mb-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-lg font-bold text-gray-900">
+                                {t('analytics.title') || 'Analytics'}
+                            </h1>
+                            <p className="text-xs text-gray-600 mt-1">
+                                @{username}
+                            </p>
+                        </div>
+                        <div className="flex items-center text-xs">
+                            <div className={`w-2 h-2 rounded-full mr-2 ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                            <span className={isConnected ? 'text-green-600' : 'text-red-600'}>
+                                {isConnected ? t('analytics.live_updates_enabled') : 'contacts.offline_updates_enabled'}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div className="lg:col-span-2">
-                    <LinkTypeDistribution analytics={analytics} />
+
+                {/* Compact Period Navigation */}
+                <div className="bg-white rounded-lg border p-3">
+                    <div className="grid grid-cols-4 gap-1">
+                        {[
+                            { id: 'today', label: 'Today' },
+                            { id: 'week', label: 'week' },
+                            { id: 'month', label: 'month' },
+                            { id: 'all', label: 'all' }
+                        ].map((period) => (
+                            <button
+                                key={period.id}
+                                onClick={() => setSelectedPeriod(period.id)}
+                                className={`px-2 py-2 text-xs font-medium rounded-md transition-colors ${
+                                    selectedPeriod === period.id
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                            >
+                                {t(`analytics.${period.id}`) || period.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Compact Overview Cards */}
+                {/* ✅ FIX: Pass the full 'analytics' object instead of 'analyticsData' */}
+                <OverviewCards
+                    analytics={analytics} // Now passing the full processed analytics object
+                    selectedPeriod={selectedPeriod}
+                    isConnected={isConnected}
+                />
+
+{/* Full Width Performance Chart */}
+<div className="bg-white rounded-lg border p-4">
+    <div className="h-64 w-full">
+        <PerformanceChart analytics={analytics} />
+    </div>
+</div>
+
+                {/* Compact Statistics Grid (inlined) */}
+                <div className="bg-white rounded-lg border p-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('analytics.quick_stats')}</h3>
+                    <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div className="space-y-2">
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">{t('analytics.total_links_')}</span>
+                                <span className="font-medium">{analytics?.topLinks?.length || 0}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">{t('analytics.active_links')}</span>
+                                <span className="font-medium">{analytics?.topLinks?.filter(link => link.totalClicks > 0).length || 0}</span>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">{t('analytics.Avg_CTR')}</span>
+                                <span className="font-medium">
+                                    {analytics?.totalViews > 0 ? ((analytics?.totalClicks / analytics?.totalViews) * 100).toFixed(1) : 0}%
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">{t('analytics.Best_Day')}</span>
+                                <span className="font-medium">
+                                    {analytics?.dailyViews ? 
+                                        Object.entries(analytics.dailyViews)
+                                            .sort(([,a], [,b]) => b - a)[0]?.[1] || 0 
+                                        : 0
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Compact Top Links (inlined) */}
+                <div className="bg-white rounded-lg border p-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('analytics.Top_Links')}</h3>
+                    <div className="space-y-2">
+                        {analytics?.topLinks?.slice(0, 5).map((link, index) => (
+                            <div key={link.linkId} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span className="text-xs font-bold text-blue-600">#{index + 1}</span>
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-xs font-medium text-gray-900 truncate">
+                                            {link.title}
+                                        </p>
+                                        <p className="text-xs text-gray-500 truncate">
+                                            {link.type}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                    <p className="text-xs font-bold text-gray-900">{link.totalClicks}</p>
+                                    <p className="text-xs text-gray-500">{t('analytics.clicks')}</p>
+                                </div>
+                            </div>
+                        )) || (
+                            <div className="text-center py-4">
+                                <p className="text-xs text-gray-500">{t('analytics.link_NA')}</p>
+                            </div>
+                            
+                        )}
+                        
+                    </div>
+                    
+
+                    
+                </div>
+
+                {/* Main Link Analytics Chart */}
+                <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm">
+                    <div className="h-81"> 
+                        <LinkAnalyticsChart analytics={analytics} isConnected={isConnected} />
+                    </div>
+                </div>
+
+                {/* Performance Summary (inlined) */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border p-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('analytics.Performance_summary')}</h3>
+                    <div className="space-y-2 text-xs">
+                        <div className="flex justify-between items-center">
+                            <span className="text-gray-600">{t('analytics.Total_engagement')}</span>
+                            <span className="font-bold text-purple-600">
+                                {(analytics?.totalViews || 0) + (analytics?.totalClicks || 0)}
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-gray-600">{t('analytics.Most_active_period')}</span>
+                            <span className="font-medium text-gray-900">
+                                {analytics?.dailyViews && analytics?.dailyViews[Object.keys(analytics.dailyViews).sort().reverse()[0]] > 0 ? Object.keys(analytics.dailyViews).sort().reverse()[0] : 'N/A'}
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-gray-600">{t('analytics.Growth_trend')}</span>
+                            <span className={`font-medium ${
+                                (analytics?.todayViews || 0) > (analytics?.yesterdayViews || 0) 
+                                    ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                                {(analytics?.todayViews || 0) > (analytics?.yesterdayViews || 0) ? t('analytics.Growing') : t('analytics.Declining')}
+                            </span>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
-
-            <StatisticsGrid analytics={analytics} />
-            <LinkAnalyticsChart analytics={analytics} isConnected={isConnected} />
-            <TopClickedLinks analytics={analytics} isConnected={isConnected} />
-
-            <div className="h-16"></div>
+            <div className="h-10"></div> {/* Spacer at the bottom */}
         </div>
     );
 }

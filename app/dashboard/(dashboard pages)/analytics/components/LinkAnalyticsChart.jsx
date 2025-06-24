@@ -176,7 +176,7 @@ export default function LinkAnalyticsChart({ analytics, isConnected }) {
                                             ></div>
                                         </div>
                                         <span className="text-xs text-gray-500">
-                                            {item.percentage.toFixed(1)}% of total clicks
+                                            {item.percentage.toFixed(1)}% {t('analytics.total_clicks_analytics')}
                                         </span>
                                     </div>
                                 </div>
