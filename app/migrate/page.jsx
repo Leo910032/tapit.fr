@@ -1,158 +1,244 @@
-// app/migrate/page.jsx - Create this file temporarily
-"use client"
-import { useState } from "react";
-import { migrateUsersToLookupTable } from "@/lib/userLookup";
+// lib/userLookup.js - FIXED VERSION
+import { fireApp } from "@/important/firebase";
+import { collection, doc, setDoc, getDoc, getDocs } from "firebase/firestore";
 
-export default function MigratePage() {
-    const [isRunning, setIsRunning] = useState(false);
-    const [isComplete, setIsComplete] = useState(false);
-    const [error, setError] = useState(null);
-
-    const handleMigration = async () => {
-        if (isRunning || isComplete) return;
+/**
+ * Creates/updates lookup entries when a user is created or updated
+ * Call this in your createAccount and updateProfile functions
+ */
+export async function updateUserLookup(userId, username, displayName, email = null) {
+    try {
+        console.log("🔄 Updating user lookup for:", { userId, username, displayName, email });
         
-        const confirm = window.confirm(
-            "This will migrate all existing users to the lookup table. " +
-            "This should only be run ONCE. Are you sure you want to continue?"
+        const lookupRef = collection(fireApp, "UserLookup");
+        
+        const lookupData = {
+            userId,
+            username,
+            displayName,
+            email,
+            updatedAt: new Date()
+        };
+        
+        // Create lookup entries one by one (more reliable than batch)
+        const promises = [];
+        
+        // Create lookup by user ID (primary key)
+        promises.push(
+            setDoc(doc(lookupRef, userId), {
+                ...lookupData,
+                type: 'userId'
+            })
         );
         
-        if (!confirm) {
-            console.log("❌ Migration cancelled by user");
-            return;
+        // Create lookup by username (lowercase for case-insensitive)
+        if (username) {
+            promises.push(
+                setDoc(doc(lookupRef, `username_${username.toLowerCase()}`), {
+                    ...lookupData,
+                    type: 'username'
+                })
+            );
         }
         
-        setIsRunning(true);
-        setError(null);
-        
-        try {
-            console.log("🚀 Starting migration to lookup table...");
-            await migrateUsersToLookupTable();
-            
-            console.log("✅ Migration completed successfully!");
-            setIsComplete(true);
-            alert("Migration completed successfully! Check the console for details.");
-            
-        } catch (error) {
-            console.error("❌ Migration failed:", error);
-            setError(error.message);
-            alert("Migration failed! Check the console for details.");
-        } finally {
-            setIsRunning(false);
+        // Create lookup by display name
+        if (displayName && displayName !== username) {
+            promises.push(
+                setDoc(doc(lookupRef, `displayName_${displayName}`), {
+                    ...lookupData,
+                    type: 'displayName'
+                })
+            );
         }
-    };
+        
+        // Create lookup by email (optional)
+        if (email) {
+            promises.push(
+                setDoc(doc(lookupRef, `email_${email.toLowerCase()}`), {
+                    ...lookupData,
+                    type: 'email'
+                })
+            );
+        }
+        
+        await Promise.all(promises);
+        console.log("✅ Updated user lookup successfully");
+        
+    } catch (error) {
+        console.error("❌ Error updating user lookup:", error);
+        throw error;
+    }
+}
 
-    return (
-        <div style={{ 
-            padding: '40px', 
-            fontFamily: 'Arial, sans-serif', 
-            maxWidth: '600px', 
-            margin: '0 auto',
-            backgroundColor: '#f9f9f9',
-            minHeight: '100vh'
-        }}>
-            <h1 style={{ color: '#8129D9', textAlign: 'center' }}>
-                🚀 Lookup Table Migration
-            </h1>
+/**
+ * Fast user lookup using the lookup table
+ * @param {string} identifier - Can be userId, username, displayName, or email
+ * @returns {Object|null} User data or null if not found
+ */
+export async function fastUserLookup(identifier) {
+    try {
+        console.log("🔍 Fast lookup for:", identifier);
+        
+        const lookupRef = collection(fireApp, "UserLookup");
+        
+        // Try direct lookup first (for user IDs)
+        let lookupDoc = await getDoc(doc(lookupRef, identifier));
+        
+        if (lookupDoc.exists()) {
+            console.log("✅ Found by direct lookup");
+            return lookupDoc.data();
+        }
+        
+        // Try prefixed lookups
+        const prefixes = ['username_', 'displayName_', 'email_'];
+        
+        for (const prefix of prefixes) {
+            const key = `${prefix}${identifier.toLowerCase()}`;
+            lookupDoc = await getDoc(doc(lookupRef, key));
             
-            <div style={{ 
-                backgroundColor: 'white', 
-                padding: '30px', 
-                borderRadius: '12px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                marginBottom: '20px'
-            }}>
-                <p>This will migrate all existing users to the new lookup table system for faster analytics.</p>
-                <p><strong>⚠️ Important: Only run this ONCE!</strong></p>
-                
-                {!isComplete && !isRunning && (
-                    <button 
-                        onClick={handleMigration}
-                        style={{
-                            backgroundColor: '#8129D9',
-                            color: 'white',
-                            padding: '15px 30px',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '16px',
-                            cursor: 'pointer',
-                            width: '100%',
-                            marginTop: '20px'
-                        }}
-                    >
-                        🚀 Start Migration
-                    </button>
-                )}
-                
-                {isRunning && (
-                    <div style={{ 
-                        textAlign: 'center', 
-                        padding: '20px',
-                        backgroundColor: '#fff3cd',
-                        borderRadius: '8px',
-                        marginTop: '20px'
-                    }}>
-                        <p>⏳ Migration in progress... Please wait and check the console for updates.</p>
-                        <div style={{ 
-                            width: '40px', 
-                            height: '40px', 
-                            border: '4px solid #f3f3f3',
-                            borderTop: '4px solid #8129D9',
-                            borderRadius: '50%',
-                            animation: 'spin 1s linear infinite',
-                            margin: '0 auto'
-                        }}></div>
-                    </div>
-                )}
-                
-                {isComplete && (
-                    <div style={{ 
-                        textAlign: 'center', 
-                        padding: '20px',
-                        backgroundColor: '#d4edda',
-                        borderRadius: '8px',
-                        marginTop: '20px'
-                    }}>
-                        <p>✅ Migration completed successfully!</p>
-                        <p>🎉 Your lookup table is now ready for ultra-fast link tracking!</p>
-                        <p><strong>You can now delete this page.</strong></p>
-                    </div>
-                )}
-                
-                {error && (
-                    <div style={{ 
-                        textAlign: 'center', 
-                        padding: '20px',
-                        backgroundColor: '#f8d7da',
-                        borderRadius: '8px',
-                        marginTop: '20px'
-                    }}>
-                        <p>❌ Migration failed: {error}</p>
-                        <p>Check the console for more details.</p>
-                    </div>
-                )}
-            </div>
+            if (lookupDoc.exists()) {
+                console.log(`✅ Found by ${prefix} lookup`);
+                return lookupDoc.data();
+            }
+        }
+        
+        console.log("❌ User not found in lookup table");
+        return null;
+        
+    } catch (error) {
+        console.error("❌ Error in fast user lookup:", error);
+        return null;
+    }
+}
+
+/**
+ * Migrates existing users to the lookup table - FIXED VERSION
+ * Run this once to populate the lookup table with existing users
+ */
+export async function migrateUsersToLookupTable() {
+    try {
+        console.log("🚀 Starting user migration to lookup table...");
+        
+        const accountsRef = collection(fireApp, "accounts");
+        const accountDataRef = collection(fireApp, "AccountData");
+        
+        // Get all accounts
+        const accountsSnapshot = await getDocs(accountsRef);
+        const accountDataSnapshot = await getDocs(accountDataRef);
+        
+        // Create maps for quick lookup
+        const accountDataMap = new Map();
+        accountDataSnapshot.forEach(doc => {
+            accountDataMap.set(doc.id, doc.data());
+        });
+        
+        console.log(`📊 Found ${accountsSnapshot.size} accounts to migrate`);
+        
+        const lookupRef = collection(fireApp, "UserLookup");
+        let count = 0;
+        const batchSize = 10; // Process in smaller batches
+        
+        // Process accounts in batches to avoid overwhelming Firestore
+        const accounts = [];
+        accountsSnapshot.forEach(doc => {
+            accounts.push({ id: doc.id, data: doc.data() });
+        });
+        
+        for (let i = 0; i < accounts.length; i += batchSize) {
+            const batch = accounts.slice(i, i + batchSize);
+            const promises = [];
             
-            <div style={{ 
-                backgroundColor: 'white', 
-                padding: '20px', 
-                borderRadius: '12px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-            }}>
-                <h3 style={{ color: '#8129D9' }}>What this does:</h3>
-                <ul style={{ lineHeight: '1.6' }}>
-                    <li>✅ Creates lookup table entries for all existing users</li>
-                    <li>✅ Maps usernames, display names, and emails to user IDs</li>
-                    <li>✅ Enables ultra-fast link click tracking</li>
-                    <li>✅ No existing data is modified or deleted</li>
-                </ul>
-            </div>
+            console.log(`🔄 Processing batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(accounts.length/batchSize)}`);
             
-            <style jsx>{`
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
+            batch.forEach(({ id: userId, data: accountData }) => {
+                const accountDetails = accountDataMap.get(userId);
+                
+                const lookupData = {
+                    userId,
+                    username: accountData.username,
+                    displayName: accountDetails?.displayName || accountData.displayName || accountData.username,
+                    email: accountData.email,
+                    updatedAt: new Date()
+                };
+                
+                // Add lookup entries for this user
+                promises.push(
+                    setDoc(doc(lookupRef, userId), { ...lookupData, type: 'userId' })
+                );
+                
+                if (accountData.username) {
+                    promises.push(
+                        setDoc(doc(lookupRef, `username_${accountData.username.toLowerCase()}`), { 
+                            ...lookupData, type: 'username' 
+                        })
+                    );
                 }
-            `}</style>
-        </div>
-    );
+                
+                if (lookupData.displayName && lookupData.displayName !== accountData.username) {
+                    promises.push(
+                        setDoc(doc(lookupRef, `displayName_${lookupData.displayName}`), { 
+                            ...lookupData, type: 'displayName' 
+                        })
+                    );
+                }
+                
+                if (accountData.email) {
+                    promises.push(
+                        setDoc(doc(lookupRef, `email_${accountData.email.toLowerCase()}`), { 
+                            ...lookupData, type: 'email' 
+                        })
+                    );
+                }
+                
+                count++;
+            });
+            
+            // Wait for this batch to complete before processing the next
+            await Promise.all(promises);
+            console.log(`✅ Completed batch ${Math.floor(i/batchSize) + 1}, processed ${Math.min(i + batchSize, accounts.length)} users`);
+            
+            // Small delay to be nice to Firestore
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        console.log(`✅ Successfully migrated ${count} users to lookup table`);
+        
+    } catch (error) {
+        console.error("❌ Error migrating users to lookup table:", error);
+        throw error;
+    }
+}
+
+/**
+ * Removes lookup entries for a user (for cleanup)
+ */
+export async function removeUserLookup(userId, username, displayName, email = null) {
+    try {
+        console.log("🗑️ Removing user lookup for:", userId);
+        
+        const lookupRef = collection(fireApp, "UserLookup");
+        const promises = [];
+        
+        // Remove all lookup entries
+        promises.push(setDoc(doc(lookupRef, userId), {}, { merge: false })); // Delete by setting empty
+        
+        if (username) {
+            promises.push(setDoc(doc(lookupRef, `username_${username.toLowerCase()}`), {}, { merge: false }));
+        }
+        
+        if (displayName) {
+            promises.push(setDoc(doc(lookupRef, `displayName_${displayName}`), {}, { merge: false }));
+        }
+        
+        if (email) {
+            promises.push(setDoc(doc(lookupRef, `email_${email.toLowerCase()}`), {}, { merge: false }));
+        }
+        
+        await Promise.all(promises);
+        console.log("✅ Removed user lookup successfully");
+        
+    } catch (error) {
+        console.error("❌ Error removing user lookup:", error);
+        throw error;
+    }
 }
