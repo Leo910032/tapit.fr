@@ -1,8 +1,9 @@
-// app/dashboard/(dashboard pages)/contacts/page.jsx - Optimisé pour mobile
+// app/dashboard/(dashboard pages)/contacts/page.jsx - Complete with Fast User Lookup
 "use client"
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/useTranslation';
 import { testForActiveSession } from '@/lib/authentication/testForActiveSession';
+import { fastUserLookup } from '@/lib/userLookup'; // ✅ Fast lookup import
 import { fireApp } from '@/important/firebase';
 import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
@@ -29,6 +30,10 @@ export default function ContactsPage() {
     const [filter, setFilter] = useState('all'); // all, new, viewed, archived
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedContacts, setSelectedContacts] = useState([]);
+    
+    // ✅ Add user info state for fast lookup
+    const [userInfo, setUserInfo] = useState(null);
+    const [userLookupLoading, setUserLookupLoading] = useState(true);
     
     // Map related state
     const [showMap, setShowMap] = useState(false);
@@ -94,70 +99,130 @@ export default function ContactsPage() {
         };
     }, [showMap]);
 
-    // Real-time Firebase listener
+    // ✅ Fast lookup effect - separate from contacts listener
     useEffect(() => {
-        const currentUser = testForActiveSession();
-        if (!currentUser) {
-            setLoading(false);
-            return;
-        }
-
-        console.log('🔥 Setting up real-time contacts listener for user:', currentUser);
-        
-        const contactsRef = doc(collection(fireApp, "Contacts"), currentUser);
-        
-        const unsubscribe = onSnapshot(contactsRef, (docSnapshot) => {
-            console.log('📱 Contacts document updated!');
-            
-            if (docSnapshot.exists()) {
-                const data = docSnapshot.data();
-                const newContacts = data.contacts || [];
-                
-                console.log('📊 Updated contacts count:', newContacts.length);
-                
-                const prevContactsCount = contacts.length;
-                const newContactsCount = newContacts.length;
-                
-                setContacts(newContacts);
-                
-                if (!loading && newContactsCount > prevContactsCount) {
-                    const newContactsAdded = newContactsCount - prevContactsCount;
-                    const hasLocation = newContacts.slice(-newContactsAdded).some(c => c.location);
-                    
-                    toast.success(
-                        t('contacts.new_contacts_notification', { 
-                            count: newContactsAdded,
-                            plural: newContactsAdded > 1 ? 's' : '',
-                            location: hasLocation ? ' 📍' : ''
-                        }), 
-                        {
-                            style: {
-                                border: '1px solid #10B981',
-                                padding: '16px',
-                                color: '#10B981',
-                            },
-                            duration: 4000,
-                            icon: '📧',
-                        }
-                    );
-                }
-            } else {
-                console.log('📭 No contacts document found');
-                setContacts([]);
+        const performFastLookup = async () => {
+            const currentUser = testForActiveSession();
+            if (!currentUser) {
+                setUserLookupLoading(false);
+                return;
             }
-            
-            setLoading(false);
-        }, (error) => {
-            console.error('❌ Error in contacts listener:', error);
-            toast.error(t('contacts.failed_to_load'));
-            setLoading(false);
-        });
 
-        return () => {
-            console.log('🧹 Cleaning up contacts listener');
-            unsubscribe();
+            console.log('⚡ Starting fast user lookup for:', currentUser);
+            
+            try {
+                const lookupResult = await fastUserLookup(currentUser);
+                
+                if (lookupResult) {
+                    console.log('✅ Fast lookup successful:', {
+                        userId: lookupResult.userId,
+                        username: lookupResult.username,
+                        displayName: lookupResult.displayName,
+                        email: lookupResult.email
+                    });
+                    
+                    setUserInfo(lookupResult);
+                    
+                    // Optional: Show success toast
+               
+                } else {
+                    console.log('❌ Fast lookup failed - user not found in lookup table');
+                    
+                    // Fallback: You could call your regular fetchUserData here
+                    // const userData = await fetchUserData(currentUser);
+                    // setUserInfo(userData);
+                }
+            } catch (error) {
+                console.error('❌ Fast lookup error:', error);
+                
+                // Optional: Show error toast
+                toast.error('Failed to load user information', {
+                    style: {
+                        border: '1px solid #EF4444',
+                        padding: '16px',
+                        color: '#EF4444',
+                    },
+                    duration: 3000,
+                });
+            } finally {
+                setUserLookupLoading(false);
+            }
         };
+
+        performFastLookup();
     }, []);
+
+    // ✅ Real-time Firebase listener - now enhanced with user info
+    useEffect(() => {
+        const setupContactsListener = async () => {
+            const currentUser = testForActiveSession();
+            if (!currentUser) {
+                setLoading(false);
+                return;
+            }
+
+            console.log('🔥 Setting up real-time contacts listener for user:', currentUser);
+            
+            const contactsRef = doc(collection(fireApp, "Contacts"), currentUser);
+            
+            const unsubscribe = onSnapshot(contactsRef, (docSnapshot) => {
+                console.log('📱 Contacts document updated!');
+                
+                if (docSnapshot.exists()) {
+                    const data = docSnapshot.data();
+                    const newContacts = data.contacts || [];
+                    
+                    console.log('📊 Updated contacts count:', newContacts.length);
+                    
+                    const prevContactsCount = contacts.length;
+                    const newContactsCount = newContacts.length;
+                    
+                    setContacts(newContacts);
+                    
+                    // ✅ Enhanced notification with user info
+                    if (!loading && newContactsCount > prevContactsCount) {
+                        const newContactsAdded = newContactsCount - prevContactsCount;
+                        const hasLocation = newContacts.slice(-newContactsAdded).some(c => c.location);
+                        
+                        // Use user info from fast lookup for personalized notification
+                        const userName = userInfo?.displayName || userInfo?.username || 'there';
+                        
+                        toast.success(
+                            `${userName}, you have ${newContactsAdded} new contact${newContactsAdded > 1 ? 's' : ''}${hasLocation ? ' with location data 📍' : ''}!`,
+                            {
+                                style: {
+                                    border: '1px solid #10B981',
+                                    padding: '16px',
+                                    color: '#10B981',
+                                },
+                                duration: 4000,
+                                icon: '📧',
+                            }
+                        );
+                    }
+                } else {
+                    console.log('📭 No contacts document found');
+                    setContacts([]);
+                }
+                
+                setLoading(false);
+            }, (error) => {
+                console.error('❌ Error in contacts listener:', error);
+                toast.error(t('contacts.failed_to_load'));
+                setLoading(false);
+            });
+
+            return () => {
+                console.log('🧹 Cleaning up contacts listener');
+                unsubscribe();
+            };
+        };
+
+        // Wait for user lookup to complete before setting up contacts listener
+        if (!userLookupLoading) {
+            setupContactsListener();
+        }
+    }, [userLookupLoading, userInfo, loading, contacts.length, t]);
 
     // Map functions
     const openContactMap = (contact = null) => {
@@ -239,11 +304,21 @@ export default function ContactsPage() {
         }
     };
 
-    if (loading) {
+    // ✅ Show loading state during user lookup
+    if (userLookupLoading || loading) {
         return (
             <div className="flex items-center justify-center p-8 min-h-[400px]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                <span className="ml-3">{t('contacts.loading')}</span>
+                <div className="flex flex-col items-center space-y-3">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                    <span className="text-sm text-gray-600">
+                        {userLookupLoading ? 'Loading user information...' : t('contacts.loading')}
+                    </span>
+                    {userInfo && !loading && (
+                        <span className="text-xs text-green-600">
+                            Welcome, {userInfo.displayName || userInfo.username}!
+                        </span>
+                    )}
+                </div>
             </div>
         );
     }
@@ -258,53 +333,79 @@ export default function ContactsPage() {
                 onSave={saveEditedContact}
             />
 
-
-{/* Map Modal - Fixed responsive top margin */}
-{showMap && (
-    <div className="fixed inset-0 bg-white z-[9999] flex flex-col md:bg-black md:bg-opacity-50 md:items-center md:justify-center md:p-2">
-<div className="bg-white w-full h-full rounded-xl md:shadow-xl md:max-w-[98vw] md:max-h-[90vh] flex flex-col mt-14 md:mt-20">
-            <div className="flex items-center justify-between p-4 border-b flex-shrink-0 bg-white">
-                <h2 className="text-lg font-semibold">
-                    {selectedContactForMap 
-                        ? t('contacts.location_for_contact', { name: selectedContactForMap.name })
-                        : t('contacts.all_contact_locations')
-                    }
-                </h2>
-                <button
-                    onClick={closeMap}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div className="flex-1 p-2 md:p-4 min-h-0">
-                <ContactsMap
-                    contacts={selectedContactForMap ? [selectedContactForMap] : contacts.filter(c => c.location?.latitude)}
-                    selectedContact={selectedContactForMap}
-                />
-            </div>
-        </div>
-    </div>
-)}
+            {/* Map Modal - Fixed responsive top margin */}
+            {showMap && (
+                <div className="fixed inset-0 bg-white z-[9999] flex flex-col md:bg-black md:bg-opacity-50 md:items-center md:justify-center md:p-2">
+                    <div className="bg-white w-full h-full rounded-xl md:shadow-xl md:max-w-[98vw] md:max-h-[90vh] flex flex-col mt-14 md:mt-20">
+                        <div className="flex items-center justify-between p-4 border-b flex-shrink-0 bg-white">
+                            <h2 className="text-lg font-semibold">
+                                {selectedContactForMap 
+                                    ? t('contacts.location_for_contact', { name: selectedContactForMap.name })
+                                    : t('contacts.all_contact_locations')
+                                }
+                            </h2>
+                            <button
+                                onClick={closeMap}
+                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="flex-1 p-2 md:p-4 min-h-0">
+                            <ContactsMap
+                                contacts={selectedContactForMap ? [selectedContactForMap] : contacts.filter(c => c.location?.latitude)}
+                                selectedContact={selectedContactForMap}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="p-4">
-                {/* Header - Mobile optimized */}
+                {/* ✅ Enhanced Header with user info from fast lookup */}
                 <div className="mb-4">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                        {t('contacts.title')}
-                    </h1>
-                    <p className="text-gray-600 text-sm">
-                        {t('contacts.subtitle')}
-                    </p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                                {t('contacts.title')}
+                            </h1>
+                            {userInfo && (
+                                <p className="text-sm text-gray-600 mb-2">
+                                    Welcome back, <span className="font-medium text-purple-600">
+                                        {userInfo.displayName || userInfo.username}
+                                    </span>
+                                </p>
+                            )}
+                            <p className="text-gray-600 text-sm">
+                                {t('contacts.subtitle')}
+                            </p>
+                        </div>
+                        
+                        {/* User info badge */}
+                        {userInfo && (
+                            <div className="hidden md:flex items-center gap-2 text-xs bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span className="text-purple-700">
+                                    {userInfo.email || 'User verified'}
+                                </span>
+                            </div>
+                        )}
+                    </div>
                     
-                    {/* Status indicators - Compact for mobile */}
+                    {/* Status indicators */}
                     <div className="flex items-center gap-2 mt-3 text-xs">
                         <div className="flex items-center text-green-600">
                             <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
                             {t('contacts.live_updates_enabled')}
                         </div>
+                        {userInfo && (
+                            <div className="flex items-center text-blue-600">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
+                                Fast lookup enabled
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -340,13 +441,16 @@ export default function ContactsPage() {
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {/* Summary stats for mobile */}
+                            {/* ✅ Enhanced summary stats with user info */}
                             <div className="bg-blue-50 rounded-lg p-3 mb-4">
                                 <div className="text-sm font-medium text-blue-900 mb-1">
-                                    {t('contacts.showing_contacts', { 
-                                        count: filteredContacts.length,
-                                        total: contacts.length 
-                                    })}
+                                    {userInfo?.displayName || userInfo?.username ? 
+                                        `${userInfo.displayName || userInfo.username}, you have ${filteredContacts.length} of ${contacts.length} contacts` :
+                                        t('contacts.showing_contacts', { 
+                                            count: filteredContacts.length,
+                                            total: contacts.length 
+                                        })
+                                    }
                                 </div>
                                 <div className="text-xs text-blue-700">
                                     {locationStats.withLocation > 0 && (
@@ -380,7 +484,7 @@ const ContactsMap = dynamic(() => import('./components/ContactsMap'), {
     loading: () => <MapLoadingComponent />
 });
 
-// Mobile-optimized Contact Card Component
+// Mobile-optimized Contact Card Component (keeping the same as before)
 function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapView }) {
     const { t } = useTranslation();
     const [expanded, setExpanded] = useState(false);
@@ -821,35 +925,36 @@ function MobileFilters({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
-{/* Filter toggle button */}
-<div className="flex items-center gap-3">
-    <button
-        onClick={() => setShowFilters(!showFilters)}
-        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-    >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
-        </svg>
-        <span className="truncate">({counts[filter]})</span>
-        <svg className={`w-4 h-4 transform transition-transform ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-    </button>
 
-    {/* Map button */}
-    <button
-        onClick={() => onMapView()}
-        disabled={locationStats.withLocation === 0}
-        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        title={locationStats.withLocation === 0 ? t('contacts.no_location_data') : t('contacts.view_all_locations')}
-    >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        <span className="truncate"> ({locationStats.withLocation})</span>
-    </button>
-</div>         
+            {/* Filter toggle button */}
+            <div className="flex items-center gap-3">
+                <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+                    </svg>
+                    <span className="truncate">({counts[filter]})</span>
+                    <svg className={`w-4 h-4 transform transition-transform ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                {/* Map button */}
+                <button
+                    onClick={() => onMapView()}
+                    disabled={locationStats.withLocation === 0}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    title={locationStats.withLocation === 0 ? t('contacts.no_location_data') : t('contacts.view_all_locations')}
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="truncate"> ({locationStats.withLocation})</span>
+                </button>
+            </div>         
 
             {/* Filter options */}
             {showFilters && (
