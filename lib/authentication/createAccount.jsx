@@ -1,4 +1,5 @@
-// lib/authentication/createAccount.jsx - UPDATED WITH LOOKUP TABLE
+// lib/authentication/createAccount.jsx - UPDATED WITH TEAM MANAGEMENT FIELDS
+
 import { fireApp } from "@/important/firebase";
 import { generateId, realEscapeString} from "../utilities";
 import { collection, doc, setDoc } from "firebase/firestore";
@@ -22,14 +23,13 @@ function getEmailSubject(language) {
 }
 
 export const createAccount = async (data) => {
-    const { email, username, password, language } = data; // ✅ Get language from client
+    const { email, username, password, language } = data;
     const userId = generateId();
     const generatedUserId = userId;
 
     console.log('🚀 Starting account creation for:', { email, username, userId, language });
 
     try {
-        // Use language passed from client, fallback to English
         const userLanguage = language || 'en';
         console.log('🌍 Using language from client for email:', userLanguage);
 
@@ -45,7 +45,6 @@ export const createAccount = async (data) => {
 
         console.log('🔐 Password hashed, preparing multilingual email...');
 
-        // Generate email content in user's language from client
         const emailSubject = getEmailSubject(userLanguage);
         const emailPayload = {
             htmlContent: welcomeEmail(cleanEmail, cleanPassword, cleanUsername, userLanguage),
@@ -59,49 +58,29 @@ export const createAccount = async (data) => {
         console.log('📧 Attempting to send welcome email in language:', userLanguage);
 
         try {
-            const emailResult = await EmailJs(
+            await EmailJs(
                 emailPayload.name, 
                 emailPayload.email, 
                 emailPayload.subject,
                 emailPayload.htmlContent
             );
-
-            console.log('✅ Email sent successfully:', emailResult);
-
+            console.log('✅ Email sent successfully');
         } catch (emailError) {
             console.error('❌ Email sending failed:', {
                 error: emailError.message,
                 stack: emailError.stack,
-                recipientEmail: emailPayload.email,
-                recipientName: emailPayload.name,
-                language: userLanguage
             });
-
-            // Log more details about the email error
-            if (emailError.originalError) {
-                console.error('📧 Original email error:', emailError.originalError);
-            }
-
-            if (emailError.responseData) {
-                console.error('📊 Email API response data:', emailError.responseData);
-            }
-
-            // Decide whether to continue or fail
-            // Option 1: Fail the entire account creation (current behavior)
             throw new Error(`Account creation failed due to email error: ${emailError.message}`);
-            
-            // Option 2: Continue without email (uncomment this instead)
-            // console.warn('⚠️ Continuing account creation without email...');
         }
 
         console.log('💾 Saving account data to Firestore...');
 
-        // Save account credentials WITHOUT language preference
+        // Save account credentials (login info) - NO CHANGES HERE
         await setDoc(doc(accountRef, `${userId}`), {
             userId: userId,
             email: cleanEmail,
             username: cleanUsername,
-            displayName: cleanUsername, // ✅ Add displayName field
+            displayName: cleanUsername,
             password: hashedPasword,
             mySalt: salt,
             createdAt: new Date().toISOString()
@@ -109,26 +88,50 @@ export const createAccount = async (data) => {
 
         console.log('✅ Account credentials saved');
 
-        // Save account details/profile WITHOUT language preference
+        // ✨ ========================================================== ✨
+        // ✨          MODIFICATION FOR TEAM MANAGEMENT FEATURE          ✨
+        // ✨ ========================================================== ✨
+        // Save account details/profile with the new team management fields initialized.
+        // Every new user starts as an individual on a free plan.
         await setDoc(doc(accountDetailsRef, `${userId}`), {
+            // --- Existing Fields ---
             displayName: cleanUsername,
-            username: cleanUsername, // ✅ Add username to AccountData too
+            username: cleanUsername,
             links: [],
             profilePhoto: "",
             selectedTheme: "Lake White",
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+
+            // --- NEW TEAM MANAGEMENT FIELDS ---
+            // Simulates the user's subscription plan. We'll check this to see if they can create a team.
+            // Values can be 'free', 'pro', 'business', etc.
+            accountType: "free",
+            
+            // A quick boolean check for UI rendering (e.g., showing a "Team" nav link).
+            // All new users start as non-managers.
+            isTeamManager: false,
+            
+            // Will be populated with the ID from the "Teams" collection when they join or create a team.
+            // Starts as null because they are not in a team yet.
+            teamId: null,
+
+            // Their role within the team. Will be 'manager' or 'member'.
+            // Starts as null.
+            teamRole: null,
+
+            // If they are a 'member', this will point to their manager's userId.
+            // Helps in creating a clear hierarchy. Starts as null.
+            managerUserId: null
         });
 
-        console.log('✅ Account profile created');
+        console.log('✅ Account profile created with initial team fields');
 
-        // ✅ CREATE LOOKUP TABLE ENTRIES
         console.log('🔍 Creating lookup table entries...');
         try {
             await updateUserLookup(userId, cleanUsername, cleanUsername, cleanEmail);
             console.log('✅ Lookup table entries created');
         } catch (lookupError) {
             console.error('❌ Failed to create lookup entries:', lookupError);
-            // Don't fail account creation for lookup errors
             console.warn('⚠️ Continuing without lookup entries...');
         }
 

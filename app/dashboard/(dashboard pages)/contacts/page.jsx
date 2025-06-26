@@ -8,7 +8,8 @@ import { fireApp } from '@/important/firebase';
 import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-
+import { ShareContactsModal } from './components/ShareContactsModal';
+import { checkTeamContactSharingEnabled } from '@/lib/teamContactSharing';
 // Create a separate loading component that has access to useTranslation
 function MapLoadingComponent() {
     const { t } = useTranslation();
@@ -30,6 +31,10 @@ export default function ContactsPage() {
     const [filter, setFilter] = useState('all'); // all, new, viewed, archived
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedContacts, setSelectedContacts] = useState([]);
+
+    const [showShareModal, setShowShareModal] = useState(false);
+const [teamSharingEnabled, setTeamSharingEnabled] = useState(false);
+const [selectionMode, setSelectionMode] = useState(false);
     
     // ✅ Add user info state for fast lookup
     const [userInfo, setUserInfo] = useState(null);
@@ -58,6 +63,21 @@ export default function ContactsPage() {
         
         return matchesFilter && matchesSearch;
     });
+    // Add this useEffect to check team sharing permissions
+useEffect(() => {
+    const checkSharingPermissions = async () => {
+        if (userInfo?.userId) {
+            try {
+                const enabled = await checkTeamContactSharingEnabled(userInfo.userId);
+                setTeamSharingEnabled(enabled);
+            } catch (error) {
+                console.error('Error checking sharing permissions:', error);
+            }
+        }
+    };
+
+    checkSharingPermissions();
+}, [userInfo]);
 
     // Get counts for each status
     const counts = {
@@ -290,6 +310,35 @@ export default function ContactsPage() {
             toast.error(t('contacts.failed_to_update_status'));
         }
     };
+    const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedContacts([]);
+};
+
+const toggleContactSelection = (contactId) => {
+    setSelectedContacts(prev => 
+        prev.includes(contactId) 
+            ? prev.filter(id => id !== contactId)
+            : [...prev, contactId]
+    );
+};
+
+const selectAllContacts = () => {
+    const selectableContacts = filteredContacts.filter(contact => !contact.isSharedContact);
+    setSelectedContacts(selectableContacts.map(contact => contact.id));
+};
+
+const clearSelection = () => {
+    setSelectedContacts([]);
+};
+
+const handleShareSelected = () => {
+    if (selectedContacts.length === 0) {
+        toast.error('Please select contacts to share');
+        return;
+    }
+    setShowShareModal(true);
+};
 
     const handleContactAction = (action, contact) => {
         switch (action) {
@@ -364,50 +413,121 @@ export default function ContactsPage() {
             )}
 
             <div className="p-4">
-                {/* ✅ Enhanced Header with user info from fast lookup */}
-                <div className="mb-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                                {t('contacts.title')}
-                            </h1>
-                            {userInfo && (
-                                <p className="text-sm text-gray-600 mb-2">
-                                    Welcome back, <span className="font-medium text-purple-600">
-                                        {userInfo.displayName || userInfo.username}
-                                    </span>
-                                </p>
-                            )}
-                            <p className="text-gray-600 text-sm">
-                                {t('contacts.subtitle')}
-                            </p>
+                {/* ✅ Enhanced Header with user info and team sharing */}
+<div className="mb-4">
+    <div className="flex items-center justify-between">
+        <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                {t('contacts.title')}
+            </h1>
+            {userInfo && (
+                <p className="text-sm text-gray-600 mb-2">
+                    Welcome back, <span className="font-medium text-purple-600">
+                        {userInfo.displayName || userInfo.username}
+                    </span>
+                </p>
+            )}
+            <p className="text-gray-600 text-sm">
+                {t('contacts.subtitle')}
+            </p>
+        </div>
+        
+        {/* Team sharing controls - REPLACES the old user info badge */}
+        {teamSharingEnabled && (
+            <div className="flex flex-col items-end gap-2">
+                <div className="flex items-center gap-2">
+                    {!selectionMode ? (
+                        <button
+                            onClick={toggleSelectionMode}
+                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                            </svg>
+                            {t('contacts.share_with_team') || 'Share with Team'}
+                        </button>
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">
+                                {selectedContacts.length} selected
+                            </span>
+                            <button
+                                onClick={selectAllContacts}
+                                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                            >
+                                Select All
+                            </button>
+                            <button
+                                onClick={clearSelection}
+                                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                            >
+                                Clear
+                            </button>
+                            <button
+                                onClick={handleShareSelected}
+                                disabled={selectedContacts.length === 0}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                                </svg>
+                                Share ({selectedContacts.length})
+                            </button>
+                            <button
+                                onClick={toggleSelectionMode}
+                                className="px-3 py-2 text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                        
-                        {/* User info badge */}
-                        {userInfo && (
-                            <div className="hidden md:flex items-center gap-2 text-xs bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
-                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                <span className="text-purple-700">
-                                    {userInfo.email || 'User verified'}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    
-                    {/* Status indicators */}
-                    <div className="flex items-center gap-2 mt-3 text-xs">
-                        <div className="flex items-center text-green-600">
-                            <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
-                            {t('contacts.live_updates_enabled')}
-                        </div>
-                        {userInfo && (
-                            <div className="flex items-center text-blue-600">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                                Fast lookup enabled
-                            </div>
-                        )}
-                    </div>
+                    )}
                 </div>
+                
+                {teamSharingEnabled && (
+                    <div className="text-xs text-purple-600 flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Team contact sharing enabled
+                    </div>
+                )}
+            </div>
+        )}
+        
+        {/* User info badge for mobile - MOVED HERE and made mobile-only */}
+        {userInfo && (
+            <div className="md:hidden flex items-center gap-2 text-xs bg-purple-50 border border-purple-200 rounded-lg px-3 py-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-purple-700">
+                    {userInfo.email || 'User verified'}
+                </span>
+            </div>
+        )}
+    </div>
+    
+    {/* Status indicators - ADD team sharing indicator */}
+    <div className="flex items-center gap-2 mt-3 text-xs">
+        <div className="flex items-center text-green-600">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+            {t('contacts.live_updates_enabled')}
+        </div>
+        {userInfo && (
+            <div className="flex items-center text-blue-600">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
+                Fast lookup enabled
+            </div>
+        )}
+        {/* ADD THIS NEW STATUS INDICATOR */}
+        {teamSharingEnabled && (
+            <div className="flex items-center text-purple-600">
+                <div className="w-2 h-2 bg-purple-500 rounded-full mr-1"></div>
+                Team sharing available
+            </div>
+        )}
+    </div>
+</div>
 
                 {/* Mobile Filters */}
                 <MobileFilters
@@ -441,39 +561,72 @@ export default function ContactsPage() {
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {/* ✅ Enhanced summary stats with user info */}
-                            <div className="bg-blue-50 rounded-lg p-3 mb-4">
-                                <div className="text-sm font-medium text-blue-900 mb-1">
-                                    {userInfo?.displayName || userInfo?.username ? 
-                                        `${userInfo.displayName || userInfo.username}, you have ${filteredContacts.length} of ${contacts.length} contacts` :
-                                        t('contacts.showing_contacts', { 
-                                            count: filteredContacts.length,
-                                            total: contacts.length 
-                                        })
-                                    }
-                                </div>
-                                <div className="text-xs text-blue-700">
-                                    {locationStats.withLocation > 0 && (
-                                        `📍 ${locationStats.withLocation} ${t('contacts.with_location')}`
-                                    )}
-                                </div>
-                            </div>
+                           {/* ✅ Enhanced summary stats with user info and team breakdown */}
+<div className="bg-blue-50 rounded-lg p-3 mb-4">
+    <div className="text-sm font-medium text-blue-900 mb-1">
+        {userInfo?.displayName || userInfo?.username ? 
+            `${userInfo.displayName || userInfo.username}, you have ${filteredContacts.length} of ${contacts.length} contacts` :
+            t('contacts.showing_contacts', { 
+                count: filteredContacts.length,
+                total: contacts.length 
+            })
+        }
+    </div>
+    <div className="text-xs text-blue-700 flex items-center gap-4">
+        <span>📧 {filteredContacts.filter(contact => !contact.isSharedContact).length} personal</span>
+        {filteredContacts.filter(contact => contact.isSharedContact).length > 0 && (
+            <span>👥 {filteredContacts.filter(contact => contact.isSharedContact).length} from team</span>
+        )}
+        {locationStats.withLocation > 0 && (
+            <span>📍 {locationStats.withLocation} with location</span>
+        )}
+    </div>
+</div>
 
-                            {/* Contact cards */}
-                            {filteredContacts.map((contact) => (
-                                <ContactCard
-                                    key={contact.id}
-                                    contact={contact}
-                                    onEdit={openEditModal}
-                                    onStatusUpdate={updateContactStatus}
-                                    onContactAction={handleContactAction}
-                                    onMapView={openContactMap}
-                                />
-                            ))}
+                      {/* Contact cards */}
+{filteredContacts.map((contact) => (
+    <div key={contact.id} className={`relative ${selectionMode && !contact.isSharedContact ? 'pl-12' : ''}`}>
+        {/* Selection checkbox */}
+        {selectionMode && !contact.isSharedContact && (
+            <div className="absolute left-3 top-4 z-10">
+                <input
+                    type="checkbox"
+                    checked={selectedContacts.includes(contact.id)}
+                    onChange={() => toggleContactSelection(contact.id)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+            </div>
+        )}
+        
+        <ContactCard
+            contact={contact}
+            onEdit={openEditModal}
+            onStatusUpdate={updateContactStatus}
+            onContactAction={handleContactAction}
+            onMapView={openContactMap}
+            showTeamSource={true}
+        />
+    </div>
+))}
                         </div>
                     )}
-                </div>
+</div>
             </div>
+            
+            {/* Share Contacts Modal - ADD THIS HERE */}
+            {showShareModal && (
+                <ShareContactsModal
+                    isOpen={showShareModal}
+                    onClose={() => {
+                        setShowShareModal(false);
+                        setSelectionMode(false);
+                        setSelectedContacts([]);
+                    }}
+                    contacts={contacts}
+                    selectedContactIds={selectedContacts}
+                    userId={userInfo?.userId}
+                />
+            )}
         </div>
     );
 }
@@ -485,6 +638,7 @@ const ContactsMap = dynamic(() => import('./components/ContactsMap'), {
 });
 
 // Mobile-optimized Contact Card Component (keeping the same as before)
+// Enhanced Contact Card Component with Team Member Source
 function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapView }) {
     const { t } = useTranslation();
     const [expanded, setExpanded] = useState(false);
@@ -507,6 +661,10 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
         });
     };
 
+    // Check if contact is from a team member
+    const isFromTeamMember = contact.sharedBy || contact.teamMemberSource;
+    const teamMemberName = contact.sharedBy?.displayName || contact.sharedBy?.username || contact.teamMemberSource;
+
     return (
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-3">
             {/* Header - Always visible */}
@@ -517,14 +675,27 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                 <div className="flex items-start gap-3">
                     {/* Avatar with indicators */}
                     <div className="relative flex-shrink-0">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${
+                            isFromTeamMember 
+                                ? 'bg-gradient-to-br from-purple-400 to-blue-500' 
+                                : 'bg-gradient-to-br from-blue-400 to-purple-500'
+                        }`}>
                             {contact.name.charAt(0).toUpperCase()}
                         </div>
+                        
+                        {/* Team member indicator */}
+                        {isFromTeamMember && (
+                            <div className="absolute -top-1 -left-1 w-4 h-4 bg-purple-500 rounded-full border border-white flex items-center justify-center">
+                                <span className="text-[10px]">👥</span>
+                            </div>
+                        )}
+                        
                         {contact.location && (
                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white">
                                 <span className="text-[8px]">📍</span>
                             </div>
                         )}
+                        
                         {contact.lastModified && (
                             <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border border-white">
                                 <span className="text-[8px]">✏️</span>
@@ -542,6 +713,19 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                                 <p className="text-xs text-gray-500 truncate">
                                     {contact.email}
                                 </p>
+                                
+                                {/* Team member source */}
+                                {isFromTeamMember && (
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                            <span>👥</span>
+                                            <span className="font-medium">
+                                                {t('contacts.shared_by') || 'Partagé par'} {teamMemberName}
+                                            </span>
+                                        </span>
+                                    </div>
+                                )}
+                                
                                 <div className="flex items-center gap-2 mt-1">
                                     <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(contact.status)}`}>
                                         {t(`contacts.status_${contact.status}`)}
@@ -573,6 +757,30 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                 <div className="border-t border-gray-100">
                     {/* Contact details */}
                     <div className="p-4 space-y-3">
+                        {/* Team member info (expanded view) */}
+                        {isFromTeamMember && (
+                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                                <div className="flex items-center gap-2 text-sm">
+                                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <div>
+                                        <span className="font-medium text-purple-800">
+                                            {t('contacts.team_contact') || 'Contact d\'équipe'}
+                                        </span>
+                                        <p className="text-xs text-purple-700 mt-1">
+                                            {t('contacts.shared_by_member', { name: teamMemberName }) || `Partagé par ${teamMemberName}`}
+                                            {contact.sharedAt && (
+                                                <span className="ml-2">
+                                                    • {formatDate(contact.sharedAt)}
+                                                </span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {contact.phone && (
                             <div className="flex items-center gap-2 text-sm">
                                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -595,7 +803,12 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>{formatDate(contact.submittedAt)}</span>
+                            <span>
+                                {isFromTeamMember 
+                                    ? `${t('contacts.shared_on') || 'Partagé le'} ${formatDate(contact.sharedAt || contact.submittedAt)}`
+                                    : formatDate(contact.submittedAt)
+                                }
+                            </span>
                         </div>
                         
                         {contact.lastModified && (
@@ -619,16 +832,18 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                     {/* Action buttons */}
                     <div className="p-4 border-t border-gray-100">
                         <div className="grid grid-cols-2 gap-2 mb-3">
-                            {/* Edit button */}
-                            <button
-                                onClick={() => onEdit(contact)}
-                                className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-                            >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                {t('contacts.edit')}
-                            </button>
+                            {/* Edit button - only show if not from team member or if user has edit permissions */}
+                            {(!isFromTeamMember || contact.canEdit) && (
+                                <button
+                                    onClick={() => onEdit(contact)}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                                >
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    {t('contacts.edit')}
+                                </button>
+                            )}
 
                             {/* Status button */}
                             {contact.status === 'new' && (
@@ -708,6 +923,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                     </div>
                 </div>
             )}
+            
         </div>
     );
 }

@@ -1,30 +1,48 @@
-// app/dashboard/general components/Preview.jsx
+// app/dashboard/general components/Preview.jsx - MODIFIED TO WORK WITH UPGRADED FUNCTION
 "use client"
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import "../../styles/3d.css";
 import { getSessionCookie } from '@/lib/authentication/session';
-import { fetchUserData } from '@/lib/fetch data/fetchUserData';
+import { fetchUserData } from '@/lib/fetch data/fetchUserData'; // This is your new function
 
 export default function Preview() {
+    // The state still holds the username string for the iframe URL
     const [username, setUsername] = useState("");
 
     useEffect(() => {
-        const sessionUsername = getSessionCookie("adminLinker");
-        if (sessionUsername === undefined) {
-            return;
+        // This effect handles fetching and validating the user data
+        async function validateAndSetUser() {
+            const sessionUsername = getSessionCookie("adminLinker");
+            if (!sessionUsername) {
+                // No user in session, do nothing.
+                return;
+            }
+
+            // Call the new fetchUserData to validate the user.
+            // It will return a userId (string) if found, or null if not.
+            const userId = await fetchUserData(sessionUsername);
+
+            // If a userId was returned, it means the user is valid.
+            // We can now safely set the username state using the value from the cookie.
+            if (userId) {
+                setUsername(sessionUsername);
+            } else {
+                // Handle the case where the user from the cookie is no longer in the DB
+                console.warn(`User "${sessionUsername}" from session cookie not found in database.`);
+            }
         }
 
-        async function getUserData() {
-            const data = await fetchUserData(sessionUsername);
-            setUsername(data?.username);
-        }
-        getUserData();
-    }, []);
+        validateAndSetUser();
+    }, []); // This effect runs once on component mount
 
     useEffect(() => {
+        // This effect for the 3D tilt logic remains unchanged.
         const container = document.getElementById("container");
         const inner = document.getElementById("inner");
+
+        // Ensure elements exist before adding listeners
+        if (!container || !inner) return;
 
         // Mouse
         const mouse = {
@@ -96,7 +114,7 @@ export default function Preview() {
             container.onmouseleave = null;
             container.onmousemove = null;
         };
-    }, []);
+    }, []); // This effect also runs once on mount
 
     return (
         <div className="w-[35rem] md:grid hidden place-items-center border-l ml-4" >
@@ -108,10 +126,10 @@ export default function Preview() {
                             <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className=" mix-blend-screen" />
                         </div>
                         <div className="h-full w-full">
-                            {/* Add preview=true parameter to distinguish from real visits */}
-                            {/* <iframe src={`http://localhost:3000/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe>*/}
-                           <iframe src={`https://www.tapit.fr/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe> 
-
+                            {/* This now works correctly. If username is an empty string, the iframe src will be incomplete but won't throw an error. */}
+                            {username && (
+                                <iframe src={`https://www.tapit.fr/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe>
+                            )}
                         </div>
                     </div>
                 </div>
