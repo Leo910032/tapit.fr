@@ -19,7 +19,13 @@ const nextConfig = {
       },
     ],
   },
-  webpack: (config) => {
+   webpack: (config, { isServer }) => {
+    // --- Step 1: Add the externals for server-side packages ---
+    // This is the fix for the 'Module not found' error for sharp and jsqr.
+    // It tells Webpack not to bundle them for the server.
+    if (isServer) {
+      config.externals.push('sharp', 'jsqr');
+    }
     config.resolve.alias = {
       ...config.resolve.alias,
       '@/components': path.resolve(__dirname, 'app/components'),
