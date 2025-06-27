@@ -104,6 +104,25 @@ useEffect(() => {
             withoutLocation: contacts.length - withLocation
         });
     }, [contacts]);
+      const saveScannedContact = async (newContact) => {
+        try {
+            const currentUser = testForActiveSession();
+            const contactsRef = doc(collection(fireApp, "Contacts"), currentUser);
+            
+            const updatedContacts = [newContact, ...contacts];
+            
+            await updateDoc(contactsRef, {
+                contacts: updatedContacts,
+                lastUpdated: new Date().toISOString()
+            });
+            
+            setShowReviewModal(false);
+            setParsedContact(null);
+        } catch (error) {
+            console.error('Error saving contact:', error);
+            throw error;
+        }
+    };
 
     // Hide/show navigation when map is opened/closed
     useEffect(() => {
