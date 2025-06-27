@@ -5,6 +5,8 @@ import { TeamHeader } from '../manager/TeamHeader';
 import { TeamMembersList } from '../manager/TeamMembersList';
 import { TeamSettingsPanel } from '../manager/TeamSettingsPanel';
 import { InviteMemberModal } from '../manager/InviteMemberModal';
+import { PendingJoinRequests } from '../manager/PendingJoinRequests';
+
 
 export const TeamManagerView = ({ 
     userData,
@@ -29,6 +31,8 @@ export const TeamManagerView = ({
                     onShowInviteModal={() => setShowInviteModal(true)}
                     onShowSettings={() => setShowSettings(!showSettings)}
                 />
+                    <PendingJoinRequests teamData={teamData} />
+
 
                 {/* Team Settings */}
                 {showSettings && (

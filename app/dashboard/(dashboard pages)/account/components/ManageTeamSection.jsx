@@ -7,6 +7,8 @@ import { toast } from 'react-hot-toast';
 import { testForActiveSession } from '@/lib/authentication/testForActiveSession';
 import { doc, onSnapshot, collection, query, where, getDoc } from 'firebase/firestore';
 import { fireApp } from '@/important/firebase';
+import { PendingApprovalStatus } from './member/PendingApprovalStatus';
+
 import { 
     createTeam, 
     joinTeamByCode, 
@@ -273,6 +275,18 @@ export default function ManageTeamSection() {
     
     // STATE 1: User is a team manager with members
     // STATE 1: User is a team manager with members
+    if (!userData.teamId && !userData.isTeamManager) {
+    return (
+        <div className="space-y-8">
+            <PendingApprovalStatus />
+            <JoinTeamView 
+                onJoinTeam={handleJoinTeam}
+                isSubmitting={isSubmitting}
+            />
+            {userData.accountType !== 'team_manager' && <UpgradeView />}
+        </div>
+    );
+}
 if (userData.isTeamManager && userData.teamId && teamData) {
     return (
         <TeamManagerView 
