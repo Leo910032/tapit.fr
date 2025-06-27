@@ -6,6 +6,8 @@ import { toast } from 'react-hot-toast';
 import { fireApp } from '@/important/firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { testForActiveSession } from '@/lib/authentication/testForActiveSession';
+import { testForActiveSession } from '@/lib/authentication/testForActiveSession';
+
 
 export const PendingJoinRequests = ({ teamData }) => {
     const { t } = useTranslation();
@@ -62,42 +64,44 @@ export const PendingJoinRequests = ({ teamData }) => {
         return () => unsubscribe();
     }, [teamData?.teamId]);
 
-    const handleApproveRequest = async (requestId, userId) => {
-        setProcessingRequestId(requestId);
-        try {
-            // Approve the join request by calling joinTeamByCode with the request
-            const { joinTeamByCode } = await import('@/lib/teamManagement');
-            const request = pendingRequests.find(r => r.requestId === requestId);
-            
-            if (request) {
-                await joinTeamByCode(userId, request.teamCode, requestId);
-                toast.success('Join request approved successfully!');
-            }
-        } catch (error) {
-            console.error('Error approving request:', error);
-            toast.error(error.message || 'Failed to approve request');
-        } finally {
-            setProcessingRequestId(null);
-        }
-    };
+ // Replace the existing handler functions with these:
+const handleApproveRequest = async (requestId, userId) => {
+    setProcessingRequestId(requestId);
+    try {
+        const currentUserId = testForActiveSession();
+        
+        // Import the new approval function
+        const { approveJoinRequest } = await import('@/lib/teamManagement');
+        
+        const result = await approveJoinRequest(currentUserId, requestId);
+        toast.success(`${result.memberName} has been approved to join the team!`);
+        
+    } catch (error) {
+        console.error('Error approving request:', error);
+        toast.error(error.message || 'Failed to approve request');
+    } finally {
+        setProcessingRequestId(null);
+    }
+};
 
-    const handleRejectRequest = async (requestId) => {
-        setProcessingRequestId(requestId);
-        try {
-            const requestRef = doc(fireApp, "TeamJoinRequests", requestId);
-            await updateDoc(requestRef, {
-                status: "rejected",
-                rejectedAt: new Date(),
-                rejectedBy: testForActiveSession()
-            });
-            toast.success('Join request rejected');
-        } catch (error) {
-            console.error('Error rejecting request:', error);
-            toast.error('Failed to reject request');
-        } finally {
-            setProcessingRequestId(null);
-        }
-    };
+const handleRejectRequest = async (requestId) => {
+    setProcessingRequestId(requestId);
+    try {
+        const currentUserId = testForActiveSession();
+        
+        // Import the new rejection function
+        const { rejectJoinRequest } = await import('@/lib/teamManagement');
+        
+        await rejectJoinRequest(currentUserId, requestId);
+        toast.success('Join request rejected');
+        
+    } catch (error) {
+        console.error('Error rejecting request:', error);
+        toast.error('Failed to reject request');
+    } finally {
+        setProcessingRequestId(null);
+    }
+};
 
     if (loading) {
         return (
