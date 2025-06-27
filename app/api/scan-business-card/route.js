@@ -1,10 +1,8 @@
-// File: app/api/scan-business-card/route.js
-export const runtime = 'nodejs'; 
+// File: app/api/scan-business-card/route.js npm install jsqr sharp
+
 import { NextResponse } from 'next/server';
 import jsQR from 'jsqr';
 import sharp from 'sharp';
-
-
 
 // --- Helper function to decode QR codes from the image buffer ---
 async function decodeQrCode(imageBase64) {

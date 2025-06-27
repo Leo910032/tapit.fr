@@ -1,8 +1,11 @@
+// File: next.config.js
+
 const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // REMOVED: output: 'standalone',
+
   images: {
     remotePatterns: [
       {
@@ -11,7 +14,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com', // For Google User profile images
+        hostname: 'lh3.googleusercontent.com',
       },
       {
         protocol: 'https',
@@ -19,13 +22,7 @@ const nextConfig = {
       },
     ],
   },
-   webpack: (config, { isServer }) => {
-    // --- Step 1: Add the externals for server-side packages ---
-    // This is the fix for the 'Module not found' error for sharp and jsqr.
-    // It tells Webpack not to bundle them for the server.
-    if (isServer) {
-      config.externals.push('sharp', 'jsqr');
-    }
+  webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@/components': path.resolve(__dirname, 'app/components'),
