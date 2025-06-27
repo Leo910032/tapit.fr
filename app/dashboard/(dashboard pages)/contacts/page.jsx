@@ -26,6 +26,7 @@ function MapLoadingComponent() {
     );
 }
 
+
 export default function ContactsPage() {
     const { t } = useTranslation();
     const [contacts, setContacts] = useState([]);
@@ -38,7 +39,7 @@ export default function ContactsPage() {
     // Business Card Scanner States
     const [showScanner, setShowScanner] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
-    const [parsedContact, setParsedContact] = useState(null);
+  const [scannedFields, setScannedFields] = useState(null);
 
     const [showShareModal, setShowShareModal] = useState(false);
 const [teamSharingEnabled, setTeamSharingEnabled] = useState(false);
@@ -104,25 +105,44 @@ useEffect(() => {
             withoutLocation: contacts.length - withLocation
         });
     }, [contacts]);
-      const saveScannedContact = async (newContact) => {
-        try {
-            const currentUser = testForActiveSession();
-            const contactsRef = doc(collection(fireApp, "Contacts"), currentUser);
-            
-            const updatedContacts = [newContact, ...contacts];
-            
-            await updateDoc(contactsRef, {
-                contacts: updatedContacts,
-                lastUpdated: new Date().toISOString()
-            });
-            
-            setShowReviewModal(false);
-            setParsedContact(null);
-        } catch (error) {
-            console.error('Error saving contact:', error);
-            throw error;
-        }
-    };
+   const saveScannedContact = async (fields) => {
+    try {
+        const currentUser = testForActiveSession();
+        if (!currentUser) throw new Error("No active session");
+
+        // Find the primary name and email for top-level access
+        const nameField = fields.find(f => f.label.toLowerCase().includes('name'));
+        const emailField = fields.find(f => f.label.toLowerCase().includes('email'));
+
+        // The new contact object for Firebase
+        const newContact = {
+            id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            // Have top-level fields for easy searching and display
+            name: nameField ? nameField.value.trim() : 'Unnamed Contact',
+            email: emailField ? emailField.value.trim().toLowerCase() : '',
+            // Store ALL fields (including name and email) in a details array for flexibility
+            details: fields.filter(f => f.value.trim() !== ''), // Don't save empty fields
+            status: 'new',
+            submittedAt: new Date().toISOString(),
+            source: 'business_card_scan'
+        };
+
+        const contactsRef = doc(collection(fireApp, "Contacts"), currentUser);
+        const updatedContacts = [newContact, ...contacts];
+        
+        await updateDoc(contactsRef, {
+            contacts: updatedContacts,
+            lastUpdated: new Date().toISOString()
+        });
+        
+        // This is the state that controls the Review Modal
+        setShowReviewModal(false); 
+        setScannedFields(null); // Clear the scanned data
+    } catch (error) {
+        console.error('Error saving scanned contact:', error);
+        throw error; // Let the modal handle the error display
+    }
+};
 
     // Hide/show navigation when map is opened/closed
     useEffect(() => {
@@ -667,8 +687,8 @@ const handleShareSelected = () => {
                 <BusinessCardScanner
                 isOpen={showScanner}
                 onClose={() => setShowScanner(false)}
-                onContactParsed={(contact) => {
-                    setParsedContact(contact);
+                onContactParsed={(fields) => {
+                    setParsedContact(fields);
                     setShowReviewModal(true);
                     setShowScanner(false);
                 }}
@@ -691,6 +711,22 @@ const ContactsMap = dynamic(() => import('./components/ContactsMap'), {
     ssr: false,
     loading: () => <MapLoadingComponent />
 });
+// =======================================================================
+// NEW: Add this helper component before your ContactCard function.
+// =======================================================================
+const FieldIcon = ({ label }) => {
+    const l = label.toLowerCase();
+    if (l.includes('name')) return <span className="text-gray-400">👤</span>;
+    if (l.includes('email')) return <span className="text-gray-400">✉️</span>;
+    if (l.includes('phone') || l.includes('tel') || l.includes('mobile')) return <span className="text-gray-400">📞</span>;
+    if (l.includes('company') || l.includes('organisation')) return <span className="text-gray-400">🏢</span>;
+    if (l.includes('website') || l.includes('url')) return <span className="text-gray-400">🌐</span>;
+    if (l.includes('qr')) return <span className="text-gray-400">🔳</span>;
+    if (l.includes('linkedin')) return <span className="text-gray-400">💼</span>;
+    if (l.includes('address') || l.includes('location')) return <span className="text-gray-400">📍</span>;
+    if (l.includes('twitter')) return <svg className="w-3 h-3 text-gray-400" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6904H306.615L611.412 515.685L658.88 583.579L1055.08 1150.31H892.476L569.165 687.854V687.828Z" fill="currentColor"/></svg>;
+    return <span className="text-gray-400">📄</span>;
+};
 
 // Mobile-optimized Contact Card Component (keeping the same as before)
 // Enhanced Contact Card Component with Team Member Source
@@ -708,13 +744,33 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
     };
 
     const formatDate = (dateString) => {
+        if (!dateString) return '';
         return new Date(dateString).toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
         });
     };
+    
+    // --- NEW LOGIC: Handle both old and new contact structures ---
+    // Check if this contact was created by the new scanner (has a 'details' array)
+    const isDynamicContact = Array.isArray(contact.details);
+
+    // Get primary info (Name/Email) for the header.
+    // This works for both old and new contact types.
+    const headerName = contact.name || 'No Name';
+    const headerEmail = contact.email || 'No Email';
+
+    // Get all other details to display in the expanded view.
+    // For new contacts, filter out Name and Email since they are in the header.
+    // For old contacts, build a 'details' array from the fixed fields.
+    const displayDetails = isDynamicContact
+        ? contact.details.filter(d => 
+              !d.label.toLowerCase().includes('name') && 
+              !d.label.toLowerCase().includes('email')
+          )
+        : [
+              contact.phone && { label: 'Phone', value: contact.phone },
+              contact.company && { label: 'Company', value: contact.company },
+          ].filter(Boolean); // .filter(Boolean) removes any null/undefined entries
 
     // Check if contact is from a team member
     const isFromTeamMember = contact.sharedBy || contact.teamMemberSource;
