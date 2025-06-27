@@ -683,7 +683,8 @@ const handleShareSelected = () => {
                 isOpen={showScanner}
                 onClose={() => setShowScanner(false)}
                 onContactParsed={(fields) => {
-                    setParsedContact(fields);
+                        setScannedFields(fields); // ✅ Use the correct state setter function
+
                     setShowReviewModal(true);
                     setShowScanner(false);
                 }}
