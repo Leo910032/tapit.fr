@@ -839,7 +839,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                     </div>
 
                     {/* Action buttons (Your existing buttons will mostly work) */}
-                    // ==========================================================
+                   // ==========================================================
 //  ACTION: Replace the empty action button div with this full block
 // ==========================================================
 <div className="p-4 border-t border-gray-100">
