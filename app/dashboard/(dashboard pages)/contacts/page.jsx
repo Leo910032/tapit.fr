@@ -132,7 +132,7 @@ const saveScannedContact = async (contactData) => {
         });
         
         setShowReviewModal(false);
-        setParsedContact(null); // ✅ Use consistent variable name
+        setScannedFields(null); // ✅ Use the correct state setter function
     } catch (error) {
         console.error('Error saving scanned contact:', error);
         throw error;
