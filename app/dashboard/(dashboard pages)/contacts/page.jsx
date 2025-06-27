@@ -39,7 +39,7 @@ export default function ContactsPage() {
     // Business Card Scanner States
     const [showScanner, setShowScanner] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
-  const [scannedFields, setScannedFields] = useState(null);
+const [parsedContact, setParsedContact] = useState(null); // ✅ Fixed variable name
 
     const [showShareModal, setShowShareModal] = useState(false);
 const [teamSharingEnabled, setTeamSharingEnabled] = useState(false);
@@ -105,23 +105,19 @@ useEffect(() => {
             withoutLocation: contacts.length - withLocation
         });
     }, [contacts]);
-   const saveScannedContact = async (fields) => {
+const saveScannedContact = async (contactData) => {
     try {
         const currentUser = testForActiveSession();
         if (!currentUser) throw new Error("No active session");
 
-        // Find the primary name and email for top-level access
-        const nameField = fields.find(f => f.label.toLowerCase().includes('name'));
-        const emailField = fields.find(f => f.label.toLowerCase().includes('email'));
-
-        // The new contact object for Firebase
         const newContact = {
             id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            // Have top-level fields for easy searching and display
-            name: nameField ? nameField.value.trim() : 'Unnamed Contact',
-            email: emailField ? emailField.value.trim().toLowerCase() : '',
-            // Store ALL fields (including name and email) in a details array for flexibility
-            details: fields.filter(f => f.value.trim() !== ''), // Don't save empty fields
+            name: contactData.name || 'Unnamed Contact',
+            email: contactData.email || '',
+            phone: contactData.phone || '',
+            company: contactData.company || '',
+            title: contactData.title || '',
+            message: contactData.message || 'Contact added via business card scan',
             status: 'new',
             submittedAt: new Date().toISOString(),
             source: 'business_card_scan'
@@ -135,12 +131,11 @@ useEffect(() => {
             lastUpdated: new Date().toISOString()
         });
         
-        // This is the state that controls the Review Modal
-        setShowReviewModal(false); 
-        setScannedFields(null); // Clear the scanned data
+        setShowReviewModal(false);
+        setParsedContact(null); // ✅ Use consistent variable name
     } catch (error) {
         console.error('Error saving scanned contact:', error);
-        throw error; // Let the modal handle the error display
+        throw error;
     }
 };
 
