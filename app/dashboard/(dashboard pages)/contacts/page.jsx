@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/useTranslation';
 import { testForActiveSession } from '@/lib/authentication/testForActiveSession';
-import { fastUserLookup } from '@/lib/userLookup'; // ✅ Fast lookup import
+import { fastUserLookup } from '@/lib/userLookup';
 import { fireApp } from '@/important/firebase';
 import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
+import BusinessCardScanner from './components/BusinessCardScanner';
+import ContactReviewModal from './components/ContactReviewModal';
 import { ShareContactsModal } from './components/ShareContactsModal';
 import { checkTeamContactSharingEnabled } from '@/lib/teamContactSharing';
 // Create a separate loading component that has access to useTranslation
@@ -31,6 +33,12 @@ export default function ContactsPage() {
     const [filter, setFilter] = useState('all'); // all, new, viewed, archived
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedContacts, setSelectedContacts] = useState([]);
+
+    
+    // Business Card Scanner States
+    const [showScanner, setShowScanner] = useState(false);
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [parsedContact, setParsedContact] = useState(null);
 
     const [showShareModal, setShowShareModal] = useState(false);
 const [teamSharingEnabled, setTeamSharingEnabled] = useState(false);
