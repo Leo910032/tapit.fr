@@ -1,4 +1,4 @@
-// app/api/scan-business-card/route.js
+// app/api/scan-business-card/route.jsl
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
