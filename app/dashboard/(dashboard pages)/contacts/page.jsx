@@ -827,7 +827,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                         {/* Display the old message field only if it exists and it's not a dynamic contact */}
                         {!isDynamicContact && contact.message && (
                             <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-<p className="text-sm text-gray-700 italic">"{contact.message}"</p>
+<p className="text-sm text-gray-700 italic">&ldquo;{contact.message}&rdquo;</p>
                             </div>
                         )}
 
