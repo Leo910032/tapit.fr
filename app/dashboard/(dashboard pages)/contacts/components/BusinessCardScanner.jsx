@@ -90,11 +90,11 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Pass parsed contact to parent
-                    onContactParsed(result.parsedContact);
-                    toast.success('Business card scanned successfully!');
-                    handleClose();
-                } else {
+    // The API now returns an array under the key "parsedFields"
+    onContactParsed(result.parsedFields); // ✅ Correct key
+    toast.success('Business card scanned successfully!');
+    handleClose(); // handleClose already closes the scanner, so this is correct
+} else {
                     toast.error(result.error || 'Failed to scan business card');
                 }
             };

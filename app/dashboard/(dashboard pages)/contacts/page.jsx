@@ -39,7 +39,7 @@ export default function ContactsPage() {
     // Business Card Scanner States
     const [showScanner, setShowScanner] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
-const [parsedContact, setParsedContact] = useState(null); // ✅ Fixed variable name
+const [scannedFields, setScannedFields] = useState(null);
 
     const [showShareModal, setShowShareModal] = useState(false);
 const [teamSharingEnabled, setTeamSharingEnabled] = useState(false);
@@ -692,9 +692,9 @@ const handleShareSelected = () => {
                 isOpen={showReviewModal}
                 onClose={() => {
                     setShowReviewModal(false);
-                    setParsedContact(null);
+        setScannedFields(null); // Use new state setter
                 }}
-                parsedContact={parsedContact}
+    parsedFields={scannedFields} // Use new state variable
                 onSave={saveScannedContact}
             />
         </div>
