@@ -839,9 +839,87 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                     </div>
 
                     {/* Action buttons (Your existing buttons will mostly work) */}
-                    <div className="p-4 border-t border-gray-100">
-                        {/* Your existing action buttons JSX here */}
-                    </div>
+                    // ==========================================================
+//  ACTION: Replace the empty action button div with this full block
+// ==========================================================
+<div className="p-4 border-t border-gray-100">
+    <div className="grid grid-cols-2 gap-2 mb-3">
+        {/* Edit button - only show if not from team member or if user has edit permissions */}
+        {(!isFromTeamMember || contact.canEdit) && (
+            <button
+                onClick={() => onEdit(contact)}
+                className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+            >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                {t('contacts.edit')}
+            </button>
+        )}
+
+        {/* Status button */}
+        {contact.status === 'new' && (
+            <button
+                onClick={() => onStatusUpdate(contact.id, 'viewed')}
+                className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                {t('contacts.mark_as_viewed')}
+            </button>
+        )}
+        
+        {contact.status !== 'archived' && (
+            <button
+                onClick={() => onStatusUpdate(contact.id, 'archived')}
+                className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8l4 4 6-6m-3 10l4-4 6 6-6 6-4-4" /></svg>
+                {t('contacts.archive')}
+            </button>
+        )}
+        
+        {contact.status === 'archived' && (
+            <button
+                onClick={() => onStatusUpdate(contact.id, 'viewed')}
+                className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                {t('contacts.restore')}
+            </button>
+        )}
+    </div>
+
+    {/* Communication buttons */}
+    <div className="grid grid-cols-3 gap-2">
+        <button
+            onClick={() => onContactAction('email', contact)}
+            className="flex items-center justify-center gap-1 px-2 py-2 text-xs text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+        >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            Email
+        </button>
+        
+        {/* This uses the top-level contact.phone if it exists */}
+        {contact.phone && (
+            <button
+                onClick={() => onContactAction('phone', contact)}
+                className="flex items-center justify-center gap-1 px-2 py-2 text-xs text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+            >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                Appel
+            </button>
+        )}
+        
+        {/* This uses the top-level contact.location if it exists */}
+        {contact.location?.latitude && (
+            <button
+                onClick={() => onMapView(contact)}
+                className="flex items-center justify-center gap-1 px-2 py-2 text-xs text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+            >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                Carte
+            </button>
+        )}
+    </div>
+</div>
                 </div>
             )}
         </div>
