@@ -838,10 +838,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                         </div>
                     </div>
 
-                    {/* Action buttons (Your existing buttons will mostly work) */}
-                   // ==========================================================
-//  ACTION: Replace the empty action button div with this full block
-// ==========================================================
+
 <div className="p-4 border-t border-gray-100">
     <div className="grid grid-cols-2 gap-2 mb-3">
         {/* Edit button - only show if not from team member or if user has edit permissions */}
