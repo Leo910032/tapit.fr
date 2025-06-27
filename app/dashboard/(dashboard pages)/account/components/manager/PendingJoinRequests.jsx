@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast';
 import { fireApp } from '@/important/firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { testForActiveSession } from '@/lib/authentication/testForActiveSession';
-import { testForActiveSession } from '@/lib/authentication/testForActiveSession';
+
 
 
 export const PendingJoinRequests = ({ teamData }) => {
