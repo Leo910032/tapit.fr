@@ -13,23 +13,50 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     const canvasRef = useRef(null);
     const fileInputRef = useRef(null);
 
-    // Start camera
-    const startCamera = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { 
-                    facingMode: 'environment', // Use back camera
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                } 
-            });
+   // ==========================================================
+//  ACTION: Replace your old startCamera function with this one.
+// ==========================================================
+const startCamera = async () => {
+    // First, we define the ideal constraints (we want the back camera)
+    const idealConstraints = {
+        video: { 
+            facingMode: 'environment',
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+        } 
+    };
+
+    try {
+        console.log("Attempting to get 'environment' (back) camera...");
+        const stream = await navigator.mediaDevices.getUserMedia(idealConstraints);
+        
+        // If successful, assign the stream and show the camera
+        if (videoRef.current) {
             videoRef.current.srcObject = stream;
             setShowCamera(true);
-        } catch (error) {
-            console.error('Camera error:', error);
-            toast.error('Unable to access camera');
         }
-    };
+    } catch (error) {
+        // If the ideal constraints fail (e.g., no back camera found)...
+        console.warn(`Could not get back camera (${error.name}), attempting fallback.`);
+        
+        // ...we try again with simpler constraints (any camera will do).
+        try {
+            console.log("Falling back to any available camera...");
+            const fallbackConstraints = { video: true };
+            const stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+            
+            // If the fallback is successful, assign the stream and show the camera
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                setShowCamera(true);
+            }
+        } catch (fallbackError) {
+            // If even the fallback fails, then there's a real issue.
+            console.error('Could not access any camera.', fallbackError);
+            toast.error('Unable to access camera on this device.');
+        }
+    }
+};
 
     // Stop camera
     const stopCamera = () => {
