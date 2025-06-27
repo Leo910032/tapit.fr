@@ -1,4 +1,4 @@
-// app/dashboard/(dashboard pages)/account/components/ManageTeamSection.jsx
+// app/dashboard/(dashboard pages)/account/components/ManageTeamSection.jsx - ENHANCED WITH REAL-TIME ANALYTICS
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -23,7 +23,7 @@ import {
     deleteTeam
 } from '@/lib/teamManagement';
 
-// Import our new componentsInviteMemberModal
+// Import our new components
 import { 
     SkeletonLoader,
     UpgradeView,
@@ -41,7 +41,10 @@ export default function ManageTeamSection() {
     const [teamMembers, setTeamMembers] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Real-time data fetching with Firebase listeners
+    // ✅ NEW: Real-time analytics aggregation
+    const [analyticsListeners, setAnalyticsListeners] = useState([]);
+
+    // Real-time data fetching with Firebase listeners + ANALYTICS TRACKING
     useEffect(() => {
         const userId = testForActiveSession();
         if (!userId) {
@@ -51,6 +54,7 @@ export default function ManageTeamSection() {
 
         let unsubscribeTeam = null;
         let unsubscribeMembers = null;
+        let analyticsUnsubscribers = [];
         
         const userRef = doc(fireApp, "AccountData", userId);
         const unsubscribeUser = onSnapshot(userRef, async (docSnap) => {
@@ -63,6 +67,10 @@ export default function ManageTeamSection() {
                 unsubscribeMembers();
                 unsubscribeMembers = null;
             }
+            
+            // ✅ NEW: Cleanup analytics listeners
+            analyticsUnsubscribers.forEach(unsub => unsub());
+            analyticsUnsubscribers = [];
 
             if (docSnap.exists()) {
                 const data = { userId, ...docSnap.data() };
@@ -79,8 +87,10 @@ export default function ManageTeamSection() {
                         }
                     });
 
-                    // If user is a team manager, also subscribe to team members
+                    // If user is a team manager, also subscribe to team members AND their analytics
                     if (data.isTeamManager) {
+                        console.log('🔥 Setting up REAL-TIME team analytics tracking...');
+                        
                         // Subscribe to all team members in real-time
                         const usersRef = collection(fireApp, "AccountData");
                         const membersQuery = query(usersRef, where("teamId", "==", data.teamId));
@@ -88,11 +98,49 @@ export default function ManageTeamSection() {
                         unsubscribeMembers = onSnapshot(membersQuery, async (snapshot) => {
                             const members = [];
                             
-                            // Process each member document
+                            // ✅ NEW: Set up real-time analytics listeners for each member
+                            snapshot.docs.forEach(memberDoc => {
+                                const memberUserId = memberDoc.id;
+                                const userData = memberDoc.data();
+                                
+                                // Real-time analytics listener for this member
+                                const analyticsRef = doc(fireApp, "Analytics", memberUserId);
+                                const analyticsUnsub = onSnapshot(analyticsRef, async (analyticsSnap) => {
+                                    console.log(`📊 Analytics updated for team member: ${memberUserId}`);
+                                    
+                                    // Trigger team analytics aggregation when any member's analytics change
+                                    try {
+                                        await aggregateTeamAnalytics(data.teamId);
+                                        console.log('✅ Team analytics auto-updated after member analytics change');
+                                    } catch (error) {
+                                        console.error('❌ Failed to auto-update team analytics:', error);
+                                    }
+                                });
+                                
+                                analyticsUnsubscribers.push(analyticsUnsub);
+
+                                // Real-time contacts listener for this member
+                                const contactsRef = doc(fireApp, "Contacts", memberUserId);
+                                const contactsUnsub = onSnapshot(contactsRef, async (contactsSnap) => {
+                                    console.log(`📇 Contacts updated for team member: ${memberUserId}`);
+                                    
+                                    // Trigger team analytics aggregation when any member's contacts change
+                                    try {
+                                        await aggregateTeamAnalytics(data.teamId);
+                                        console.log('✅ Team analytics auto-updated after member contacts change');
+                                    } catch (error) {
+                                        console.error('❌ Failed to auto-update team analytics:', error);
+                                    }
+                                });
+                                
+                                analyticsUnsubscribers.push(contactsUnsub);
+                            });
+                            
+                            // Process each member document for the UI
                             for (const docSnap of snapshot.docs) {
                                 const userData = docSnap.data();
                                 
-                                // Get member's analytics in real-time
+                                // Get member's current analytics
                                 let memberStats = {
                                     totalViews: 0,
                                     totalClicks: 0,
@@ -101,8 +149,6 @@ export default function ManageTeamSection() {
                                 };
 
                                 try {
-                                    // Note: We'll add real-time analytics listeners separately if needed
-                                    // For now, we get current data
                                     const analyticsRef = doc(fireApp, "Analytics", docSnap.id);
                                     const analyticsSnap = await getDoc(analyticsRef);
                                     if (analyticsSnap.exists()) {
@@ -136,7 +182,7 @@ export default function ManageTeamSection() {
                                     isOnline: false,
                                     stats: memberStats,
                                     permissions: {
-                                        canViewAnalytics: true, // Will be set when team data updates
+                                        canViewAnalytics: true,
                                         canViewContacts: true,
                                         canInviteMembers: true
                                     }
@@ -174,10 +220,12 @@ export default function ManageTeamSection() {
             if (unsubscribeMembers) {
                 unsubscribeMembers();
             }
+            // ✅ NEW: Cleanup analytics listeners
+            analyticsUnsubscribers.forEach(unsub => unsub());
         };
     }, []);
 
-    // Event handlers
+    // Event handlers (same as before)
     const handleCreateTeam = async (teamName) => {
         setIsSubmitting(true);
         try {
@@ -221,6 +269,7 @@ export default function ManageTeamSection() {
             setIsSubmitting(false);
         }
     };
+
     const handleRemoveMember = async (memberUserId) => {
         if (!confirm(t('teams.confirm_remove_member') || 'Are you sure you want to remove this member?')) {
             return;
@@ -229,7 +278,7 @@ export default function ManageTeamSection() {
         try {
             await removeTeamMember(userData.userId, memberUserId);
             toast.success(t('teams.member_removed') || 'Member removed successfully!');
-            // No need to manually refresh - Firebase listeners will update automatically
+            // Real-time listeners will update automatically
         } catch (error) {
             toast.error(error.message);
         }
@@ -237,18 +286,18 @@ export default function ManageTeamSection() {
 
     const handleUpdateSettings = async (newSettings) => {
         await updateTeamSettings(userData.userId, newSettings);
-        // No need to manually refresh - Firebase listeners will update automatically
+        // Real-time listeners will update automatically
     };
 
     const handleRegenerateCode = async () => {
         const result = await regenerateTeamCode(userData.userId);
-        // No need to manually refresh - Firebase listeners will update automatically
+        // Real-time listeners will update automatically
         return result;
     };
 
     const handleDeleteTeam = async () => {
         await deleteTeam(userData.userId);
-        // No need to manually refresh - Firebase listeners will update automatically
+        // Real-time listeners will update automatically
     };
 
     const handleLeaveTeam = async () => {
@@ -256,7 +305,7 @@ export default function ManageTeamSection() {
             try {
                 await leaveTeam(userData.userId);
                 toast.success(t('teams.left_team') || 'Left team successfully!');
-                // No need to manually refresh - Firebase listeners will update automatically
+                // Real-time listeners will update automatically
             } catch (error) {
                 toast.error(error.message);
             }
@@ -274,33 +323,33 @@ export default function ManageTeamSection() {
     }
     
     // STATE 1: User is a team manager with members
-    // STATE 1: User is a team manager with members
     if (!userData.teamId && !userData.isTeamManager) {
-    return (
-        <div className="space-y-8">
-            <PendingApprovalStatus />
-            <JoinTeamView 
-                onJoinTeam={handleJoinTeam}
-                isSubmitting={isSubmitting}
+        return (
+            <div className="space-y-8">
+                <PendingApprovalStatus />
+                <JoinTeamView 
+                    onJoinTeam={handleJoinTeam}
+                    isSubmitting={isSubmitting}
+                />
+                {userData.accountType !== 'team_manager' && <UpgradeView />}
+            </div>
+        );
+    }
+
+    if (userData.isTeamManager && userData.teamId && teamData) {
+        return (
+            <TeamManagerView 
+                userData={userData}
+                teamData={teamData}
+                userRole="manager"
+                members={teamMembers}
+                onRemoveMember={handleRemoveMember}
+                onUpdateSettings={handleUpdateSettings}
+                onRegenerateCode={handleRegenerateCode}
+                onDeleteTeam={handleDeleteTeam}
             />
-            {userData.accountType !== 'team_manager' && <UpgradeView />}
-        </div>
-    );
-}
-if (userData.isTeamManager && userData.teamId && teamData) {
-    return (
-        <TeamManagerView 
-            userData={userData}
-            teamData={teamData}
-            userRole="manager"
-            members={teamMembers}
-            onRemoveMember={handleRemoveMember}
-            onUpdateSettings={handleUpdateSettings}
-            onRegenerateCode={handleRegenerateCode}
-            onDeleteTeam={handleDeleteTeam}
-        />
-    );
-}
+        );
+    }
 
     // STATE 2: User is a team member
     if (userData.teamId && !userData.isTeamManager && teamData) {

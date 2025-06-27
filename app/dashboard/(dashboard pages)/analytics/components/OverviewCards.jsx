@@ -1,3 +1,4 @@
+//app/dashboard/(dashboard pages)/analytics/components/OverviewCards.jsx
 "use client"
 import Image from "next/image";
 import { useTranslation } from "@/lib/useTranslation";
