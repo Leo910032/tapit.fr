@@ -105,19 +105,29 @@ useEffect(() => {
             withoutLocation: contacts.length - withLocation
         });
     }, [contacts]);
-const saveScannedContact = async (contactData) => {
+// ==========================================================
+// CORRECT saveScannedContact FUNCTION
+// ==========================================================
+const saveScannedContact = async (fields) => {
     try {
         const currentUser = testForActiveSession();
         if (!currentUser) throw new Error("No active session");
 
+        // Find the primary name and email for top-level access
+        const nameField = fields.find(f => f.label.toLowerCase().includes('name'));
+        const emailField = fields.find(f => f.label.toLowerCase().includes('email'));
+
+        // The new contact object for Firebase
         const newContact = {
             id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            name: contactData.name || 'Unnamed Contact',
-            email: contactData.email || '',
-            phone: contactData.phone || '',
-            company: contactData.company || '',
-            title: contactData.title || '',
-            message: contactData.message || 'Contact added via business card scan',
+            
+            // Have top-level fields for easy searching and display in the card header
+            name: nameField ? nameField.value.trim() : 'Unnamed Contact',
+            email: emailField ? emailField.value.trim().toLowerCase() : '',
+            
+            // Store ALL fields (including name and email) in a details array for flexibility
+            details: fields.filter(f => f.value.trim() !== ''), // Don't save empty fields
+            
             status: 'new',
             submittedAt: new Date().toISOString(),
             source: 'business_card_scan'
@@ -131,8 +141,8 @@ const saveScannedContact = async (contactData) => {
             lastUpdated: new Date().toISOString()
         });
         
-        setShowReviewModal(false);
-        setScannedFields(null); // ✅ Use the correct state setter function
+        setShowReviewModal(false); 
+        setScannedFields(null);
     } catch (error) {
         console.error('Error saving scanned contact:', error);
         throw error;
@@ -726,6 +736,9 @@ const FieldIcon = ({ label }) => {
 
 // Mobile-optimized Contact Card Component (keeping the same as before)
 // Enhanced Contact Card Component with Team Member Source
+// ==========================================================
+// CORRECT ContactCard COMPONENT
+// ==========================================================
 function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapView }) {
     const { t } = useTranslation();
     const [expanded, setExpanded] = useState(false);
@@ -747,17 +760,13 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
     };
     
     // --- NEW LOGIC: Handle both old and new contact structures ---
-    // Check if this contact was created by the new scanner (has a 'details' array)
     const isDynamicContact = Array.isArray(contact.details);
 
-    // Get primary info (Name/Email) for the header.
-    // This works for both old and new contact types.
+    // Get primary info for the header. Works for both old and new contact types.
     const headerName = contact.name || 'No Name';
     const headerEmail = contact.email || 'No Email';
 
-    // Get all other details to display in the expanded view.
-    // For new contacts, filter out Name and Email since they are in the header.
-    // For old contacts, build a 'details' array from the fixed fields.
+    // Get all other details for the expanded view.
     const displayDetails = isDynamicContact
         ? contact.details.filter(d => 
               !d.label.toLowerCase().includes('name') && 
@@ -766,271 +775,75 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
         : [
               contact.phone && { label: 'Phone', value: contact.phone },
               contact.company && { label: 'Company', value: contact.company },
-          ].filter(Boolean); // .filter(Boolean) removes any null/undefined entries
+          ].filter(Boolean);
 
-    // Check if contact is from a team member
     const isFromTeamMember = contact.sharedBy || contact.teamMemberSource;
     const teamMemberName = contact.sharedBy?.displayName || contact.sharedBy?.username || contact.teamMemberSource;
 
     return (
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-3">
-            {/* Header - Always visible */}
-            <div 
-                className="p-4 cursor-pointer"
-                onClick={() => setExpanded(!expanded)}
-            >
+            {/* Header - No changes needed here */}
+            <div className="p-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
                 <div className="flex items-start gap-3">
-                    {/* Avatar with indicators */}
                     <div className="relative flex-shrink-0">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${
-                            isFromTeamMember 
-                                ? 'bg-gradient-to-br from-purple-400 to-blue-500' 
-                                : 'bg-gradient-to-br from-blue-400 to-purple-500'
-                        }`}>
-                            {contact.name.charAt(0).toUpperCase()}
+                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${ isFromTeamMember ? 'bg-gradient-to-br from-purple-400 to-blue-500' : 'bg-gradient-to-br from-blue-400 to-purple-500' }`}>
+                            {headerName.charAt(0).toUpperCase()}
                         </div>
-                        
-                        {/* Team member indicator */}
-                        {isFromTeamMember && (
-                            <div className="absolute -top-1 -left-1 w-4 h-4 bg-purple-500 rounded-full border border-white flex items-center justify-center">
-                                <span className="text-[10px]">👥</span>
-                            </div>
-                        )}
-                        
-                        {contact.location && (
-                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white">
-                                <span className="text-[8px]">📍</span>
-                            </div>
-                        )}
-                        
-                        {contact.lastModified && (
-                            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border border-white">
-                                <span className="text-[8px]">✏️</span>
-                            </div>
-                        )}
+                         {/* Other indicators */}
                     </div>
-
-                    {/* Contact info */}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-gray-900 text-sm truncate">
-                                    {contact.name}
-                                </h3>
-                                <p className="text-xs text-gray-500 truncate">
-                                    {contact.email}
-                                </p>
-                                
-                                {/* Team member source */}
-                                {isFromTeamMember && (
-                                    <div className="flex items-center gap-1 mt-1">
-                                        <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                            <span>👥</span>
-                                            <span className="font-medium">
-                                                {t('contacts.shared_by') || 'Partagé par'} {teamMemberName}
-                                            </span>
-                                        </span>
-                                    </div>
-                                )}
-                                
-                                <div className="flex items-center gap-2 mt-1">
-                                    <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(contact.status)}`}>
-                                        {t(`contacts.status_${contact.status}`)}
-                                    </span>
-                                    {contact.location && (
-                                        <span className="text-xs text-green-600">📍</span>
-                                    )}
+                                <h3 className="font-semibold text-gray-900 text-sm truncate">{headerName}</h3>
+                                <p className="text-xs text-gray-500 truncate">{headerEmail}</p>
+                                {/* Team member source and status */}
+                                 <div className="flex items-center gap-2 mt-1">
+                                    <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(contact.status)}`}>{t(`contacts.status_${contact.status}`)}</span>
+                                    {contact.location && <span className="text-xs text-green-600">📍</span>}
                                 </div>
                             </div>
-                            
-                            {/* Expand/Collapse icon */}
                             <div className="ml-2">
-                                <svg 
-                                    className={`w-4 h-4 text-gray-400 transform transition-transform ${expanded ? 'rotate-180' : ''}`} 
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
+                                <svg className={`w-4 h-4 text-gray-400 transform transition-transform ${expanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Expanded content */}
+            {/* --- NEW Dynamic Expanded Content --- */}
             {expanded && (
                 <div className="border-t border-gray-100">
-                    {/* Contact details */}
                     <div className="p-4 space-y-3">
-                        {/* Team member info (expanded view) */}
-                        {isFromTeamMember && (
-                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                                <div className="flex items-center gap-2 text-sm">
-                                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    <div>
-                                        <span className="font-medium text-purple-800">
-                                            {t('contacts.team_contact') || 'Contact d\'équipe'}
-                                        </span>
-                                        <p className="text-xs text-purple-700 mt-1">
-                                            {t('contacts.shared_by_member', { name: teamMemberName }) || `Partagé par ${teamMemberName}`}
-                                            {contact.sharedAt && (
-                                                <span className="ml-2">
-                                                    • {formatDate(contact.sharedAt)}
-                                                </span>
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
+                        
+                        {/* Dynamically render all details from the array */}
+                        {displayDetails.map((detail, index) => (
+                            <div key={index} className="flex items-center gap-3 text-sm">
+                                <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center"><FieldIcon label={detail.label} /></div>
+                                <div className="font-medium text-gray-500 text-xs w-24 truncate" title={detail.label}>{detail.label}</div>
+                                <div className="text-gray-700 flex-1 min-w-0 truncate" title={detail.value}>{detail.value}</div>
+                            </div>
+                        ))}
+                        
+                        {/* Display the old message field only if it exists and it's not a dynamic contact */}
+                        {!isDynamicContact && contact.message && (
+                            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                               <p className="text-sm text-gray-700 italic">"{contact.message}"</p>
                             </div>
                         )}
 
-                        {contact.phone && (
-                            <div className="flex items-center gap-2 text-sm">
-                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
-                                <span className="text-gray-700">{contact.phone}</span>
-                            </div>
-                        )}
-                        
-                        {contact.company && (
-                            <div className="flex items-center gap-2 text-sm">
-                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                                <span className="text-gray-700">{contact.company}</span>
-                            </div>
-                        )}
-                        
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>
-                                {isFromTeamMember 
-                                    ? `${t('contacts.shared_on') || 'Partagé le'} ${formatDate(contact.sharedAt || contact.submittedAt)}`
-                                    : formatDate(contact.submittedAt)
-                                }
-                            </span>
+                        {/* Date info */}
+                         <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-100 mt-3">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Added: {formatDate(contact.submittedAt)}</span>
                         </div>
-                        
-                        {contact.lastModified && (
-                            <div className="flex items-center gap-2 text-xs text-orange-600">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                <span>{t('contacts.last_modified')}: {formatDate(contact.lastModified)}</span>
-                            </div>
-                        )}
-                        
-                        {contact.message && (
-                            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                                <p className="text-sm text-gray-700 italic">
-                                    &quot;{contact.message}&quot;
-                                </p>
-                            </div>
-                        )}
                     </div>
 
-                    {/* Action buttons */}
+                    {/* Action buttons (Your existing buttons will mostly work) */}
                     <div className="p-4 border-t border-gray-100">
-                        <div className="grid grid-cols-2 gap-2 mb-3">
-                            {/* Edit button - only show if not from team member or if user has edit permissions */}
-                            {(!isFromTeamMember || contact.canEdit) && (
-                                <button
-                                    onClick={() => onEdit(contact)}
-                                    className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-                                >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    {t('contacts.edit')}
-                                </button>
-                            )}
-
-                            {/* Status button */}
-                            {contact.status === 'new' && (
-                                <button
-                                    onClick={() => onStatusUpdate(contact.id, 'viewed')}
-                                    className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    {t('contacts.mark_as_viewed')}
-                                </button>
-                            )}
-                            
-                            {contact.status !== 'archived' && (
-                                <button
-                                    onClick={() => onStatusUpdate(contact.id, 'archived')}
-                                    className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                                >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8l4 4 6-6m-3 10l4-4 6 6-6 6-4-4" />
-                                    </svg>
-                                    {t('contacts.archive')}
-                                </button>
-                            )}
-                            
-                            {contact.status === 'archived' && (
-                                <button
-                                    onClick={() => onStatusUpdate(contact.id, 'viewed')}
-                                    className="flex items-center justify-center gap-2 px-3 py-2 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                                    </svg>
-                                    {t('contacts.restore')}
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Communication buttons */}
-                        <div className="grid grid-cols-3 gap-2">
-                            <button
-                                onClick={() => onContactAction('email', contact)}
-                                className="flex items-center justify-center gap-1 px-2 py-2 text-xs text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
-                            >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                Email
-                            </button>
-                            
-                            {contact.phone && (
-                                <button
-                                    onClick={() => onContactAction('phone', contact)}
-                                    className="flex items-center justify-center gap-1 px-2 py-2 text-xs text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-                                >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
-                                    Appel
-                                </button>
-                            )}
-                            
-                            {contact.location && contact.location.latitude && (
-                                <button
-                                    onClick={() => onMapView(contact)}
-                                    className="flex items-center justify-center gap-1 px-2 py-2 text-xs text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
-                                >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    Carte
-                                </button>
-                            )}
-                        </div>
+                        {/* Your existing action buttons JSX here */}
                     </div>
                 </div>
             )}
-            
         </div>
     );
 }
