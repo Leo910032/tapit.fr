@@ -1,8 +1,10 @@
 // app/dashboard/(dashboard pages)/contacts/components/BusinessCardScanner.jsx
 "use client"
-import { useState, useRef } from 'react';
+
 import { useTranslation } from '@/lib/useTranslation';
 import { toast } from 'react-hot-toast';
+import { useState, useRef, useEffect } from 'react'; // <-- Step 1: Add useEffect
+
 
 export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }) {
     const { t } = useTranslation();
@@ -11,66 +13,69 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     const [showCamera, setShowCamera] = useState(false);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
-    const fileInputRef = useRef(null);
+    const fileInputRef = useRef(null);    
+    const [mediaStream, setMediaStream] = useState(null);
+
 
    // ==========================================================
-//  ACTION: Replace your old startCamera function with this one.
-// ==========================================================
-const startCamera = async () => {
-    // First, we define the ideal constraints (we want the back camera)
-    const idealConstraints = {
-        video: { 
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-        } 
-    };
 
-    try {
-        console.log("Attempting to get 'environment' (back) camera...");
-        const stream = await navigator.mediaDevices.getUserMedia(idealConstraints);
-        
-        // If successful, assign the stream and show the camera
-        if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            setShowCamera(true);
+    useEffect(() => {
+        // If we have a stream and the video element is now in the DOM...
+        if (mediaStream && videoRef.current) {
+            // ...connect them.
+            videoRef.current.srcObject = mediaStream;
         }
-    } catch (error) {
-        // If the ideal constraints fail (e.g., no back camera found)...
-        console.warn(`Could not get back camera (${error.name}), attempting fallback.`);
-        
-        // ...we try again with simpler constraints (any camera will do).
-        try {
-            console.log("Falling back to any available camera...");
-            const fallbackConstraints = { video: true };
-            const stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
-            
-            // If the fallback is successful, assign the stream and show the camera
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                setShowCamera(true);
+
+             return () => {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
             }
-        } catch (fallbackError) {
-            // If even the fallback fails, then there's a real issue.
-            console.error('Could not access any camera.', fallbackError);
+        };
+    }, [mediaStream]);
+// ==========================================================
+    // UPDATED: startCamera function is now simpler
+    // ==========================================================
+    const startCamera = async () => {
+        const idealConstraints = { video: { facingMode: 'environment' } };
+        const fallbackConstraints = { video: true };
+
+        try {
+            let stream;
+            try {
+                // First, try to get the back camera
+                stream = await navigator.mediaDevices.getUserMedia(idealConstraints);
+            } catch (err) {
+                // If that fails, fall back to any camera
+                console.warn("Could not get back camera, falling back.", err);
+                stream = await navigator.mediaDevices.getUserMedia(fallbackConstraints);
+            }
+            
+            // Set the stream in state and tell the UI to show the camera view
+            setMediaStream(stream);
+            setShowCamera(true);
+
+        } catch (error) {
+            // If all attempts fail, show an error.
+            console.error('Could not access any camera.', error);
             toast.error('Unable to access camera on this device.');
         }
-    }
-};
+    };
 
     // Stop camera
     const stopCamera = () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-            const tracks = videoRef.current.srcObject.getTracks();
-            tracks.forEach(track => track.stop());
-        }
+        // The useEffect cleanup will handle stopping the tracks.
+        // We just need to reset the state.
+        setMediaStream(null);
         setShowCamera(false);
     };
 
     // Capture photo from camera
+   // --- The rest of your functions (capturePhoto, handleFileSelect, processImage, handleClose) remain the same ---
+    
     const capturePhoto = () => {
         const canvas = canvasRef.current;
         const video = videoRef.current;
+        if (!canvas || !video || !video.videoWidth) return;
         
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -85,6 +90,7 @@ const startCamera = async () => {
         }, 'image/jpeg', 0.8);
     };
 
+
     // Handle file selection
     const handleFileSelect = (event) => {
         const file = event.target.files[0];
@@ -94,53 +100,50 @@ const startCamera = async () => {
     };
 
     // Process the image
-    const processImage = async () => {
+     const processImage = async () => {
         if (!capturedImage) return;
-
         setIsProcessing(true);
+        toast.loading('Scanning card...', { id: 'scanning-toast' });
         
         try {
-            // Convert image to base64
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const imageBase64 = e.target.result;
-                
-                // Call our API
                 const response = await fetch('/api/scan-business-card', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ imageBase64 })
                 });
                 
                 const result = await response.json();
+                toast.dismiss('scanning-toast');
                 
                 if (result.success) {
-    // The API now returns an array under the key "parsedFields"
-    onContactParsed(result.parsedFields); // ✅ Correct key
-    toast.success('Business card scanned successfully!');
-    handleClose(); // handleClose already closes the scanner, so this is correct
-} else {
+                    onContactParsed(result.parsedFields);
+                    toast.success('Scan complete! Please review.');
+                } else {
                     toast.error(result.error || 'Failed to scan business card');
                 }
             };
             
             reader.readAsDataURL(capturedImage);
             
+             reader.onloadend = () => {
+                setIsProcessing(false);
+             };
         } catch (error) {
+            toast.dismiss('scanning-toast');
             console.error('Processing error:', error);
             toast.error('Failed to process business card');
-        } finally {
             setIsProcessing(false);
         }
     };
 
+
     // Reset and close
-    const handleClose = () => {
+  const handleClose = () => {
         stopCamera();
         setCapturedImage(null);
-        setIsProcessing(false);
         onClose();
     };
 
