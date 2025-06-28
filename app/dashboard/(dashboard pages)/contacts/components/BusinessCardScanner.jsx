@@ -96,20 +96,59 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         if (file && file.type.startsWith('image/')) {
             console.log('File selected:', file.name, file.type, file.size);
             
+            // Check file size (limit to 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                toast.error('Image file is too large. Please select an image under 10MB.');
+                return;
+            }
+            
             setCapturedImage(file);
 
             const reader = new FileReader();
             reader.onloadend = () => {
-                console.log('FileReader result:', reader.result ? 'Success' : 'Failed');
-                setPreviewUrl(reader.result);
+                console.log('FileReader completed');
+                if (reader.result) {
+                    console.log('FileReader result length:', reader.result.length);
+                    setPreviewUrl(reader.result);
+                } else {
+                    console.error('FileReader result is empty');
+                    toast.error('Failed to read the selected image');
+                    setCapturedImage(null);
+                    setPreviewUrl(null);
+                }
             };
-            reader.onerror = () => {
-                console.error('FileReader error:', reader.error);
-                toast.error('Failed to read the selected image');
+            reader.onerror = (error) => {
+                console.error('FileReader error:', error);
+                console.error('FileReader error details:', reader.error);
+                toast.error('Failed to read image file');
                 setCapturedImage(null);
                 setPreviewUrl(null);
             };
-            reader.readAsDataURL(file);
+            reader.onabort = () => {
+                console.error('FileReader aborted');
+                toast.error('Image reading was cancelled');
+                setCapturedImage(null);
+                setPreviewUrl(null);
+            };
+            
+            // Add a timeout to prevent hanging
+            setTimeout(() => {
+                if (reader.readyState === FileReader.LOADING) {
+                    reader.abort();
+                    toast.error('Image reading timed out. Try a smaller image.');
+                    setCapturedImage(null);
+                    setPreviewUrl(null);
+                }
+            }, 10000); // 10 second timeout
+            
+            try {
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Error starting FileReader:', error);
+                toast.error('Failed to start reading the image file');
+                setCapturedImage(null);
+                setPreviewUrl(null);
+            }
         } else {
             toast.error('Please select a valid image file');
         }
