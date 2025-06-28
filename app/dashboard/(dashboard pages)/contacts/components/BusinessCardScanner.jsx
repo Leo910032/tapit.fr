@@ -91,67 +91,128 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         }, 'image/jpeg', 0.8);
     };
 
-    const handleFileSelect = (event) => {
+    const handleFileSelect = async (event) => {
         const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            console.log('File selected:', file.name, file.type, file.size);
+        if (!file) {
+            console.log('No file selected');
+            return;
+        }
+
+        console.log('File selected:', {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            lastModified: file.lastModified
+        });
+
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select a valid image file');
+            return;
+        }
+        
+        // Check file size (limit to 5MB for mobile)
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('Image file is too large. Please select an image under 5MB.');
+            return;
+        }
+        
+        setCapturedImage(file);
+
+        // Try modern approach first
+        try {
+            console.log('Attempting to read file with modern approach...');
             
-            // Check file size (limit to 10MB)
-            if (file.size > 10 * 1024 * 1024) {
-                toast.error('Image file is too large. Please select an image under 10MB.');
+            if (file.arrayBuffer) {
+                // Modern approach using arrayBuffer
+                const arrayBuffer = await file.arrayBuffer();
+                console.log('ArrayBuffer created, size:', arrayBuffer.byteLength);
+                
+                const blob = new Blob([arrayBuffer], { type: file.type });
+                const url = URL.createObjectURL(blob);
+                console.log('Object URL created:', url.substring(0, 50) + '...');
+                
+                setPreviewUrl(url);
                 return;
             }
-            
-            setCapturedImage(file);
+        } catch (error) {
+            console.error('Modern approach failed:', error);
+        }
 
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                console.log('FileReader completed');
-                if (reader.result) {
-                    console.log('FileReader result length:', reader.result.length);
-                    setPreviewUrl(reader.result);
-                } else {
-                    console.error('FileReader result is empty');
-                    toast.error('Failed to read the selected image');
-                    setCapturedImage(null);
-                    setPreviewUrl(null);
-                }
-            };
-            reader.onerror = (error) => {
-                console.error('FileReader error:', error);
-                console.error('FileReader error details:', reader.error);
-                toast.error('Failed to read image file');
-                setCapturedImage(null);
-                setPreviewUrl(null);
-            };
-            reader.onabort = () => {
-                console.error('FileReader aborted');
-                toast.error('Image reading was cancelled');
-                setCapturedImage(null);
-                setPreviewUrl(null);
-            };
+        // Fallback to FileReader
+        console.log('Falling back to FileReader...');
+        const reader = new FileReader();
+        
+        reader.onloadstart = () => {
+            console.log('FileReader: Loading started');
+        };
+        
+        reader.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const progress = (e.loaded / e.total) * 100;
+                console.log('FileReader progress:', progress.toFixed(2) + '%');
+            }
+        };
+        
+        reader.onloadend = () => {
+            console.log('FileReader: Loading ended');
+            console.log('FileReader state:', reader.readyState);
+            console.log('FileReader result exists:', !!reader.result);
             
-            // Add a timeout to prevent hanging
-            setTimeout(() => {
-                if (reader.readyState === FileReader.LOADING) {
-                    reader.abort();
-                    toast.error('Image reading timed out. Try a smaller image.');
-                    setCapturedImage(null);
-                    setPreviewUrl(null);
-                }
-            }, 10000); // 10 second timeout
-            
-            try {
-                reader.readAsDataURL(file);
-            } catch (error) {
-                console.error('Error starting FileReader:', error);
-                toast.error('Failed to start reading the image file');
+            if (reader.result && reader.readyState === FileReader.DONE) {
+                console.log('FileReader result length:', reader.result.length);
+                console.log('FileReader result preview:', reader.result.substring(0, 50) + '...');
+                setPreviewUrl(reader.result);
+            } else {
+                console.error('FileReader failed - no result or wrong state');
+                toast.error('Failed to read the selected image');
                 setCapturedImage(null);
                 setPreviewUrl(null);
             }
-        } else {
-            toast.error('Please select a valid image file');
+        };
+        
+        reader.onerror = (error) => {
+            console.error('FileReader error event:', error);
+            console.error('FileReader error code:', reader.error?.code);
+            console.error('FileReader error name:', reader.error?.name);
+            console.error('FileReader error message:', reader.error?.message);
+            toast.error('Failed to read image file');
+            setCapturedImage(null);
+            setPreviewUrl(null);
+        };
+        
+        reader.onabort = () => {
+            console.error('FileReader aborted');
+            toast.error('Image reading was cancelled');
+            setCapturedImage(null);
+            setPreviewUrl(null);
+        };
+        
+        // Add a timeout to prevent hanging
+        const timeoutId = setTimeout(() => {
+            if (reader.readyState === FileReader.LOADING) {
+                console.error('FileReader timeout');
+                reader.abort();
+                toast.error('Image reading timed out. Try a smaller image.');
+                setCapturedImage(null);
+                setPreviewUrl(null);
+            }
+        }, 15000); // 15 second timeout
+        
+        try {
+            console.log('Starting FileReader.readAsDataURL...');
+            reader.readAsDataURL(file);
+        } catch (error) {
+            clearTimeout(timeoutId);
+            console.error('Error starting FileReader:', error);
+            toast.error('Failed to start reading the image file');
+            setCapturedImage(null);
+            setPreviewUrl(null);
         }
+        
+        // Clear timeout when done
+        reader.addEventListener('loadend', () => clearTimeout(timeoutId));
+        reader.addEventListener('error', () => clearTimeout(timeoutId));
+        reader.addEventListener('abort', () => clearTimeout(timeoutId));
         
         // Clear the input so the same file can be selected again if needed
         event.target.value = '';
