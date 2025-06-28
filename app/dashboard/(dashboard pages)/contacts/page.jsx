@@ -405,7 +405,7 @@ const handleShareSelected = () => {
         }
     };
 
-    // ✅ Show loading state during user lookup
+ 
     if (userLookupLoading || loading) {
         return (
             <div className="flex items-center justify-center p-8 min-h-[400px]">
@@ -466,7 +466,7 @@ const handleShareSelected = () => {
 
             <div className="p-4">
                 {/* ✅ Enhanced Header with user info and team sharing */}
-// Fixed header section for contacts page
+
 {/* ✅ Enhanced Header with user info and ALWAYS show scan card button */}
 <div className="mb-4">
     <div className="flex items-center justify-between">
@@ -699,7 +699,7 @@ const handleShareSelected = () => {
                 isOpen={showScanner}
                 onClose={() => setShowScanner(false)}
                 onContactParsed={(fields) => {
-                        setScannedFields(fields); // ✅ Use the correct state setter function
+                        setScannedFields(fields); 
 
                     setShowReviewModal(true);
                     setShowScanner(false);
@@ -709,16 +709,16 @@ const handleShareSelected = () => {
                 isOpen={showReviewModal}
                 onClose={() => {
                     setShowReviewModal(false);
-        setScannedFields(null); // Use new state setter
+        setScannedFields(null); 
                 }}
-    parsedFields={scannedFields} // Use new state variable
+    parsedFields={scannedFields} 
                 onSave={saveScannedContact}
             />
         </div>
     );
 }
 
-// Dynamically import the map component to avoid SSR issues
+
 const ContactsMap = dynamic(() => import('./components/ContactsMap'), {
     ssr: false,
     loading: () => <MapLoadingComponent />
