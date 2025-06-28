@@ -175,11 +175,11 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+            <div className="bg-white rounded-t-xl sm:rounded-xl shadow-xl w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b">
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b bg-white sticky top-0 z-10">
                     <h3 className="text-lg font-semibold text-gray-900">
                         📷 Scan Business Card
                     </h3>
@@ -193,7 +193,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                     </button>
                 </div>
 
-                <div className="p-6">
+                <div className="p-4 sm:p-6 pb-6">
                     {/* ✅ Initial choice screen - show when no camera and no preview */}
                     {!showCamera && !previewUrl && (
                         <div className="space-y-4">
@@ -242,7 +242,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                     ref={videoRef}
                                     autoPlay
                                     playsInline
-                                    className="w-full h-64 object-cover"
+                                    className="w-full h-48 sm:h-64 object-cover"
                                 />
                                 
                                 {/* Overlay guide */}
@@ -255,13 +255,13 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                             <div className="flex gap-3">
                                 <button
                                     onClick={stopCamera}
-                                    className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                                    className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm sm:text-base"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={capturePhoto}
-                                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
                                 >
                                     📷 Capture
                                 </button>
@@ -272,11 +272,11 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                     {/* ✅ Image preview - show when we have capturedImage */}
                     {capturedImage && previewUrl && (
                         <div className="space-y-4">
-                            <div className="bg-gray-100 rounded-lg p-4">
+                            <div className="bg-gray-100 rounded-lg p-3 sm:p-4">
                                 <img
                                     src={previewUrl}
                                     alt="Captured business card"
-                                    className="w-full h-48 object-contain rounded"
+                                    className="w-full h-32 sm:h-48 object-contain rounded"
                                 />
                             </div>
                             
@@ -284,14 +284,14 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                 <button
                                     onClick={handleRetake}
                                     disabled={isProcessing}
-                                    className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                                    className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors text-sm sm:text-base"
                                 >
                                     Retake
                                 </button>
                                 <button
                                     onClick={processImage}
                                     disabled={isProcessing}
-                                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                                 >
                                     {isProcessing && (
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
