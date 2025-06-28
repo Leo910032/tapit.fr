@@ -16,6 +16,11 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     const fileInputRef = useRef(null);    
     const [mediaStream, setMediaStream] = useState(null);
 
+    const [previewUrl, setPreviewUrl] = useState(null);
+    
+
+
+
 
    // ==========================================================
 
@@ -72,7 +77,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     // Capture photo from camera
    // --- The rest of your functions (capturePhoto, handleFileSelect, processImage, handleClose) remain the same ---
     
-    const capturePhoto = () => {
+  const capturePhoto = () => {
         const canvas = canvasRef.current;
         const video = videoRef.current;
         if (!canvas || !video || !video.videoWidth) return;
@@ -83,19 +88,28 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0);
         
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setPreviewUrl(dataUrl); // Set the base64 preview
+
         canvas.toBlob((blob) => {
             const file = new File([blob], 'business-card.jpg', { type: 'image/jpeg' });
-            setCapturedImage(file);
+            setCapturedImage(file); // Set the file for processing
             stopCamera();
         }, 'image/jpeg', 0.8);
     };
 
 
-    // Handle file selection
+
     const handleFileSelect = (event) => {
         const file = event.target.files[0];
         if (file && file.type.startsWith('image/')) {
-            setCapturedImage(file);
+            setCapturedImage(file); // Set the file for processing
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result); // Set the base64 preview
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -141,10 +155,15 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
 
 
     // Reset and close
-  const handleClose = () => {
+   const handleClose = () => {
         stopCamera();
         setCapturedImage(null);
+        setPreviewUrl(null); // Clear the preview
         onClose();
+    };
+       const handleRetake = () => {
+        setCapturedImage(null);
+        setPreviewUrl(null); // Clear the preview
     };
 
     if (!isOpen) return null;
@@ -169,7 +188,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                 </div>
 
                 <div className="p-6">
-                    {!showCamera && !capturedImage && (
+                    {!showCamera &&  !previewUrl && (
                         <div className="space-y-4">
                             <p className="text-gray-600 text-center">
                                 Choose how to capture the business card:
@@ -248,7 +267,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                         <div className="space-y-4">
                             <div className="bg-gray-100 rounded-lg p-4">
                                 <img
-                                    src={URL.createObjectURL(capturedImage)}
+                                    src={previewUrl}
                                     alt="Captured business card"
                                     className="w-full h-48 object-contain rounded"
                                 />
