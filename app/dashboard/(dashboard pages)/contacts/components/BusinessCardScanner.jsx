@@ -10,22 +10,11 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     const [isProcessing, setIsProcessing] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
     const [showCamera, setShowCamera] = useState(false);
-    const [showCropper, setShowCropper] = useState(false);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const fileInputRef = useRef(null);    
     const [mediaStream, setMediaStream] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
-
-    // Cropping states
-    const [cropArea, setCropArea] = useState({ x: 0, y: 0, width: 0, height: 0 });
-    const [isDragging, setIsDragging] = useState(false);
-    const [isResizing, setIsResizing] = useState(false);
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-    const [resizeHandle, setResizeHandle] = useState(null);
-    const [imageContainer, setImageContainer] = useState({ width: 0, height: 0 });
-    const cropCanvasRef = useRef(null);
-    const cropImageRef = useRef(null);
 
     // ✅ Fixed useEffect for media stream management
     useEffect(() => {
@@ -48,32 +37,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
             setCapturedImage(null);
             setPreviewUrl(null);
             setIsProcessing(false);
-            setShowCropper(false);
-            setIsDragging(false);
-            setIsResizing(false);
-            setResizeHandle(null);
         }
     }, [isOpen]);
-
-    // Add global mouse event listeners for better responsiveness
-    useEffect(() => {
-        const handleGlobalMouseMove = (e) => handleMouseMove(e);
-        const handleGlobalMouseUp = () => handleMouseUp();
-
-        if (isDragging || isResizing) {
-            document.addEventListener('mousemove', handleGlobalMouseMove);
-            document.addEventListener('mouseup', handleGlobalMouseUp);
-            document.body.style.userSelect = 'none';
-            document.body.style.cursor = isDragging ? 'grabbing' : 'default';
-        }
-
-        return () => {
-            document.removeEventListener('mousemove', handleGlobalMouseMove);
-            document.removeEventListener('mouseup', handleGlobalMouseUp);
-            document.body.style.userSelect = '';
-            document.body.style.cursor = '';
-        };
-    }, [isDragging, isResizing, cropArea, dragStart, resizeHandle, imageContainer]);
 
     const startCamera = async () => {
         const idealConstraints = { 
@@ -134,7 +99,6 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
             const file = new File([blob], 'business-card.jpg', { type: 'image/jpeg' });
             setCapturedImage(file);
             stopCamera();
-            setShowCropper(true);
         }, 'image/jpeg', 0.9);
     };
 
@@ -169,7 +133,6 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         try {
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
-            setShowCropper(true);
         } catch (error) {
             console.error('Error creating preview:', error);
             toast.error('Failed to load the selected image');
@@ -177,172 +140,6 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         
         // Clear the input so the same file can be selected again if needed
         event.target.value = '';
-    };
-
-    // Image cropping functions
-    const initializeCropArea = (img) => {
-        const containerWidth = img.offsetWidth;
-        const containerHeight = img.offsetHeight;
-        
-        setImageContainer({ width: containerWidth, height: containerHeight });
-        
-        // Default crop area (80% of image, centered)
-        const cropWidth = containerWidth * 0.8;
-        const cropHeight = containerHeight * 0.6;
-        const cropX = (containerWidth - cropWidth) / 2;
-        const cropY = (containerHeight - cropHeight) / 2;
-        
-        setCropArea({
-            x: cropX,
-            y: cropY,
-            width: cropWidth,
-            height: cropHeight
-        });
-    };
-
-    const handleMouseDown = (e, handle = null) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (handle) {
-            setIsResizing(true);
-            setResizeHandle(handle);
-        } else {
-            setIsDragging(true);
-            const rect = cropImageRef.current.getBoundingClientRect();
-            setDragStart({
-                x: e.clientX - rect.left - cropArea.x,
-                y: e.clientY - rect.top - cropArea.y
-            });
-        }
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isDragging && !isResizing) return;
-        
-        const rect = cropImageRef.current.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-        if (isDragging) {
-            const newX = mouseX - dragStart.x;
-            const newY = mouseY - dragStart.y;
-            
-            // Constrain to image bounds
-            const maxX = imageContainer.width - cropArea.width;
-            const maxY = imageContainer.height - cropArea.height;
-            
-            setCropArea(prev => ({
-                ...prev,
-                x: Math.max(0, Math.min(newX, maxX)),
-                y: Math.max(0, Math.min(newY, maxY))
-            }));
-        } else if (isResizing && resizeHandle) {
-            const minSize = 80; // Increased minimum size for better usability
-            
-            setCropArea(prev => {
-                let newCrop = { ...prev };
-                
-                switch (resizeHandle) {
-                    case 'nw': // Northwest
-                        const nwDeltaX = Math.max(mouseX - prev.x, prev.width - (imageContainer.width - prev.x));
-                        const nwDeltaY = Math.max(mouseY - prev.y, prev.height - (imageContainer.height - prev.y));
-                        
-                        newCrop.x = Math.max(0, mouseX);
-                        newCrop.y = Math.max(0, mouseY);
-                        newCrop.width = Math.max(minSize, prev.x + prev.width - newCrop.x);
-                        newCrop.height = Math.max(minSize, prev.y + prev.height - newCrop.y);
-                        break;
-                        
-                    case 'ne': // Northeast
-                        newCrop.y = Math.max(0, mouseY);
-                        newCrop.width = Math.max(minSize, Math.min(mouseX - prev.x, imageContainer.width - prev.x));
-                        newCrop.height = Math.max(minSize, prev.y + prev.height - newCrop.y);
-                        break;
-                        
-                    case 'sw': // Southwest
-                        newCrop.x = Math.max(0, mouseX);
-                        newCrop.width = Math.max(minSize, prev.x + prev.width - newCrop.x);
-                        newCrop.height = Math.max(minSize, Math.min(mouseY - prev.y, imageContainer.height - prev.y));
-                        break;
-                        
-                    case 'se': // Southeast
-                        newCrop.width = Math.max(minSize, Math.min(mouseX - prev.x, imageContainer.width - prev.x));
-                        newCrop.height = Math.max(minSize, Math.min(mouseY - prev.y, imageContainer.height - prev.y));
-                        break;
-                        
-                    case 'n': // North
-                        newCrop.y = Math.max(0, mouseY);
-                        newCrop.height = Math.max(minSize, prev.y + prev.height - newCrop.y);
-                        break;
-                        
-                    case 's': // South
-                        newCrop.height = Math.max(minSize, Math.min(mouseY - prev.y, imageContainer.height - prev.y));
-                        break;
-                        
-                    case 'w': // West
-                        newCrop.x = Math.max(0, mouseX);
-                        newCrop.width = Math.max(minSize, prev.x + prev.width - newCrop.x);
-                        break;
-                        
-                    case 'e': // East
-                        newCrop.width = Math.max(minSize, Math.min(mouseX - prev.x, imageContainer.width - prev.x));
-                        break;
-                }
-                
-                return newCrop;
-            });
-        }
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-        setIsResizing(false);
-        setResizeHandle(null);
-    };
-
-    const applyCrop = () => {
-        const img = cropImageRef.current;
-        const canvas = cropCanvasRef.current;
-        
-        if (!img || !canvas || !previewUrl) return;
-        
-        const ctx = canvas.getContext('2d');
-        
-        // Calculate the actual image dimensions vs displayed dimensions
-        const scaleX = img.naturalWidth / img.offsetWidth;
-        const scaleY = img.naturalHeight / img.offsetHeight;
-        
-        // Set canvas size to crop area
-        canvas.width = cropArea.width * scaleX;
-        canvas.height = cropArea.height * scaleY;
-        
-        // Draw the cropped portion
-        ctx.drawImage(
-            img,
-            cropArea.x * scaleX, // source x
-            cropArea.y * scaleY, // source y
-            cropArea.width * scaleX, // source width
-            cropArea.height * scaleY, // source height
-            0, // destination x
-            0, // destination y
-            canvas.width, // destination width
-            canvas.height // destination height
-        );
-        
-        // Convert to blob and update the captured image
-        canvas.toBlob((blob) => {
-            const croppedFile = new File([blob], 'cropped-business-card.jpg', { type: 'image/jpeg' });
-            setCapturedImage(croppedFile);
-            
-            // Update preview URL
-            const newPreviewUrl = URL.createObjectURL(blob);
-            if (previewUrl && previewUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(previewUrl);
-            }
-            setPreviewUrl(newPreviewUrl);
-            setShowCropper(false);
-        }, 'image/jpeg', 0.9);
     };
 
     // ✅ Process image function
@@ -405,7 +202,6 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         }
         setPreviewUrl(null);
         setIsProcessing(false);
-        setShowCropper(false);
         onClose();
     };
 
@@ -417,7 +213,6 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         }
         setPreviewUrl(null);
         setIsProcessing(false);
-        setShowCropper(false);
     };
 
     if (!isOpen) return null;
@@ -443,7 +238,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
 
                 <div className="flex-1 overflow-y-auto min-h-0">
                     {/* ✅ Initial choice screen */}
-                    {!showCamera && !showCropper && !previewUrl && (
+                    {!showCamera && !capturedImage && (
                         <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
                             <div className="text-center mb-8">
                                 <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -557,162 +352,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                         </div>
                     )}
 
-                    {/* ✅ Enhanced Image Cropper */}
-                    {showCropper && previewUrl && (
-                        <div className="p-4 flex flex-col items-center">
-                            <div className="w-full max-w-3xl">
-                                <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-                                    Crop Your Business Card
-                                </h4>
-                                <p className="text-sm text-gray-600 mb-4 text-center">
-                                    Drag to move • Resize from corners and edges • Position the card perfectly
-                                </p>
-                                
-                                <div className="relative bg-gray-100 rounded-xl overflow-hidden mb-4">
-                                    <img
-                                        ref={cropImageRef}
-                                        src={previewUrl}
-                                        alt="Business card to crop"
-                                        className="w-full h-auto max-h-[500px] object-contain select-none"
-                                        onLoad={(e) => initializeCropArea(e.target)}
-                                        onMouseMove={handleMouseMove}
-                                        onMouseUp={handleMouseUp}
-                                        onMouseLeave={handleMouseUp}
-                                        onDragStart={(e) => e.preventDefault()}
-                                    />
-                                    
-                                    {/* Crop area overlay with improved handles */}
-                                    {cropArea.width > 0 && (
-                                        <>
-                                            {/* Crop area with proper positioning */}
-                                            <div
-                                                className="absolute bg-transparent border-2 border-white shadow-lg select-none"
-                                                style={{
-                                                    left: cropArea.x,
-                                                    top: cropArea.y,
-                                                    width: cropArea.width,
-                                                    height: cropArea.height,
-                                                    cursor: isDragging ? 'grabbing' : 'grab',
-                                                    boxShadow: `0 0 0 ${Math.max(cropArea.x, cropArea.y, imageContainer.width - cropArea.x - cropArea.width, imageContainer.height - cropArea.y - cropArea.height) + 50}px rgba(0, 0, 0, 0.4)`
-                                                }}
-                                                onMouseDown={(e) => handleMouseDown(e)}
-                                            >
-                                                {/* Corner resize handles - properly positioned */}
-                                                <div 
-                                                    className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg cursor-nw-resize hover:scale-125 hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        top: '-8px', 
-                                                        left: '-8px',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 'nw')}
-                                                ></div>
-                                                <div 
-                                                    className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg cursor-ne-resize hover:scale-125 hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        top: '-8px', 
-                                                        right: '-8px',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 'ne')}
-                                                ></div>
-                                                <div 
-                                                    className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg cursor-sw-resize hover:scale-125 hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        bottom: '-8px', 
-                                                        left: '-8px',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 'sw')}
-                                                ></div>
-                                                <div 
-                                                    className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg cursor-se-resize hover:scale-125 hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        bottom: '-8px', 
-                                                        right: '-8px',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 'se')}
-                                                ></div>
-                                                
-                                                {/* Edge resize handles - properly positioned and sized */}
-                                                <div 
-                                                    className="absolute w-6 h-3 bg-white border border-blue-500 rounded-full shadow-md cursor-n-resize hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        top: '-6px', 
-                                                        left: '50%',
-                                                        transform: 'translateX(-50%)',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 'n')}
-                                                ></div>
-                                                <div 
-                                                    className="absolute w-6 h-3 bg-white border border-blue-500 rounded-full shadow-md cursor-s-resize hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        bottom: '-6px', 
-                                                        left: '50%',
-                                                        transform: 'translateX(-50%)',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 's')}
-                                                ></div>
-                                                <div 
-                                                    className="absolute w-3 h-6 bg-white border border-blue-500 rounded-full shadow-md cursor-w-resize hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        top: '50%', 
-                                                        left: '-6px',
-                                                        transform: 'translateY(-50%)',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 'w')}
-                                                ></div>
-                                                <div 
-                                                    className="absolute w-3 h-6 bg-white border border-blue-500 rounded-full shadow-md cursor-e-resize hover:bg-blue-50 transition-all duration-150 z-10"
-                                                    style={{ 
-                                                        top: '50%', 
-                                                        right: '-6px',
-                                                        transform: 'translateY(-50%)',
-                                                        touchAction: 'none'
-                                                    }}
-                                                    onMouseDown={(e) => handleMouseDown(e, 'e')}
-                                                ></div>
-                                                
-                                                {/* Grid lines for better alignment */}
-                                                <div className="absolute inset-0 pointer-events-none opacity-30">
-                                                    {/* Rule of thirds grid */}
-                                                    <div className="absolute w-full border-t border-white" style={{ top: '33.33%' }}></div>
-                                                    <div className="absolute w-full border-t border-white" style={{ top: '66.66%' }}></div>
-                                                    <div className="absolute h-full border-l border-white" style={{ left: '33.33%' }}></div>
-                                                    <div className="absolute h-full border-l border-white" style={{ left: '66.66%' }}></div>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                                
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={handleRetake}
-                                        className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium"
-                                    >
-                                        Retake
-                                    </button>
-                                    <button
-                                        onClick={applyCrop}
-                                        className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l2 2 4-4" />
-                                        </svg>
-                                        Apply Crop
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* ✅ Enhanced Final Preview */}
-                    {capturedImage && !showCropper && previewUrl && (
+                    {capturedImage && previewUrl && (
                         <div className="p-4 flex flex-col items-center">
                             <div className="w-full max-w-2xl">
                                 <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">
@@ -741,13 +382,6 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                         Retake Photo
                                     </button>
                                     <button
-                                        onClick={() => setShowCropper(true)}
-                                        disabled={isProcessing}
-                                        className="px-4 py-3 text-orange-600 bg-orange-50 hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors font-medium"
-                                    >
-                                        Crop
-                                    </button>
-                                    <button
                                         onClick={processImage}
                                         disabled={isProcessing}
                                         className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
@@ -769,9 +403,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                         </div>
                     )}
 
-                    {/* Hidden canvases for image processing */}
+                    {/* Hidden canvas for image processing */}
                     <canvas ref={canvasRef} className="hidden" />
-                    <canvas ref={cropCanvasRef} className="hidden" />
                 </div>
             </div>
         </div>
