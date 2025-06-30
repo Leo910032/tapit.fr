@@ -54,12 +54,12 @@ export default function Buttons() {
                             <Image src={"https://linktree.sirv.com/Images/svg%20element/torn.svg"} alt="ele" width={1000} height={100} priority className="w-full scale-[-1]" />
                         </span>
                         <span className="w-full absolute top-0 -translate-y-[6px]">
-                            <Image src={"https://linktree.sirv.com/Images/svg%20element/torn.svg"} alt="ele" width={1000} height={1000} priority className="w-full" />
+                            <Image src={"https://linktree.sirv.com/Images/svg%20element/torn.svg"} alt="ele" width={1000} height={100} priority className="w-full" />
                         </span>
                     </div>
                     <div onClick={()=>handleUpdateTheme(13)} className={`min-w-[30%] h-10 cursor-pointer hover:scale-105 active:scale-95 flex-1 border relative border-black bg-black`}>
                         <span className="w-full absolute top-8 translate-y-[6px]">
-                            <Image src={"https://linktree.sirv.com/Images/svg%20element/jiggy.svg"} alt="ele" width={1000} height={1000} priority className="w-full" />
+                            <Image src={"https://linktree.sirv.com/Images/svg%20element/jiggy.svg"} alt="ele" width={1000} height={100} priority className="w-full" />
                         </span>
                         <span className="w-full absolute top-0 -translate-y-[19px]">
                             <Image src={"https://linktree.sirv.com/Images/svg%20element/jiggy.svg"} alt="ele" width={1000} height={100} priority className="w-full scale-[-1]" />
