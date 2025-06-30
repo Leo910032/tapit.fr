@@ -33,13 +33,51 @@ export default function Preview() {
                 console.log('🔍 Preview: fetchUserData result:', userId);
 
                 if (userId) {
-                    console.log('✅ Preview: User validated, setting username:', sessionUsername);
-                    setUsername(sessionUsername);
-                    setDebugInfo({ 
-                        sessionUsername, 
-                        userId, 
-                        status: 'success' 
-                    });
+                    // 🔧 IMPORTANT: For preview, we need to use the PUBLIC username, not the session ID
+                    // Let's get the actual public username from the user data
+                    try {
+                        const { fireApp } = await import("@/important/firebase");
+                        const { collection, doc, getDoc } = await import("firebase/firestore");
+                        
+                        const collectionRef = collection(fireApp, "AccountData");
+                        const docRef = doc(collectionRef, userId);
+                        const docSnap = await getDoc(docRef);
+                        
+                        if (docSnap.exists()) {
+                            const userData = docSnap.data();
+                            const publicUsername = userData.username || sessionUsername;
+                            
+                            console.log('✅ Preview: Found public username:', publicUsername);
+                            console.log('🔍 Preview: Session ID:', sessionUsername);
+                            console.log('🔍 Preview: Public username:', publicUsername);
+                            
+                            setUsername(publicUsername); // Use public username for iframe
+                            setDebugInfo({ 
+                                sessionUsername, 
+                                userId,
+                                publicUsername,
+                                status: 'success' 
+                            });
+                        } else {
+                            console.log('✅ Preview: No user data found, using session username:', sessionUsername);
+                            setUsername(sessionUsername);
+                            setDebugInfo({ 
+                                sessionUsername, 
+                                userId, 
+                                status: 'success' 
+                            });
+                        }
+                    } catch (error) {
+                        console.error('❌ Preview: Error getting public username:', error);
+                        // Fallback to session username
+                        setUsername(sessionUsername);
+                        setDebugInfo({ 
+                            sessionUsername, 
+                            userId, 
+                            status: 'success',
+                            warning: 'Could not get public username'
+                        });
+                    }
                     
                     // 🔧 Show iframe after successful validation
                     setTimeout(() => {
@@ -168,12 +206,17 @@ export default function Preview() {
             <div className="absolute top-4 left-4 z-50 bg-black bg-opacity-75 text-white text-xs p-2 rounded max-w-xs">
                 <div className="font-bold mb-1">🔍 Preview Debug:</div>
                 <div>Loading: {isLoading ? 'Yes' : 'No'}</div>
-                <div>Username: {username || 'None'}</div>
+                <div>Session ID: {debugInfo.sessionUsername || 'None'}</div>
+                <div>Public Username: {username || 'None'}</div>
+                <div>User ID: {debugInfo.userId || 'None'}</div>
                 <div>Show iframe: {showIframe ? 'Yes' : 'No'}</div>
                 <div>Iframe key: {iframeKey}</div>
-                <div>Session: {debugInfo.sessionUsername || 'None'}</div>
-                <div>UserID: {debugInfo.userId || 'None'}</div>
                 <div>Status: {debugInfo.status || debugInfo.error || 'Unknown'}</div>
+                {debugInfo.warning && (
+                    <div className="text-yellow-300 mt-1">
+                        ⚠️ {debugInfo.warning}
+                    </div>
+                )}
                 {debugInfo.error && (
                     <div className="text-red-300 mt-1">
                         Error: {debugInfo.error}
