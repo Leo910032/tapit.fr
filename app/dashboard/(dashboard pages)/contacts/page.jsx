@@ -410,7 +410,7 @@ export default function ContactsPage() {
                     </span>
                     {userInfo && !loading && (
                         <span className="text-xs text-green-600">
-                            Welcome, {userInfo.displayName || userInfo.username}!
+                            {t('contacts.welcome')}, {userInfo.displayName || userInfo.username}!
                         </span>
                     )}
                 </div>
@@ -468,7 +468,7 @@ export default function ContactsPage() {
                             </h1>
                             {userInfo && (
                                 <p className="text-xs sm:text-sm text-gray-600 mb-2 truncate">
-                                    Welcome back, <span className="font-medium text-purple-600">
+                                   {t('contacts.welcome')}, <span className="font-medium text-purple-600">
                                         {userInfo.displayName || userInfo.username}
                                     </span>
                                 </p>
@@ -505,24 +505,24 @@ export default function ContactsPage() {
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                                 </svg>
                                                 <span className="hidden sm:inline">{t('contacts.share_with_team') || 'Share'}</span>
-                                                <span className="sm:hidden">Share</span>
+                                                <span className="sm:hidden"> {t('contacts.Share')}</span>
                                             </button>
                                         ) : (
                                             <div className="flex items-center gap-1.5">
                                                 <span className="text-xs text-gray-600 whitespace-nowrap">
-                                                    {selectedContacts.length} selected
+                                                    {selectedContacts.length}  {t('contacts.selected')}
                                                 </span>
                                                 <button
                                                     onClick={selectAllContacts}
                                                     className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors whitespace-nowrap"
                                                 >
-                                                    All
+                                                      {t('contacts.All')}
                                                 </button>
                                                 <button
                                                     onClick={clearSelection}
                                                     className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors whitespace-nowrap"
                                                 >
-                                                    Clear
+                                                      {t('contacts.Clear')}
                                                 </button>
                                                 <button
                                                     onClick={handleShareSelected}
@@ -554,8 +554,8 @@ export default function ContactsPage() {
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
-                                    <span className="hidden sm:inline">Team contact sharing enabled</span>
-                                    <span className="sm:hidden">Team sharing</span>
+                                    <span className="hidden sm:inline">   {t('contacts.team_contact')} </span>
+                                    <span className="sm:hidden">  {t('contacts.team_shearing')} </span>
                                 </div>
                             )}
                         </div>
@@ -566,20 +566,20 @@ export default function ContactsPage() {
                         <div className="flex items-center text-green-600 whitespace-nowrap">
                             <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
                             <span className="hidden sm:inline">{t('contacts.live_updates_enabled')}</span>
-                            <span className="sm:hidden">Live updates</span>
+                            <span className="sm:hidden"> {t('contacts.live_updates')} </span>
                         </div>
                         {userInfo && (
                             <div className="flex items-center text-blue-600 whitespace-nowrap">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                                <span className="hidden sm:inline">Fast lookup enabled</span>
-                                <span className="sm:hidden">Fast lookup</span>
+                                <span className="hidden sm:inline"> {t('contacts.fast_look')} </span>
+                                <span className="sm:hidden"> {t('contacts.fast_lookup')} </span>
                             </div>
                         )}
                         {teamSharingEnabled && (
                             <div className="flex items-center text-purple-600 whitespace-nowrap">
                                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-1"></div>
-                                <span className="hidden sm:inline">Team sharing available</span>
-                                <span className="sm:hidden">Team sharing</span>
+                                <span className="hidden sm:inline"> {t('contacts.team_sharing_avaible')} </span>
+                                <span className="sm:hidden"> {t('contacts.team_sharing')}  </span>
                             </div>
                         )}
                     </div>
