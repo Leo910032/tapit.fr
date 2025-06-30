@@ -29,6 +29,11 @@
     "success_message": "Contact information shared successfully!",
     "error_message": "Failed to share contact information. Please try again."
   },
+
+   "profile_image" :{
+    "pick_image" : "Pick your image",
+    "remove" : "Remove"
+  },
   "business_card_scanner": {
     "title": "Scan Business Card",
     "capture_title": "Capture Business Card",
@@ -428,9 +433,6 @@
     "contacts": "Contacts"
   },
   "login": {
-    "continue_with_google" : "Continue with Google",
-    "google_signin_success" : "Google sign-in successful!",
-    "google_signin_failed"  : "Google sign-in failed",
     "title": "Log in to your Linktree",
     "username_placeholder": "Enter your username",
     "password_placeholder": "Password",
@@ -944,4 +946,3 @@
     "total_interactions_description": "Total interactions with your links"
   }
 }
-

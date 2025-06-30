@@ -1,6 +1,6 @@
 {
   "exchange": {
-    "title": "Échanger le contact",
+    "title": "Échanger les coordonnées",
     "description": "Partagez vos coordonnées pour vous connecter avec le propriétaire de ce profil.",
     "close_modal": "Fermer la modale",
     "name_label": "Nom complet",
@@ -16,23 +16,27 @@
     "company_placeholder": "Entrez votre entreprise ou organisation",
     "message_label": "Message (Facultatif)",
     "message_placeholder": "Ajoutez un message personnel...",
-    "location_share_title": "Partager votre position ?",
-    "location_share_description": "Pour aider à visualiser où les connexions sont établies, vous pouvez partager votre position approximative. Ceci est facultatif.",
-    "share_location_button": "Partager la position",
-    "location_granted_message": "Accès à la position autorisé. Merci !",
+    "location_share_title": "Partager votre localisation ?",
+    "location_share_description": "Pour aider à visualiser où les connexions sont établies, vous pouvez partager votre localisation approximative. Ceci est facultatif.",
+    "share_location_button": "Partager la localisation",
+    "location_granted_message": "Accès à la localisation accordé. Merci !",
     "geolocation_not_supported": "La géolocalisation n'est pas prise en charge par votre navigateur.",
-    "location_permission_denied": "L'accès à la position a été refusé. Vous pouvez l'activer dans les paramètres de votre navigateur.",
-    "location_retrieval_failed": "Impossible de récupérer votre position.",
+    "location_permission_denied": "L'accès à la localisation a été refusé. Vous pouvez l'activer dans les paramètres de votre navigateur.",
+    "location_retrieval_failed": "Impossible de récupérer votre localisation.",
     "cancel": "Annuler",
-    "submit": "Partager le contact",
+    "submit": "Partager les coordonnées",
     "submitting": "Partage en cours...",
     "success_message": "Coordonnées partagées avec succès !",
     "error_message": "Échec du partage des coordonnées. Veuillez réessayer."
   },
+  "profile_image": {
+    "pick_image": "Choisissez votre image",
+    "remove": "Retirer"
+  },
   "business_card_scanner": {
     "title": "Scanner une carte de visite",
-    "capture_title": "Capturer une carte de visite",
-    "capture_description": "Choisissez comment capturer la carte de visite. Pour de meilleurs résultats, assurez-vous d'un bon éclairage et que la carte remplit la majeure partie du cadre.",
+    "capture_title": "Capturer la carte de visite",
+    "capture_description": "Choisissez comment capturer la carte de visite. Pour de meilleurs résultats, assurez-vous d'avoir un bon éclairage et que la carte remplisse la majeure partie du cadre.",
     "take_photo": "Prendre une photo",
     "use_camera": "Utiliser votre appareil photo",
     "upload_image": "Télécharger une image",
@@ -68,11 +72,11 @@
     "team_shearing": "Partage d'équipe",
     "live_updates": "Mises à jour en direct",
     "Clear": "Effacer",
-    "team_contact": "Partage de contact d'équipe activé",
+    "team_contact": "Partage des contacts d'équipe activé",
     "Share": "Partager",
     "selected": "sélectionné(s)",
     "fast_look": "Recherche rapide activée",
-    "sharing_enabled": "Partage de contact d'équipe activé",
+    "sharing_enabled": "Partage des contacts d'équipe activé",
     "edit_contact": "Modifier le contact",
     "edit": "Modifier",
     "modified": "Modifié",
@@ -89,16 +93,16 @@
     "submitted_at": "Soumis le",
     "contact_id": "ID du contact",
     "save_changes": "Enregistrer les modifications",
-    "saving": "Enregistrement...",
-    "location_for_contact": "Position pour {name}",
-    "all_contact_locations": "Positions de tous les contacts",
+    "saving": "Enregistrement en cours...",
+    "location_for_contact": "Localisation pour {name}",
+    "all_contact_locations": "Toutes les localisations de contacts",
     "title": "Liste de contacts",
     "subtitle": "Gérez les contacts qui ont partagé leurs informations via votre profil",
     "loading": "Chargement des contacts...",
     "loading_map": "Chargement de la carte...",
     "live_updates_enabled": "Mises à jour en direct activées",
     "offline_updates_enabled": "Mises à jour en direct non activées",
-    "contacts_with_location": "{count} contacts avec position",
+    "contacts_with_location": "{count} contacts avec localisation",
     "new_contacts_notification": "Vous avez {count} nouveau{plural} contact{plural}{location} !",
     "failed_to_load": "Échec du chargement des contacts",
     "status_updated": "Statut du contact mis à jour",
@@ -107,15 +111,15 @@
     "failed_to_update_contacts": "Échec de la mise à jour des contacts",
     "filter_by_status": "Filtrer par statut",
     "filter_all": "Tous",
-    "filter_new": "Nouveaux",
+    "filter_new": "Nouveau",
     "filter_viewed": "Vus",
     "filter_archived": "Archivés",
     "search_placeholder": "Rechercher des contacts...",
     "no_location_data": "Aucun contact avec des données de localisation",
-    "view_all_locations": "Voir les positions de tous les contacts",
+    "view_all_locations": "Voir toutes les localisations de contacts",
     "map_button": "Carte",
     "selected_contacts": "{count} contact(s) sélectionné(s)",
-    "mark_as_viewed": "Marquer comme vu",
+    "mark_as_viewed": "Marquer comme lu",
     "archive": "Archiver",
     "restore": "Restaurer",
     "no_contacts_found": "Aucun contact trouvé",
@@ -128,7 +132,7 @@
     "located": "Localisé",
     "send_email": "Envoyer un e-mail",
     "call": "Appeler",
-    "view_location_on_map": "Voir la position sur la carte",
+    "view_location_on_map": "Voir la localisation sur la carte",
     "export_contacts": "Exporter les contacts",
     "export_headers": {
       "name": "Nom",
@@ -138,18 +142,18 @@
       "message": "Message",
       "status": "Statut",
       "submitted_at": "Soumis le",
-      "has_location": "A une position",
+      "has_location": "A une localisation",
       "latitude": "Latitude",
       "longitude": "Longitude",
-      "location_accuracy": "Précision de la position"
+      "location_accuracy": "Précision de la localisation"
     },
-    "contact_locations": "Positions des contacts",
-    "viewing_location_for": "Affichage de la position pour {name}",
-    "showing_contacts_with_location": "Affichage de {count} contacts avec des données de localisation",
+    "contact_locations": "Localisations des contacts",
+    "viewing_location_for": "Affichage de la localisation pour {name}",
+    "showing_contacts_with_location": "Affichage de {count} contacts avec données de localisation",
     "coordinates": "Coordonnées",
     "accuracy": "Précision",
     "selected_contact": "{name} sélectionné",
-    "contact_location": "Position du contact",
+    "contact_location": "Localisation du contact",
     "show_all_contacts": "Afficher tous les contacts",
     "open_in_google_maps": "Ouvrir dans Google Maps",
     "copy_coordinates": "Copier les coordonnées",
@@ -158,9 +162,9 @@
     "showing_contacts": "vous avez {count} sur {total} contacts",
     "personal": "personnel",
     "from_team": "de l'équipe",
-    "with_location": "avec position",
+    "with_location": "avec localisation",
     "added": "Ajouté :",
-    "mark_viewed": "Marquer comme vu",
+    "mark_viewed": "Marquer comme lu",
     "filter_with_count": "Filtrer ({count})",
     "map_with_count": "Carte ({count})"
   },
@@ -195,22 +199,22 @@
   "add_icon_modal": {
     "title": "Ajouter une icône",
     "search_placeholder": "Rechercher",
-    "search_label": "Rechercher",
+    "search_label": "Recherche",
     "already_added": "Déjà ajouté",
-    "no_icons_found": "Aucune icône trouvée. Essayer autre chose ?",
+    "no_icons_found": "Aucune icône trouvée. Essayez autre chose ?",
     "all_category": "Toutes"
   },
   "supportbanner": {
     "support_banner": "Bannière de soutien"
   },
   "support": {
-    "act_now": "Agir maintenant",
+    "act_now": "Agissez maintenant",
     "show_your_support": "Montrez votre soutien",
     "support_banner_description": "Montrez votre soutien à des causes importantes avec une bannière de profil. Une seule bannière peut être active à la fois."
   },
   "social": {
     "social_icons": "Icônes sociales",
-    "be_iconic": "Soyez iconique",
+    "be_iconic": "Soyez emblématique",
     "add_icons_description": "Ajoutez des icônes menant à vos profils sociaux, e-mail et plus encore.",
     "add_icon": "Ajouter une icône",
     "drag_drop_reorder": "Glissez-déposez les icônes ci-dessus pour les réorganiser.",
@@ -221,17 +225,17 @@
   "map": {
     "failed_to_load": "Échec du chargement de Google Maps : {{error}}",
     "no_location_data_title": "Aucune donnée de localisation disponible",
-    "no_location_data_description": "Aucun contact n'a encore partagé sa position. Lorsque les visiteurs soumettent des formulaires de contact avec l'autorisation de localisation, leurs positions apparaîtront sur cette carte.",
+    "no_location_data_description": "Aucun contact n'a encore partagé sa localisation. Lorsque les visiteurs soumettent des formulaires de contact avec l'autorisation de localisation accordée, leurs localisations apparaîtront sur cette carte.",
     "loading_error_title": "Erreur de chargement de la carte",
     "loading_error_description": "Veuillez vérifier la configuration de votre clé API Google Maps ou essayez de rafraîchir la page.",
     "loading_message": "Chargement de la carte avec {{count}} contact{{plural}}...",
-    "contact_locations_title": "Positions des contacts",
+    "contact_locations_title": "Localisations des contacts",
     "legend_new_contacts": "Nouveaux contacts",
     "legend_viewed_contacts": "Contacts vus",
     "legend_archived_contacts": "Contacts archivés",
     "total_contacts_count": "Total :",
     "total_contacts": "contact localisé",
-    "click_marker_tip": "Cliquez sur un marqueur pour vous concentrer sur la position de ce contact"
+    "click_marker_tip": "Cliquez sur n'importe quel marqueur pour vous concentrer sur la localisation de ce contact"
   },
   "themes": {
     "custom": "Personnalisé",
@@ -273,7 +277,7 @@
     "gradient": "Dégradé",
     "image": "Image",
     "video": "Vidéo",
-    "polka": "À pois",
+    "polka": "Pois",
     "stripe": "Rayures",
     "waves": "Vagues",
     "zig_zag": "Zig Zag"
@@ -282,14 +286,14 @@
     "snow_fall": "Chute de neige"
   },
   "fonts": {
-    "select_font": "Sélectionner une police",
+    "select_font": "Sélectionnez une police",
     "search_by_font_name": "Rechercher par nom de police",
     "classic": "Classique",
     "selected": "Sélectionnée",
     "no_fonts_found": "Aucune police trouvée."
   },
   "buttons": {
-    "fill": "Plein",
+    "fill": "Rempli",
     "outline": "Contour",
     "hard_shadow": "Ombre dure",
     "soft_shadow": "Ombre douce",
@@ -310,15 +314,15 @@
   },
   "profile": {
     "add_social_icons": "Ajouter des icônes sociales",
-    "my_account": "Mon compte",
+    "my_account": "Mon Compte",
     "sign_out": "Se déconnecter"
   },
   "share": {
     "share_your_linktree": "Partagez votre Linktree",
-    "get_more_visitors": "Attirez plus de visiteurs sur votre Linktree en le partageant avec votre public.",
+    "get_more_visitors": "Attirez plus de visiteurs sur votre Linktree en le partageant avec votre audience.",
     "add_to_socials": "Ajouter à vos réseaux sociaux",
-    "add_linktree_to_socials": "Ajouter Linktree à vos réseaux sociaux",
-    "add_linktree_url_description": "Ajoutez l'URL de votre Linktree à vos profils sociaux pour que le monde entier puisse trouver facilement votre Linktree.",
+    "add_linktree_to_socials": "Ajoutez Linktree à vos réseaux sociaux",
+    "add_linktree_url_description": "Ajoutez l'URL de votre Linktree à vos profils sociaux pour que le monde entier puisse facilement trouver votre Linktree.",
     "share_linktree_to": "Partager mon Linktree sur...",
     "share_to": "Partager sur...",
     "share_linktree_connections": "Partagez votre Linktree avec toutes vos connexions pour que tout le monde soit au courant.",
@@ -329,7 +333,7 @@
     "snapchat": "Snapchat",
     "instagram": "Instagram",
     "facebook_profile": "Profil Facebook",
-    "tiktok_profile": "Profil Tiktok",
+    "tiktok_profile": "Profil TikTok",
     "twitch_profile": "Profil Twitch",
     "facebook_page": "Page Facebook",
     "youtube": "Youtube",
@@ -342,15 +346,15 @@
     "share_on_twitter": "Partager sur Twitter",
     "share_via_whatsapp": "Partager via WhatsApp",
     "share_via_messenger": "Partager via Messenger",
-    "share_via_email": "Partager via E-mail",
-    "snapchat_description": "Ajoutez votre Linktree à votre profil public Snapchat. Copiez simplement l'URL de votre Linktree, ouvrez Snapchat, allez dans Mon profil public, appuyez sur Modifier, puis sélectionnez Linktree ou Site web, puis Ajouter votre Linktree et collez l'URL de votre Linktree dans le champ Ajouter un Linktree.",
+    "share_via_email": "Partager par e-mail",
+    "snapchat_description": "Ajoutez votre Linktree à votre profil public Snapchat. Copiez simplement l'URL de votre Linktree, ouvrez Snapchat, allez sur Mon Profil Public, appuyez sur Modifier, puis sélectionnez Linktree ou Site Web, puis Ajouter Votre Linktree et collez l'URL de votre Linktree dans le champ Ajouter Linktree.",
     "instagram_description": "Ajoutez votre Linktree à votre profil Instagram. Copiez simplement l'URL de votre Linktree, allez dans Modifier le profil, et collez-la dans le champ Site web.",
     "facebook_description": "Ajoutez votre Linktree à votre profil Facebook. Copiez simplement l'URL de votre Linktree, allez sur la page À propos de votre profil, cliquez sur Coordonnées et informations générales, puis cliquez sur + Ajouter un site web, collez l'URL de votre Linktree dans le champ Adresse du site web, et cliquez sur Enregistrer.",
-    "tiktok_description": "Ajoutez votre Linktree à votre profil TikTok. Copiez simplement l'URL de votre Linktree, allez sur votre profil TikTok, cliquez sur Gérer le compte, puis sur Modifier le profil, et collez l'URL de votre Linktree dans le champ Site web, puis cliquez sur Enregistrer. (Note : vous devrez peut-être passer à un compte professionnel TikTok pour activer cette option).",
-    "twitch_description": "Ajoutez votre Linktree à votre chaîne Twitch. Copiez simplement l'URL de votre Linktree, allez sur votre chaîne Twitch, cliquez sur À propos, puis cliquez sur Modifier les infos et les liens, faites défiler jusqu'à Liens sociaux, ajoutez Linktree dans le premier champ de texte, et collez l'URL de votre Linktree dans le deuxième champ de texte, puis cliquez sur Ajouter.",
+    "tiktok_description": "Ajoutez votre Linktree à votre profil TikTok. Copiez simplement l'URL de votre Linktree, allez sur votre profil TikTok, cliquez sur Gérer le compte, cliquez sur Modifier le profil, et collez l'URL de votre Linktree dans le champ Site web, puis cliquez sur Enregistrer. (Note : vous devrez peut-être passer à un compte professionnel TikTok pour activer cette option).",
+    "twitch_description": "Ajoutez votre Linktree à votre chaîne Twitch. Copiez simplement l'URL de votre Linktree, allez sur votre chaîne Twitch, cliquez sur À propos, puis cliquez sur Modifier les paramètres À propos et liens, faites défiler jusqu'à Liens sociaux, ajoutez Linktree dans le premier champ de texte, et collez l'URL de votre Linktree dans le second champ, puis cliquez sur Ajouter.",
     "facebook_page_description": "Ajoutez votre Linktree à votre page Facebook. Copiez simplement l'URL de votre Linktree, allez sur la page À propos, faites défiler jusqu'à Informations de contact supplémentaires, cliquez sur Entrer un site web, et collez l'URL de votre Linktree dans le champ Site web.",
     "youtube_description": "Ajoutez votre Linktree à votre chaîne YouTube. Copiez simplement l'URL de votre Linktree, allez sur votre chaîne YouTube, cliquez sur Personnaliser la chaîne, puis sur Informations générales, et sous Liens, ajoutez un titre de lien et collez l'URL de votre Linktree dans le champ URL, puis cliquez sur Publier.",
-    "linkedin_description": "Ajoutez votre Linktree à votre profil LinkedIn. Copiez simplement l'URL de votre Linktree, allez sur votre profil LinkedIn, cliquez sur l'icône en forme de crayon, faites défiler jusqu'à Coordonnées, collez l'URL de votre Linktree dans le champ URL du site web, puis cliquez sur Appliquer.",
+    "linkedin_description": "Ajoutez votre Linktree à votre profil LinkedIn. Copiez simplement l'URL de votre Linktree, allez sur votre profil LinkedIn, cliquez sur l'icône crayon, faites défiler jusqu'à Coordonnées, collez l'URL de votre Linktree dans le champ URL du site web, puis cliquez sur Appliquer.",
     "pinterest_description": "Ajoutez votre Linktree à votre profil Pinterest. Copiez simplement l'URL de votre Linktree, allez dans vos paramètres Pinterest, collez l'URL de votre Linktree dans le champ URL du site web, puis cliquez sur Enregistrer.",
     "twitter_description": "Ajoutez votre Linktree à votre profil Twitter. Copiez simplement l'URL de votre Linktree, allez sur votre profil, cliquez sur Modifier le profil, et collez l'URL de votre Linktree dans le champ Site web."
   },
@@ -361,17 +365,17 @@
   "seo": {
     "title": "SEO",
     "custom_metadata": "Métadonnées personnalisées",
-    "metadata_notice": "Les modifications apportées aux métadonnées могут mettre un certain temps à apparaître sur d'autres plateformes.",
-    "meta_title": "Titre Méta",
-    "meta_description": "Description Méta"
+    "metadata_notice": "Les modifications des métadonnées peuvent prendre un certain temps avant d'apparaître sur d'autres plateformes.",
+    "meta_title": "Méta-titre",
+    "meta_description": "Méta-description"
   },
   "email": {
     "welcome": {
       "subject": "Merci d'avoir créé un compte !",
       "title": "Bienvenue sur My Linktree Clone !",
-      "description": "Ce projet est ma tentative de recréer le système incroyable que Linktree a développé.",
+      "description": "Ce projet est ma tentative de recréer l'incroyable système développé par Linktree.",
       "disclaimer_title": "Avertissement : ",
-      "disclaimer_text": "Ceci n'est pas le vrai Linktree et n'a aucune affiliation avec Linktree, c'est juste un projet personnel.",
+      "disclaimer_text": "Ceci n'est pas le vrai Linktree, et n'a aucune affiliation avec Linktree, c'est juste un projet personnel.",
       "credentials_intro": "Vos identifiants de connexion sont fournis ci-dessous :",
       "email_label": "E-mail :",
       "password_label": "Mot de passe :",
@@ -382,19 +386,19 @@
     "reset": {
       "subject": "E-mail de réinitialisation de mot de passe",
       "title": "E-mail de réinitialisation de mot de passe",
-      "description": "Vous avez demandé à réinitialiser votre mot de passe. Veuillez utiliser le lien suivant pour réinitialiser votre mot de passe :",
+      "description": "Vous avez demandé à réinitialiser votre mot de passe. Veuillez utiliser le lien suivant pour le réinitialiser :",
       "button": "Réinitialiser le mot de passe",
       "footer": "Merci d'utiliser notre service ! ❤❤❤",
-      "reset_title": "Réinitialisation du mot de passe",
+      "reset_title": "Réinitialisation de mot de passe",
       "reset_subtitle": "Sécurisez votre compte",
-      "greeting": "Salut ! 👋",
-      "reset_message": "Vous avez demandé à réinitialiser le mot de passe de votre compte TapIt. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe. Ce lien expirera dans 1 heure pour des raisons de sécurité.",
+      "greeting": "Bonjour ! 👋",
+      "reset_message": "Vous avez demandé la réinitialisation du mot de passe pour votre compte TapIt. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe. Ce lien expirera dans 1 heure pour des raisons de sécurité.",
       "security_notice": "Avis de sécurité",
       "reset_security_message": "Si vous n'avez pas demandé cette réinitialisation de mot de passe, veuillez ignorer cet e-mail. Votre compte reste sécurisé et aucune modification n'a été apportée.",
       "reset_button": "Réinitialiser mon mot de passe →",
       "additional_info": "Pour votre sécurité, ce lien expirera dans 1 heure. Si vous avez besoin d'aide, veuillez contacter notre équipe de support.",
       "reset_footer_message": "Cet e-mail a été envoyé depuis TapIt",
-      "reset_footer_note": "Si vous avez des difficultés avec le bouton ci-dessus, copiez et collez cette URL dans votre navigateur :",
+      "reset_footer_note": "Si vous rencontrez des problèmes avec le bouton ci-dessus, copiez et collez cette URL dans votre navigateur :",
       "contact_support": "Si vous avez des questions ou besoin d'aide, n'hésitez pas à contacter notre équipe de support."
     }
   },
@@ -409,7 +413,7 @@
     "sensitiveType2_under": "J'ai moins de 25 ans",
     "sensitiveType1_21": "J'ai moins de 21 ans",
     "sensitiveType1_18": "J'ai moins de 18 ans",
-    "act_now": "Agir maintenant"
+    "act_now": "Agissez maintenant"
   },
   "navbar": {
     "links": "Liens",
@@ -428,33 +432,30 @@
     "contacts": "Contacts"
   },
   "login": {
-    "continue_with_google": "Continuer avec Google",
-    "google_signin_success": "Connexion avec Google réussie !",
-    "google_signin_failed": "Échec de la connexion avec Google",
     "title": "Connectez-vous à votre Linktree",
     "username_placeholder": "Entrez votre nom d'utilisateur",
     "password_placeholder": "Mot de passe",
     "forgot_password": "Mot de passe oublié ?",
-    "submit": "Soumettre",
+    "submit": "Se connecter",
     "no_account": "Vous n'avez pas de compte ?",
-    "sign_up": "S'inscrire",
+    "sign_up": "Inscrivez-vous",
     "invalid_credentials": "Identifiants de connexion invalides !",
     "success": "Connexion réussie",
     "validating": "Validation des identifiants...",
     "incorrect_password": "Vous avez entré un mot de passe incorrect !",
-    "username_not_registered": "Ce nom d'utilisateur n'est associé à aucun utilisateur."
+    "username_not_registered": "Ce nom d'utilisateur n'est associé à aucun compte."
   },
   "signup": {
     "title": "Créez votre compte",
     "username_placeholder": "Créez votre pseudo",
     "email_placeholder": "E-mail",
     "password_placeholder": "Mot de passe",
-    "submit": "Soumettre",
+    "submit": "S'inscrire",
     "have_account": "Vous avez déjà un compte ?",
     "log_in": "Se connecter",
     "cannot_submit": "Impossible de soumettre le formulaire pour le moment !",
     "something_went_wrong": "Quelque chose s'est mal passé",
-    "setting_up_account": "Configuration de votre compte.",
+    "setting_up_account": "Création de votre compte en cours.",
     "could_not_complete_registration": "Impossible de finaliser l'inscription",
     "setup_complete": "Configuration terminée",
     "username_taken": "Ce nom d'utilisateur est déjà pris.",
@@ -474,7 +475,7 @@
     "rest_link_request": "Demander un lien de réinitialisation de mot de passe",
     "reset_link_sent": "Lien de réinitialisation de mot de passe envoyé",
     "error_link_sent": "Oups ! Une erreur est survenue !",
-    "sending_request": "Envoi de la demande...",
+    "sending_request": "Envoi de la demande en cours...",
     "error_occurred": "Oups ! Une erreur est survenue !",
     "provide_email": "Indiquez votre adresse e-mail",
     "remenber_password": "Vous vous souvenez de votre mot de passe ?",
@@ -494,14 +495,14 @@
   },
   "reset_password": {
     "title": "Entrez votre nouveau mot de passe",
-    "advice": "Je vous conseille que votre nouveau mot de passe soit différent de votre mot de passe précédent.",
+    "advice": "Je vous conseille de choisir un nouveau mot de passe différent de l'ancien.",
     "password_placeholder": "Mot de passe",
     "confirm_placeholder": "Retapez le mot de passe",
     "submit": "Changer le mot de passe",
     "passwords_must_match": "Les deux mots de passe doivent correspondre !",
-    "password_setup": "Configuration de votre nouveau mot de passe...",
+    "password_setup": "Configuration de votre nouveau mot de passe en cours...",
     "password_error": "Oups ! Quelque chose s'est mal passé",
-    "password_succes": "Mot de passe changé ! ✨✔",
+    "password_succes": "Mot de passe changé avec succès ! ✨✔",
     "password_placeholder_retype": "Retapez le mot de passe",
     "password_change": "Changer le mot de passe ",
     "login": "Retourner à la connexion",
@@ -509,8 +510,8 @@
     "page": "page"
   },
   "landing": {
-    "headline": "Le seul lien dont vous aurez jamais besoin",
-    "subheadline": "Connectez votre public à tout votre contenu avec un seul lien",
+    "headline": "Le Seul Lien Dont Vous Aurez Jamais Besoin",
+    "subheadline": "Connectez votre audience à tout votre contenu avec un seul lien",
     "placeholder": "Créez votre pseudo",
     "submit": "Créer"
   },
@@ -520,7 +521,7 @@
     "sensitive_material": "Contenu sensible",
     "seo": "SEO",
     "jump_to": "Aller à :",
-    "sensitive_material_description": "Affichez un avertissement de contenu sensible avant que les visiteurs ne puissent voir votre profil."
+    "sensitive_material_description": "Affichez un avertissement de contenu sensible avant que les visiteurs puissent voir votre profil."
   },
   "not_found": {
     "title": "Oh oh. Page non trouvée",
@@ -533,11 +534,11 @@
     "add": "Ajouter",
     "inspired_by_interest": "Inspiré par vos centres d'intérêt",
     "view_all": "Voir tout",
-    "twitter_handle": "Pseudo Twitter",
-    "tiktok_profile": "Profil Tiktok",
-    "instagram_handle": "Pseudo Instagram",
+    "twitter_handle": "Identifiant Twitter",
+    "tiktok_profile": "Profil TikTok",
+    "instagram_handle": "Identifiant Instagram",
     "video_link": "Lien vidéo",
-    "music_link": "Lien musical"
+    "music_link": "Lien musique"
   },
   "manageLinks": {
     "add_header": "Ajouter un en-tête",
@@ -561,11 +562,11 @@
     "spotify": "Spotify",
     "spotify_description": "Partagez votre musique la plus récente ou préférée",
     "pinterest": "Pinterest",
-    "pinterest_description": "Mettez en valeur des épingles, des tableaux et plus encore",
+    "pinterest_description": "Présentez des Épingles, des tableaux et plus encore",
     "twitter": "Twitter",
-    "twitter_description": "Mettez en valeur vos tweets et fils de discussion 🤣",
+    "twitter_description": "Présentez vos tweets et threads 🤣",
     "reddit": "Reddit",
-    "reddit_description": "Mettez en valeur votre profil Reddit",
+    "reddit_description": "Présentez votre profil Reddit",
     "tiktok_profile": "Profil TikTok",
     "tiktok_description": "Obtenez plus d'abonnés TikTok",
     "audiomack": "Audiomack",
@@ -574,20 +575,20 @@
   },
   "special": {
     "enter_text": "Entrez du texte",
-    "headline_title": "Titre principal",
+    "headline_title": "Titre de la manchette",
     "url": "URL",
-    "please_enter_valid_url": "veuillez entrer une URL valide",
+    "please_enter_valid_url": "veuillez entrer une url valide",
     "delete": "Supprimer",
-    "delete_forever_question": "Supprimer ceci pour toujours ?",
+    "delete_forever_question": "Supprimer ceci définitivement ?",
     "cancel": "Annuler",
-    "enter_url_setup": "Entrez votre URL {{urlKind}}, puis configurez votre lien",
+    "enter_url_setup": "Entrez l'URL de votre {{urlKind}}, puis configurez votre lien",
     "custom": "Personnalisé"
   },
   "socials": {
     "threads": {
       "title": "Threads",
       "placeholder": "Nom d'utilisateur*",
-      "example": "@utilisateurthreads",
+      "example": "@threaduser",
       "error": "Veuillez entrer un nom d'utilisateur valide."
     },
     "instagram": {
@@ -599,7 +600,7 @@
     "email": {
       "title": "E-mail",
       "placeholder": "Adresse*",
-      "example": "votreemail@exemple.com",
+      "example": "votreemail@example.com",
       "error": "Veuillez entrer une adresse e-mail valide."
     },
     "youtube": {
@@ -646,15 +647,15 @@
     },
     "android": {
       "title": "Android Play Store",
-      "placeholder": "Entrez l'URL du Play Store*",
+      "placeholder": "Entrez l'URL Android Play Store*",
       "example": "https://play.google.com/store/apps/details?id=votre.nom.de.paquet",
-      "error": "Veuillez entrer une URL valide du Play Store."
+      "error": "Veuillez entrer une URL Android Play Store valide."
     },
     "apple_store": {
       "title": "Apple App Store",
-      "placeholder": "Entrez l'URL de l'App Store*",
+      "placeholder": "Entrez l'URL Apple App Store*",
       "example": "https://apps.apple.com/fr/app/votre-app/id1234567890",
-      "error": "Veuillez entrer une URL valide de l'App Store."
+      "error": "Veuillez entrer une URL Apple App Store valide."
     },
     "apple_music": {
       "title": "Apple Music",
@@ -701,7 +702,7 @@
     "etsy": {
       "title": "Etsy",
       "placeholder": "Entrez l'URL Etsy*",
-      "example": "https://www.etsy.com/fr/shop/votre boutique",
+      "example": "https://www.etsy.com/fr/shop/votreboutique",
       "error": "Veuillez entrer une URL Etsy valide."
     },
     "linkedin": {
@@ -773,34 +774,34 @@
   },
   "support_groups": {
     "choose_cause": "Choisissez une cause",
-    "banner_link_text": "Votre bannière mènera à ceci",
+    "banner_link_text": "Votre bannière mènera à ce lien",
     "support_creator": {
       "caption": "Soutenir le créateur",
-      "card_title": "Découvrez plus de mes projets.",
-      "card_message": "Jetez un œil à mes projets et aux choses que j'ai ajoutées sur GitHub. Vous y trouverez un mélange de différents travaux, et je suis ravi de les partager avec vous !",
+      "card_title": "Explorez plus de mes projets.",
+      "card_message": "Jetez un œil à mes projets et aux choses que j'ai ajoutées sur GitHub. Vous y trouverez un mélange de différents travaux sur lesquels j'ai travaillé, et je suis ravi de les partager avec vous !",
       "title": "Découvrez mes projets GitHub",
-      "message": "Je vous invite à explorer mon profil GitHub, où vous trouverez un éventail de projets et de contributions passionnants. N'hésitez pas à jeter un coup d'œil, et si vous trouvez quelque chose qui vous plaît, n'hésitez pas à montrer votre soutien en laissant une étoile ⭐"
+      "message": "Je vous invite à explorer mon profil GitHub, où vous trouverez un éventail de projets et de contributions passionnants. N'hésitez pas à jeter un œil, et si vous trouvez quelque chose qui vous plaît, n'hésitez pas à montrer votre soutien en laissant une étoile ⭐"
     },
     "free_palestine": {
       "caption": "#FreePalestine",
       "card_title": "La guerre n'est jamais la solution.",
-      "card_message": "Affichez une bannière de soutien pour encourager vos visiteurs à #FreePalestine, à faire des dons, à découvrir des ressources et à soutenir le droit de tous les peuples à vivre en paix.",
+      "card_message": "Affichez une bannière de soutien pour encourager vos visiteurs à #FreePalestine, à faire des dons, à découvrir des ressources, et à soutenir le droit de tous à vivre en paix.",
       "title": "La guerre n'est pas la solution.",
-      "message": "Je sensibilise, collecte des dons et apporte mon soutien à #FreePalestine, et au droit de tous les peuples à vivre en paix. Voulez-vous me rejoindre ?"
+      "message": "Je sensibilise, collecte des dons et apporte mon soutien à #FreePalestine, et au droit de tous à vivre en paix. Voulez-vous vous joindre à moi ?"
     },
     "stand_with_ukraine": {
       "caption": "#StandWithUkraine",
       "card_title": "La guerre n'est jamais la solution.",
-      "card_message": "Affichez une bannière de soutien pour encourager vos visiteurs à #StandWithUkraine, à faire des dons, à découvrir des ressources et à soutenir le droit de tous les peuples à vivre en paix.",
+      "card_message": "Affichez une bannière de soutien pour encourager vos visiteurs à #StandWithUkraine, à faire des dons, à découvrir des ressources, et à soutenir le droit de tous à vivre en paix.",
       "title": "La guerre n'est pas la solution.",
-      "message": "Je sensibilise, collecte des dons et apporte mon soutien à #StandWithUkraine, et au droit de tous les peuples à vivre en paix. Voulez-vous me rejoindre ?"
+      "message": "Je sensibilise, collecte des dons et apporte mon soutien à #StandWithUkraine, et au droit de tous à vivre en paix. Voulez-vous vous joindre à moi ?"
     },
     "anti_racism": {
-      "caption": "Anti-Racisme",
+      "caption": "Antiracisme",
       "card_title": "Le racisme est une urgence internationale.",
-      "card_message": "Affichez une bannière de soutien sur votre Linktree permettant à vos visiteurs de faire des dons et de découvrir des ressources en faveur de l'antiracisme, de la justice et de l'égalité.",
-      "title": "Soutenez l'anti-racisme",
-      "message": "Je sensibilise, collecte des dons et partage des informations en faveur de la justice raciale et de l'égalité. Voulez-vous me rejoindre ?"
+      "card_message": "Affichez une bannière de soutien sur votre Linktree pour permettre à vos visiteurs de faire des dons et de découvrir des ressources en faveur de l'antiracisme, de la justice et de l'égalité.",
+      "title": "Soutenez l'antiracisme",
+      "message": "Je sensibilise, encourage les dons et partage des informations en faveur de la justice raciale et de l'égalité. Voulez-vous vous joindre à moi ?"
     },
     "pride": {
       "caption": "Fierté",
@@ -825,8 +826,8 @@
     "download": "Télécharger",
     "confirm_upload": "Confirmer le téléchargement",
     "upload": "Télécharger",
-    "uploading": "Téléchargement...",
-    "uploading_file": "Téléchargement du fichier...",
+    "uploading": "Téléchargement en cours...",
+    "uploading_file": "Téléchargement du fichier en cours...",
     "file_uploaded": "Fichier téléchargé !",
     "upload_failed": "Échec du téléchargement",
     "file_uploaded_success": "Fichier téléchargé avec succès !",
@@ -852,7 +853,7 @@
     "active_links": "Liens actifs :",
     "Best_Day": "Meilleur jour :",
     "Avg_CTR": "CTR moyen :",
-    "Top_Links": "Top liens",
+    "Top_Links": "Top Liens",
     "clicks": "clics",
     "Profile_views": "Vues du profil",
     "Link_clicks": "Clics sur les liens",
@@ -865,7 +866,7 @@
     "Total_engagement": "Engagement total :",
     "link_NA": "Aucune donnée de liens disponible",
     "performance_last_7_days": "Performance hebdomadaire",
-    "clicks_by_type": "Distribution des clics",
+    "clicks_by_type": "Répartition des clics",
     "live_updates_enabled": "Mises à jour en direct activées",
     "offline_updates_enabled": "Mises à jour en direct non activées",
     "title": "Tableau de bord des statistiques",
@@ -889,10 +890,10 @@
     "share_to_track": "Partagez votre profil pour commencer à suivre les vues et les clics !",
     "link_performance": "Performance des liens",
     "clicks_by_link": "Clics par lien",
-    "click_distribution": "Distribution des clics",
+    "click_distribution": "Répartition des clics",
     "total_links": "Total des liens",
     "total_clicks": "Total des clics",
-    "avg_clicks_per_link": "Clics moyens par lien",
+    "avg_clicks_per_link": "Moyenne de clics par lien",
     "created": "Créé",
     "today": "Aujourd'hui",
     "week": "Cette semaine",
@@ -907,10 +908,10 @@
       "api_key_missing": "Clé API Google Maps non trouvée. Veuillez définir NEXT_PUBLIC_GOOGLE_MAPS_API_KEY dans vos variables d'environnement.",
       "failed_to_load": "Échec du chargement de Google Maps : {{error}}",
       "no_location_data_title": "Aucune donnée de localisation",
-      "no_location_data_description": "Aucun contact avec une localisation trouvée",
+      "no_location_data_description": "Aucun contact avec localisation trouvé",
       "loading_error_title": "Erreur de chargement",
       "loading_contacts": "Chargement de {{count}} contact{{plural}}...",
-      "contact_locations": "Positions des contacts",
+      "contact_locations": "Localisations des contacts",
       "new_contacts": "Nouveaux contacts",
       "viewed_contacts": "Contacts vus",
       "archived_contacts": "Contacts archivés",
