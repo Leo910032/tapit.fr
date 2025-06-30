@@ -233,24 +233,7 @@ export default function House({ userId }) {
         <LanguageProvider>
             <PublicLanguageSwitcher />
             
-            {/* 🔧 Enhanced debug info for preview mode */}
-            {(process.env.NODE_ENV === 'development' || isPreviewMode) && (
-                <div className="fixed top-2 right-2 z-50 bg-black bg-opacity-75 text-white text-xs p-2 rounded max-w-xs">
-                    <div className="text-yellow-300 font-bold mb-1">
-                        {isPreviewMode ? '👁️ PREVIEW MODE' : '🔧 DEBUG'}
-                    </div>
-                    <div>URL: @{userId}</div>
-                    <div>Fast Lookup: {fastLookupUsed ? '✅' : '❌'}</div>
-                    <div>Username: {username || 'Loading...'}</div>
-                    <div>Preview: {isPreviewMode ? '✅' : '❌'}</div>
-                    <div>Client: {isClient ? '✅' : '❌'}</div>
-                    {userLookupData && <div>Display: {userLookupData.displayName}</div>}
-                    {sensitiveWarning && <div className="text-red-300">⚠️ Sensitive Content</div>}
-                    <div className="text-xs text-gray-300 mt-1">
-                        Data: {username ? 'Loaded' : 'Loading...'}
-                    </div>
-                </div>
-            )}
+       
             
             <HouseContext.Provider value={{ 
                 setSensitiveWarning, 
