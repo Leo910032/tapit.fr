@@ -15,6 +15,17 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
+      }
+      ,
+      // ADD THIS for Google favicons
+      {
+        protocol: 'https',
+        hostname: 'www.google.com',
+      },
+      // ADD THIS for DuckDuckGo favicons (backup)
+      {
+        protocol: 'https',
+        hostname: 'icons.duckduckgo.com',
       },
       {
         protocol: 'https',
