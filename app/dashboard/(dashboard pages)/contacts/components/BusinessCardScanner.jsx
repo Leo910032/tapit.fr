@@ -265,7 +265,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-            <div className="bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full max-w-4xl h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full max-w-4xl h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col">
                 
                 {/* Header - Mobile optimized */}
                 <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-white flex-shrink-0">
