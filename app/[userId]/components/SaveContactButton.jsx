@@ -25,7 +25,7 @@ export default function SaveContactButton({ userId }) {
 
                 setUsername(currentUser.username || userId);
 
-                const collectionRef = collection(fireApp, "accounts");
+                const collectionRef = collection(fireApp, "AccountData");
                 const docRef = doc(collectionRef, `${currentUser}`);
 
                 const unsubscribe = onSnapshot(docRef, (docSnap) => {
