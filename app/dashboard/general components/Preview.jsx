@@ -1,50 +1,78 @@
-// app/dashboard/general components/Preview.jsx - MODIFIED TO WORK WITH UPGRADED FUNCTION
+// app/dashboard/general components/Preview.jsx - DEBUG & FIX VERSION
 "use client"
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import "../../styles/3d.css";
 import { getSessionCookie } from '@/lib/authentication/session';
-import { fetchUserData } from '@/lib/fetch data/fetchUserData'; // This is your new function
+import { fetchUserData } from '@/lib/fetch data/fetchUserData';
 
 export default function Preview() {
-    // The state still holds the username string for the iframe URL
     const [username, setUsername] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [debugInfo, setDebugInfo] = useState({});
 
     useEffect(() => {
-        // This effect handles fetching and validating the user data
         async function validateAndSetUser() {
-            const sessionUsername = getSessionCookie("adminLinker");
-            if (!sessionUsername) {
-                // No user in session, do nothing.
-                return;
-            }
+            try {
+                console.log('🔍 Preview: Starting user validation...');
+                
+                const sessionUsername = getSessionCookie("adminLinker");
+                console.log('🔍 Preview: Session username:', sessionUsername);
+                
+                if (!sessionUsername) {
+                    console.log('❌ Preview: No session username found');
+                    setDebugInfo({ error: 'No session username' });
+                    setIsLoading(false);
+                    return;
+                }
 
-            // Call the new fetchUserData to validate the user.
-            // It will return a userId (string) if found, or null if not.
-            const userId = await fetchUserData(sessionUsername);
+                // Call fetchUserData to validate
+                console.log('🔍 Preview: Validating user with fetchUserData...');
+                const userId = await fetchUserData(sessionUsername);
+                console.log('🔍 Preview: fetchUserData result:', userId);
 
-            // If a userId was returned, it means the user is valid.
-            // We can now safely set the username state using the value from the cookie.
-            if (userId) {
-                setUsername(sessionUsername);
-            } else {
-                // Handle the case where the user from the cookie is no longer in the DB
-                console.warn(`User "${sessionUsername}" from session cookie not found in database.`);
+                if (userId) {
+                    console.log('✅ Preview: User validated, setting username:', sessionUsername);
+                    setUsername(sessionUsername);
+                    setDebugInfo({ 
+                        sessionUsername, 
+                        userId, 
+                        status: 'success' 
+                    });
+                } else {
+                    console.warn(`❌ Preview: User "${sessionUsername}" not found in database`);
+                    setDebugInfo({ 
+                        error: 'User not found in database',
+                        sessionUsername 
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Preview: Error during validation:', error);
+                setDebugInfo({ 
+                    error: error.message,
+                    stack: error.stack 
+                });
+            } finally {
+                setIsLoading(false);
             }
         }
 
         validateAndSetUser();
-    }, []); // This effect runs once on component mount
+    }, []);
 
     useEffect(() => {
-        // This effect for the 3D tilt logic remains unchanged.
-        const container = document.getElementById("container");
-        const inner = document.getElementById("inner");
+        // 3D tilt logic - only run if container exists
+        const container = document.getElementById("preview-container");
+        const inner = document.getElementById("preview-inner");
 
-        // Ensure elements exist before adding listeners
-        if (!container || !inner) return;
+        if (!container || !inner) {
+            console.log('🔍 Preview: Container or inner element not found');
+            return;
+        }
 
-        // Mouse
+        console.log('✅ Preview: Setting up 3D tilt effects');
+
+        // Mouse tracking logic
         const mouse = {
             _x: 0,
             _y: 0,
@@ -64,7 +92,6 @@ export default function Preview() {
             },
         };
 
-        // Track the mouse position relative to the center of the container.
         mouse.setOrigin(container);
 
         let counter = 0;
@@ -110,30 +137,106 @@ export default function Preview() {
 
         // Cleanup
         return () => {
-            container.onmouseenter = null;
-            container.onmouseleave = null;
-            container.onmousemove = null;
+            if (container) {
+                container.onmouseenter = null;
+                container.onmouseleave = null;
+                container.onmousemove = null;
+            }
         };
-    }, []); // This effect also runs once on mount
+    }, []);
+
+    // 🔧 Debug component for development
+    const DebugPanel = () => {
+        if (process.env.NODE_ENV !== 'development') return null;
+        
+        return (
+            <div className="absolute top-4 left-4 z-50 bg-black bg-opacity-75 text-white text-xs p-2 rounded max-w-xs">
+                <div className="font-bold mb-1">🔍 Preview Debug:</div>
+                <div>Loading: {isLoading ? 'Yes' : 'No'}</div>
+                <div>Username: {username || 'None'}</div>
+                <div>Session: {debugInfo.sessionUsername || 'None'}</div>
+                <div>UserID: {debugInfo.userId || 'None'}</div>
+                <div>Status: {debugInfo.status || debugInfo.error || 'Unknown'}</div>
+                {debugInfo.error && (
+                    <div className="text-red-300 mt-1">
+                        Error: {debugInfo.error}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     return (
-        <div className="w-[35rem] md:grid hidden place-items-center border-l ml-4" >
-            <div className='w-fit h-fit' id='container'>
-                <div className="h-[45rem] scale-[0.8] w-[23rem] bg-black rounded-[3rem] grid place-items-center" id="inner">
+        <div className="w-[35rem] md:grid hidden place-items-center border-l ml-4 relative">
+            <DebugPanel />
+            
+            <div className='w-fit h-fit' id='preview-container'>
+                <div className="h-[45rem] scale-[0.8] w-[23rem] bg-black rounded-[3rem] grid place-items-center" id="preview-inner">
                     <div className="h-[97.5%] w-[95%] bg-white bg-opacity-[.1] grid place-items-center rounded-[2.5rem] overflow-hidden relative border">
+                        
+                        {/* Phone elements */}
                         <div className='absolute h-[20px] w-[20px] rounded-full top-2 bg-black'></div>
-                        <div className='top-6 left-6 absolute pointer-events-none'>
-                            <Image src={"https://linktree.sirv.com/Images/gif/loading.gif"} width={25} height={25} alt="loading" className=" mix-blend-screen" />
-                        </div>
+                        
+                        {/* Loading indicator - show while loading */}
+                        {isLoading && (
+                            <div className='top-6 left-6 absolute pointer-events-none'>
+                                <Image 
+                                    src={"https://linktree.sirv.com/Images/gif/loading.gif"} 
+                                    width={25} 
+                                    height={25} 
+                                    alt="loading" 
+                                    className="mix-blend-screen" 
+                                />
+                            </div>
+                        )}
+                        
+                        {/* Main content area */}
                         <div className="h-full w-full">
-                            {/* This now works correctly. If username is an empty string, the iframe src will be incomplete but won't throw an error. */}
-                            {username && (
-                                <iframe src={`https://www.tapit.fr/${username}?preview=true`} frameBorder="0" className='h-full bg-white w-full'></iframe>
+                            {!isLoading && username ? (
+                                <iframe 
+                                    src={`https://www.tapit.fr/${username}?preview=true&_=${Date.now()}`}
+                                    frameBorder="0" 
+                                    className='h-full bg-white w-full'
+                                    title={`Preview for ${username}`}
+                                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                                    onLoad={() => console.log('✅ Preview iframe loaded successfully')}
+                                    onError={(e) => console.error('❌ Preview iframe error:', e)}
+                                />
+                            ) : !isLoading && debugInfo.error ? (
+                                // Error state
+                                <div className="flex flex-col items-center justify-center h-full text-gray-600 p-4 text-center">
+                                    <div className="text-4xl mb-4">⚠️</div>
+                                    <div className="text-sm font-medium mb-2">Preview Error</div>
+                                    <div className="text-xs text-gray-500">
+                                        {debugInfo.error}
+                                    </div>
+                                    <button 
+                                        onClick={() => window.location.reload()} 
+                                        className="mt-4 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                                    >
+                                        Retry
+                                    </button>
+                                </div>
+                            ) : !isLoading ? (
+                                // No username state
+                                <div className="flex flex-col items-center justify-center h-full text-gray-600 p-4 text-center">
+                                    <div className="text-4xl mb-4">👤</div>
+                                    <div className="text-sm font-medium mb-2">No Preview Available</div>
+                                    <div className="text-xs text-gray-500">
+                                        Please log in to see your profile preview
+                                    </div>
+                                </div>
+                            ) : (
+                                // Loading state - show loading screen
+                                <div className="flex flex-col items-center justify-center h-full text-gray-600">
+                                    <div className="text-4xl mb-4">⏳</div>
+                                    <div className="text-sm">Loading preview...</div>
+                                </div>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }

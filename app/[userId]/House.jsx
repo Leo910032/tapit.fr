@@ -1,4 +1,4 @@
-// app/[userId]/House.jsx - COMBINED BUTTONS ON SAME LINE
+// app/[userId]/House.jsx - PREVIEW PARAMETER FIX
 "use client"
 import ProfilePic from "./components/ProfilePic";
 import UserInfo from "./components/UserInfo";
@@ -26,14 +26,29 @@ export default function House({ userId }) {
     const [sensitiveType, setSensitiveType] = useState(false);
     const [viewRecorded, setViewRecorded] = useState(false);
     const [username, setUsername] = useState("");
+    const [isPreviewMode, setIsPreviewMode] = useState(false);
 
     // Fast lookup state
     const [fastLookupUsed, setFastLookupUsed] = useState(false);
     const [userLookupData, setUserLookupData] = useState(null);
 
+    // 🔧 Check if this is preview mode
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPreview = urlParams.get('preview') === 'true';
+            setIsPreviewMode(isPreview);
+            
+            console.log('🔍 House: Preview mode detected:', isPreview);
+            console.log('🔍 House: Full URL:', window.location.href);
+            console.log('🔍 House: userId param:', userId);
+        }
+    }, []);
+
     // Enhanced fetchUserData function that tries fast lookup first
     const enhancedFetchUserData = async (inputUserId) => {
         console.log('🚀 Enhanced fetchUserData called with:', inputUserId);
+        console.log('🔍 Preview mode:', isPreviewMode);
         
         try {
             // Try fast lookup first
@@ -61,6 +76,8 @@ export default function House({ userId }) {
         async function fetchProfilePicture() {
             try {
                 console.log('📊 Starting profile fetch for:', userId);
+                console.log('🔍 Is preview mode:', isPreviewMode);
+                
                 const currentUser = await enhancedFetchUserData(userId);
                 console.log('✅ Got currentUser:', currentUser);
                 
@@ -71,10 +88,15 @@ export default function House({ userId }) {
 
                 const collectionRef = collection(fireApp, "AccountData");
                 const docRef = doc(collectionRef, `${currentUser}`);
+                
+                console.log('🔍 Fetching from Firestore document:', currentUser);
                 const getDocRef = await getDoc(docRef);
 
                 if (getDocRef.exists()) {
-                    const { sensitiveStatus, sensitivetype, username: profileUsername } = getDocRef.data();
+                    const data = getDocRef.data();
+                    console.log('✅ Document data retrieved:', Object.keys(data));
+                    
+                    const { sensitiveStatus, sensitivetype, username: profileUsername } = data;
                     
                     setSensitiveWarning(sensitiveStatus ? sensitiveStatus : false);
                     setHasSensitiveContent(sensitiveStatus ? sensitiveStatus : false);
@@ -90,27 +112,44 @@ export default function House({ userId }) {
                     
                     console.log('✅ Profile data loaded successfully:', {
                         username: finalUsername,
-                        fastLookupUsed: fastLookupUsed
+                        fastLookupUsed: fastLookupUsed,
+                        isPreview: isPreviewMode
                     });
                 } else {
                     console.error('❌ Profile document does not exist for:', currentUser);
+                    
+                    // 🔧 In preview mode, show a helpful error
+                    if (isPreviewMode) {
+                        console.warn('⚠️ Preview mode: Document not found, this might be normal for new users');
+                    }
                 }
             } catch (error) {
                 console.error('❌ Error in fetchProfilePicture:', error);
+                
+                // 🔧 Enhanced error logging for preview mode
+                if (isPreviewMode) {
+                    console.error('❌ Preview mode error details:', {
+                        message: error.message,
+                        stack: error.stack,
+                        userId: userId
+                    });
+                }
             }
         }
         
         fetchProfilePicture();
-    }, [userId]);
+    }, [userId, isPreviewMode]); // Add isPreviewMode to dependencies
 
-    // Record profile view
+    // Record profile view - but NOT in preview mode
     useEffect(() => {
         async function recordView() {
-            // Check if this is a preview - don't record views for previews
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPreview = urlParams.get('preview') === 'true';
+            // 🔧 IMPORTANT: Skip analytics in preview mode
+            if (isPreviewMode) {
+                console.log('🔍 Skipping view recording - preview mode active');
+                return;
+            }
             
-            if (!viewRecorded && userId && !isPreview) {
+            if (!viewRecorded && userId) {
                 try {
                     console.log('📈 Recording profile view with fast lookup data');
                     
@@ -118,13 +157,12 @@ export default function House({ userId }) {
                     const viewerInfo = {
                         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
                         referrer: typeof window !== 'undefined' ? document.referrer : '',
-                        recordDetailed: false, // Set to true if you want detailed logs
+                        recordDetailed: false,
                         fastLookupUsed: fastLookupUsed,
                         viewedUsername: userLookupData?.username || userId,
                         viewedDisplayName: userLookupData?.displayName
                     };
 
-                    // userId here is actually the username from the URL parameter
                     await recordProfileView(userId, viewerInfo);
                     setViewRecorded(true);
                     console.log('✅ Profile view recorded successfully');
@@ -138,19 +176,24 @@ export default function House({ userId }) {
         const timer = setTimeout(recordView, 2000);
         
         return () => clearTimeout(timer);
-    }, [userId, viewRecorded, fastLookupUsed, userLookupData]);
+    }, [userId, viewRecorded, fastLookupUsed, userLookupData, isPreviewMode]);
 
     return (
         <LanguageProvider>
             <PublicLanguageSwitcher />
             
-            {/* Debug info for development */}
-            {process.env.NODE_ENV === 'development' && (
+            {/* 🔧 Enhanced debug info for preview mode */}
+            {(process.env.NODE_ENV === 'development' || isPreviewMode) && (
                 <div className="fixed top-2 right-2 z-50 bg-black bg-opacity-75 text-white text-xs p-2 rounded">
+                    <div className="text-yellow-300 font-bold mb-1">
+                        {isPreviewMode ? '👁️ PREVIEW MODE' : '🔧 DEBUG'}
+                    </div>
                     <div>URL: @{userId}</div>
                     <div>Fast Lookup: {fastLookupUsed ? '✅' : '❌'}</div>
                     <div>Username: {username}</div>
+                    <div>Preview: {isPreviewMode ? '✅' : '❌'}</div>
                     {userLookupData && <div>Display: {userLookupData.displayName}</div>}
+                    {sensitiveWarning && <div className="text-red-300">⚠️ Sensitive Content</div>}
                 </div>
             )}
             
@@ -158,7 +201,8 @@ export default function House({ userId }) {
                 setSensitiveWarning, 
                 sensitiveType,
                 userInfo: userLookupData,
-                fastLookupUsed
+                fastLookupUsed,
+                isPreviewMode // 🔧 Add preview mode to context
             }}>
                 {!sensitiveWarning ? (
                     <>
