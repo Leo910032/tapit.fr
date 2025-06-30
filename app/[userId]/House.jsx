@@ -1,4 +1,4 @@
-// app/[userId]/House.jsx - MINIMAL MODIFICATION
+// app/[userId]/House.jsx - COMBINED BUTTONS ON SAME LINE
 "use client"
 import ProfilePic from "./components/ProfilePic";
 import UserInfo from "./components/UserInfo";
@@ -9,7 +9,7 @@ import ExchangeButton from "./components/ExchangeButton";
 import FileDownloadButton from "./components/FileDownloadButton";
 import React, { useEffect, useState } from "react";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
-import { fastUserLookup } from "@/lib/userLookup"; // ✅ Add fast lookup
+import { fastUserLookup } from "@/lib/userLookup";
 import { fireApp } from "@/important/firebase";
 import { collection, doc, getDoc } from "firebase/firestore";
 import SensitiveWarning from "./components/SensitiveWarning";
@@ -27,11 +27,11 @@ export default function House({ userId }) {
     const [viewRecorded, setViewRecorded] = useState(false);
     const [username, setUsername] = useState("");
 
-    // ✅ Add minimal fast lookup state
+    // Fast lookup state
     const [fastLookupUsed, setFastLookupUsed] = useState(false);
     const [userLookupData, setUserLookupData] = useState(null);
 
-    // ✅ Enhanced fetchUserData function that tries fast lookup first
+    // Enhanced fetchUserData function that tries fast lookup first
     const enhancedFetchUserData = async (inputUserId) => {
         console.log('🚀 Enhanced fetchUserData called with:', inputUserId);
         
@@ -56,7 +56,7 @@ export default function House({ userId }) {
         }
     };
 
-    // ✅ Keep the original useEffect structure but use enhanced fetch
+    // Keep the original useEffect structure but use enhanced fetch
     useEffect(() => {
         async function fetchProfilePicture() {
             try {
@@ -119,7 +119,7 @@ export default function House({ userId }) {
                         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
                         referrer: typeof window !== 'undefined' ? document.referrer : '',
                         recordDetailed: false, // Set to true if you want detailed logs
-                        fastLookupUsed: fastLookupUsed, // ✅ Include fast lookup info
+                        fastLookupUsed: fastLookupUsed,
                         viewedUsername: userLookupData?.username || userId,
                         viewedDisplayName: userLookupData?.displayName
                     };
@@ -144,7 +144,7 @@ export default function House({ userId }) {
         <LanguageProvider>
             <PublicLanguageSwitcher />
             
-            {/* ✅ Add debug info to see what's happening */}
+            {/* Debug info for development */}
             {process.env.NODE_ENV === 'development' && (
                 <div className="fixed top-2 right-2 z-50 bg-black bg-opacity-75 text-white text-xs p-2 rounded">
                     <div>URL: @{userId}</div>
@@ -157,12 +157,11 @@ export default function House({ userId }) {
             <HouseContext.Provider value={{ 
                 setSensitiveWarning, 
                 sensitiveType,
-                userInfo: userLookupData, // ✅ Pass lookup data to context
+                userInfo: userLookupData,
                 fastLookupUsed
             }}>
                 {!sensitiveWarning ? (
                     <>
-                        {/* ✅ Keep original component structure - no changes needed */}
                         <BgDiv userId={userId} />
 
                         <div className="relative z-20 md:w-[50rem] w-full flex flex-col items-center h-full mx-auto">
@@ -171,19 +170,26 @@ export default function House({ userId }) {
                                 <UserInfo userId={userId} hasSensitiveContent={hasSensitiveContent} />
                                 <MyLinks userId={userId} hasSensitiveContent={hasSensitiveContent} />
                                 
-                                {/* ✅ File Download Button - Only shows if user has uploaded a file */}
+                                {/* File Download Button - Only shows if user has uploaded a file */}
                                 <FileDownloadButton userId={userId} />
-                                     {/* ✅ NEW: Save Contact Button - Only shows if user has contact info */}
-                <SaveContactButton userId={userId} />
-                
                                 
-                                {/* Exchange Button */}
+                                {/* 🔥 COMBINED BUTTONS SECTION */}
                                 <div className="w-full px-5 mb-4">
-                                    <ExchangeButton 
-                                        username={username} 
-                                        userInfo={userLookupData}
-                                        fastLookupUsed={fastLookupUsed}
-                                    />
+                                    <div className="flex gap-3">
+                                        {/* Exchange Button - Left Side */}
+                                        <div className="flex-1">
+                                            <ExchangeButton 
+                                                username={username} 
+                                                userInfo={userLookupData}
+                                                fastLookupUsed={fastLookupUsed}
+                                            />
+                                        </div>
+                                        
+                                        {/* Save Contact Button - Right Side */}
+                                        <div className="flex-1">
+                                            <SaveContactButton userId={userId} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

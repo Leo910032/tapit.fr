@@ -1,4 +1,4 @@
-// app/[userId]/components/SaveContactButton.jsx - SOLUTION ROBUSTE
+// app/[userId]/components/SaveContactButton.jsx - RESPONSIVE VERSION FOR SIDE-BY-SIDE
 "use client"
 import { useState, useEffect } from 'react';
 import { fireApp } from "@/important/firebase";
@@ -62,7 +62,7 @@ export default function SaveContactButton({ userId }) {
         fetchContactData();
     }, [userId]);
 
-    // 📱 Génération vCard optimisée
+    // vCard generation
     const generateVCard = () => {
         if (!contactData) return '';
 
@@ -115,7 +115,7 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
-    // 🔥 SOLUTION PRINCIPALE : Téléchargement direct SANS API de partage
+    // Direct save method
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -123,10 +123,9 @@ export default function SaveContactButton({ userId }) {
             const vCardContent = generateVCard();
             
             if (isMobile) {
-                // 📱 SUR MOBILE : Ouverture directe avec data URL
+                // Mobile: Direct data URL opening
                 const dataURL = `data:text/vcard;charset=utf-8,${encodeURIComponent(vCardContent)}`;
                 
-                // Créer un lien invisible et le cliquer
                 const link = document.createElement('a');
                 link.href = dataURL;
                 link.download = `${contactData.displayName || 'contact'}.vcf`;
@@ -134,22 +133,20 @@ export default function SaveContactButton({ userId }) {
                 
                 document.body.appendChild(link);
                 
-                // Sur iOS, il faut ouvrir dans une nouvelle fenêtre
                 if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
                     window.open(dataURL, '_blank');
                 } else {
-                    // Sur Android, déclencher le téléchargement
                     link.click();
                 }
                 
                 document.body.removeChild(link);
                 
-                toast.success('📱 Ouvrez l\'app Contacts pour ajouter le contact!', {
+                toast.success('📱 Open with Contacts app!', {
                     duration: 4000
                 });
                 
             } else {
-                // 💻 SUR DESKTOP : Téléchargement Blob
+                // Desktop: Blob download
                 const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 
@@ -163,34 +160,32 @@ export default function SaveContactButton({ userId }) {
                 
                 setTimeout(() => URL.revokeObjectURL(url), 100);
                 
-                toast.success('📥 Fichier téléchargé ! Ouvrez-le pour ajouter le contact.', {
+                toast.success('📥 File downloaded!', {
                     duration: 4000
                 });
             }
             
         } catch (error) {
-            console.error('Erreur sauvegarde directe:', error);
-            // Fallback vers la copie
+            console.error('Save error:', error);
             handleCopyContact();
         }
     };
 
-    // 📋 Copier les informations (fallback)
+    // Copy contact info
     const handleCopyContact = async () => {
         try {
             const contactText = [
-                contactData.displayName && `Nom: ${contactData.displayName}`,
+                contactData.displayName && `Name: ${contactData.displayName}`,
                 contactData.email && `Email: ${contactData.email}`,
-                contactData.phone && `Téléphone: ${contactData.phone}`,
-                contactData.website && `Site web: ${contactData.website}`,
-                contactData.company && `Entreprise: ${contactData.company}`,
+                contactData.phone && `Phone: ${contactData.phone}`,
+                contactData.website && `Website: ${contactData.website}`,
+                contactData.company && `Company: ${contactData.company}`,
                 contactData.bio && `Bio: ${contactData.bio}`
             ].filter(Boolean).join('\n');
 
             if (navigator.clipboard) {
                 await navigator.clipboard.writeText(contactText);
             } else {
-                // Fallback pour les anciens navigateurs
                 const textArea = document.createElement('textarea');
                 textArea.value = contactText;
                 document.body.appendChild(textArea);
@@ -199,22 +194,21 @@ export default function SaveContactButton({ userId }) {
                 document.body.removeChild(textArea);
             }
             
-            toast.success('📋 Informations copiées dans le presse-papiers!', {
+            toast.success('📋 Contact info copied!', {
                 duration: 3000
             });
         } catch (error) {
-            console.error('Erreur copie:', error);
-            toast.error('Impossible de copier les informations');
+            console.error('Copy error:', error);
+            toast.error('Failed to copy contact info');
         }
     };
 
-    // 🔲 QR Code pour partage rapide
+    // QR Code display
     const handleShowQR = () => {
         try {
             const vCardContent = generateVCard();
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(vCardContent)}`;
             
-            // Créer une popup avec le QR code
             const popup = window.open('', '_blank', 'width=450,height=500,scrollbars=no,resizable=no');
             if (popup) {
                 popup.document.write(`
@@ -229,7 +223,7 @@ export default function SaveContactButton({ userId }) {
                                 padding: 20px; 
                                 text-align: center; 
                                 font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                background: linear-gradient(135deg, #10B981 0%, #059669 100%);
                                 color: white;
                                 min-height: 100vh;
                                 display: flex;
@@ -261,11 +255,11 @@ export default function SaveContactButton({ userId }) {
                                 line-height: 1.5;
                             }
                             .name {
-                                color: #667eea;
+                                color: #10B981;
                                 font-weight: bold;
                             }
                             .close-btn {
-                                background: #667eea;
+                                background: #10B981;
                                 color: white;
                                 border: none;
                                 padding: 10px 20px;
@@ -278,10 +272,10 @@ export default function SaveContactButton({ userId }) {
                     </head>
                     <body>
                         <div class="container">
-                            <h2>📱 Scanner pour sauvegarder</h2>
+                            <h2>📱 Scan to Save Contact</h2>
                             <img src="${qrUrl}" alt="QR Code" />
-                            <p>Scannez ce QR code avec l'appareil photo de votre téléphone pour ajouter<br><span class="name">${contactData.displayName || 'ce contact'}</span> à vos contacts</p>
-                            <button class="close-btn" onclick="window.close()">Fermer</button>
+                            <p>Scan this QR code with your phone camera to add<br><span class="name">${contactData.displayName || 'this contact'}</span> to your contacts</p>
+                            <button class="close-btn" onclick="window.close()">Close</button>
                         </div>
                     </body>
                     </html>
@@ -289,49 +283,12 @@ export default function SaveContactButton({ userId }) {
                 popup.document.close();
             }
             
-            toast.success('📱 Scannez le QR code avec votre téléphone!', {
+            toast.success('📱 Scan QR code with your phone!', {
                 duration: 3000
             });
         } catch (error) {
-            console.error('Erreur QR code:', error);
-            toast.error('Impossible de générer le QR code');
-        }
-    };
-
-    // 🔄 Partage natif (SEULEMENT si supporté et HTTPS)
-    const tryNativeShare = async () => {
-        // Vérifications strictes
-        if (!navigator.share) {
-            toast.error('Partage non supporté sur cet appareil');
-            return false;
-        }
-
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-            toast.error('Le partage nécessite une connexion sécurisée');
-            return false;
-        }
-
-        try {
-            const contactText = [
-                contactData.displayName && `${contactData.displayName}`,
-                contactData.email && `📧 ${contactData.email}`,
-                contactData.phone && `📞 ${contactData.phone}`,
-                contactData.website && `🌐 ${contactData.website}`
-            ].filter(Boolean).join('\n');
-
-            await navigator.share({
-                title: `Contact: ${contactData.displayName || 'Inconnu'}`,
-                text: contactText
-            });
-
-            toast.success('Contact partagé!');
-            return true;
-        } catch (error) {
-            if (error.name !== 'AbortError') {
-                console.error('Erreur partage natif:', error);
-                toast.error('Échec du partage');
-            }
-            return false;
+            console.error('QR error:', error);
+            toast.error('Failed to generate QR code');
         }
     };
 
@@ -342,30 +299,33 @@ export default function SaveContactButton({ userId }) {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     return (
-        <div className="w-full px-5 mb-4 relative">
+        <div className="relative">
             <div className="flex gap-2">
-                {/* 🎯 BOUTON PRINCIPAL - Sauvegarde directe */}
+                {/* 🎯 MAIN BUTTON - Responsive design */}
                 <button
                     onClick={handleDirectSave}
-                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 px-3 md:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                 >
-                    <FaAddressCard className="w-5 h-5" />
-                    <div className="flex-1 text-center">
-                        <div className="text-sm font-semibold">
-                            {isMobile ? 'Sauvegarder Contact' : 'Télécharger Contact'}
-                        </div>
-                        <div className="text-xs opacity-90">
-                            {contactData.displayName && `Ajouter ${contactData.displayName}`}
-                        </div>
-                    </div>
-                    <FaDownload className="w-4 h-4" />
+                    <FaAddressCard className="w-5 h-5 flex-shrink-0" />
+                    
+                    {/* Desktop text */}
+                    <span className="hidden md:block">
+                        {isMobile ? 'Save Contact' : 'Download Contact'}
+                    </span>
+                    
+                    {/* Mobile text (shorter) */}
+                    <span className="block md:hidden text-sm">
+                        Save
+                    </span>
+                    
+                    <FaDownload className="w-4 h-4 flex-shrink-0" />
                 </button>
 
-                {/* MENU OPTIONS */}
+                {/* OPTIONS MENU BUTTON */}
                 <button
                     onClick={() => setShowOptions(!showOptions)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
-                    title="Plus d'options"
+                    title="More options"
                 >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -373,12 +333,12 @@ export default function SaveContactButton({ userId }) {
                 </button>
             </div>
 
-            {/* MENU D'OPTIONS */}
+            {/* OPTIONS MENU */}
             {showOptions && (
-                <div className="absolute right-5 top-full mt-2 bg-white rounded-lg shadow-lg border z-50 min-w-[220px] overflow-hidden">
+                <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border z-50 min-w-[220px] overflow-hidden">
                     <div className="py-2">
                         
-                        {/* Option Copier (TOUJOURS disponible) */}
+                        {/* Copy Option */}
                         <button
                             onClick={() => {
                                 handleCopyContact();
@@ -387,10 +347,10 @@ export default function SaveContactButton({ userId }) {
                             className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
                         >
                             <FaCopy className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm">Copier les informations</span>
+                            <span className="text-sm">Copy Contact Info</span>
                         </button>
 
-                        {/* Option QR Code */}
+                        {/* QR Code Option */}
                         <button
                             onClick={() => {
                                 handleShowQR();
@@ -401,27 +361,13 @@ export default function SaveContactButton({ userId }) {
                             <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                             </svg>
-                            <span className="text-sm">Afficher QR Code</span>
+                            <span className="text-sm">Show QR Code</span>
                         </button>
-
-                        {/* Option Partage natif (SEULEMENT si HTTPS) */}
-                        {navigator.share && location.protocol === 'https:' && (
-                            <button
-                                onClick={() => {
-                                    tryNativeShare();
-                                    setShowOptions(false);
-                                }}
-                                className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                            >
-                                <FaShare className="w-4 h-4 text-blue-600" />
-                                <span className="text-sm">Partager (Natif)</span>
-                            </button>
-                        )}
                     </div>
                 </div>
             )}
 
-            {/* Overlay pour fermer le menu */}
+            {/* Close menu overlay */}
             {showOptions && (
                 <div 
                     className="fixed inset-0 z-40" 
