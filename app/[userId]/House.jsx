@@ -26,24 +26,33 @@ export default function House({ userId }) {
     const [sensitiveType, setSensitiveType] = useState(false);
     const [viewRecorded, setViewRecorded] = useState(false);
     const [username, setUsername] = useState("");
-    const [isPreviewMode, setIsPreviewMode] = useState(false);
+    // 🔧 Initialize preview mode IMMEDIATELY to avoid race conditions
+    const [isPreviewMode, setIsPreviewMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('preview') === 'true';
+        }
+        return false;
+    });
 
     // Fast lookup state
     const [fastLookupUsed, setFastLookupUsed] = useState(false);
     const [userLookupData, setUserLookupData] = useState(null);
 
-    // 🔧 Check if this is preview mode
+    // 🔧 Check if this is preview mode - SYNCHRONOUSLY to avoid race condition
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const urlParams = new URLSearchParams(window.location.search);
             const isPreview = urlParams.get('preview') === 'true';
-            setIsPreviewMode(isPreview);
             
             console.log('🔍 House: Preview mode detected:', isPreview);
             console.log('🔍 House: Full URL:', window.location.href);
             console.log('🔍 House: userId param:', userId);
+            
+            // Set preview mode IMMEDIATELY and synchronously
+            setIsPreviewMode(isPreview);
         }
-    }, []);
+    }, []); // Empty dependency array - runs once immediately
 
     // Enhanced fetchUserData function that tries fast lookup first
     const enhancedFetchUserData = async (inputUserId) => {
@@ -94,7 +103,7 @@ export default function House({ userId }) {
 
                 if (getDocRef.exists()) {
                     const data = getDocRef.data();
-                    console.log('✅ Document data retrieved:', Object.keys(data));
+                    console.log('✅ Document data retrieved - preview mode:', isPreviewMode);
                     
                     const { sensitiveStatus, sensitivetype, username: profileUsername } = data;
                     
@@ -138,7 +147,7 @@ export default function House({ userId }) {
         }
         
         fetchProfilePicture();
-    }, [userId, isPreviewMode]); // Add isPreviewMode to dependencies
+    }, [userId]); // Remove isPreviewMode dependency to avoid double execution
 
     // Record profile view - but NOT in preview mode
     useEffect(() => {
@@ -184,16 +193,19 @@ export default function House({ userId }) {
             
             {/* 🔧 Enhanced debug info for preview mode */}
             {(process.env.NODE_ENV === 'development' || isPreviewMode) && (
-                <div className="fixed top-2 right-2 z-50 bg-black bg-opacity-75 text-white text-xs p-2 rounded">
+                <div className="fixed top-2 right-2 z-50 bg-black bg-opacity-75 text-white text-xs p-2 rounded max-w-xs">
                     <div className="text-yellow-300 font-bold mb-1">
                         {isPreviewMode ? '👁️ PREVIEW MODE' : '🔧 DEBUG'}
                     </div>
                     <div>URL: @{userId}</div>
                     <div>Fast Lookup: {fastLookupUsed ? '✅' : '❌'}</div>
-                    <div>Username: {username}</div>
+                    <div>Username: {username || 'Loading...'}</div>
                     <div>Preview: {isPreviewMode ? '✅' : '❌'}</div>
                     {userLookupData && <div>Display: {userLookupData.displayName}</div>}
                     {sensitiveWarning && <div className="text-red-300">⚠️ Sensitive Content</div>}
+                    <div className="text-xs text-gray-300 mt-1">
+                        Data: {username ? 'Loaded' : 'Loading...'}
+                    </div>
                 </div>
             )}
             
