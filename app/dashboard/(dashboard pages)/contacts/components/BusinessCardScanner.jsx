@@ -16,6 +16,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     const [mediaStream, setMediaStream] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
 
+
+
     // ✅ Fixed useEffect for media stream management
     useEffect(() => {
         if (mediaStream && videoRef.current) {
@@ -69,7 +71,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
 
         } catch (error) {
             console.error('Could not access any camera.', error);
-            toast.error('Unable to access camera on this device.');
+            toast.error(t('business_card_scanner.camera_access_error'));
         }
     };
 
@@ -119,14 +121,14 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
 
         if (!file.type.startsWith('image/')) {
             console.error('❌ Invalid file type:', file.type);
-            toast.error('Please select a valid image file');
+            toast.error(t('business_card_scanner.invalid_file_type'));
             return;
         }
         
         // Check file size (limit to 10MB)
         if (file.size > 10 * 1024 * 1024) {
             console.error('❌ File too large:', file.size, 'bytes');
-            toast.error('Image file is too large. Please select an image under 10MB.');
+            toast.error(t('business_card_scanner.file_too_large'));
             return;
         }
         
@@ -161,7 +163,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         } catch (error) {
             console.error('❌ Error creating preview URL:', error);
             console.error('❌ Error stack:', error.stack);
-            toast.error('Failed to load the selected image');
+            toast.error(t('business_card_scanner.image_load_failed'));
             
             // Fallback to FileReader
             console.log('🔄 Attempting FileReader fallback...');
@@ -173,7 +175,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                 };
                 reader.onerror = (error) => {
                     console.error('❌ FileReader fallback failed:', error);
-                    toast.error('Failed to read the image file');
+                    toast.error(t('business_card_scanner.image_read_failed'));
                 };
                 reader.readAsDataURL(file);
             } catch (fallbackError) {
@@ -190,7 +192,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
     const processImage = async () => {
         if (!capturedImage) return;
         setIsProcessing(true);
-        toast.loading('Scanning card...', { id: 'scanning-toast' });
+        toast.loading(t('business_card_scanner.scanning_card'), { id: 'scanning-toast' });
         
         try {
             const reader = new FileReader();
@@ -208,14 +210,14 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                     
                     if (result.success) {
                         onContactParsed(result.parsedFields);
-                        toast.success('Scan complete! Please review.');
+                        toast.success(t('business_card_scanner.scan_complete'));
                     } else {
-                        toast.error(result.error || 'Failed to scan business card');
+                        toast.error(result.error || t('business_card_scanner.scan_failed'));
                     }
                 } catch (error) {
                     toast.dismiss('scanning-toast');
                     console.error('API call error:', error);
-                    toast.error('Failed to process business card');
+                    toast.error(t('business_card_scanner.processing_failed'));
                 } finally {
                     setIsProcessing(false);
                 }
@@ -223,7 +225,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
             
             reader.onerror = () => {
                 toast.dismiss('scanning-toast');
-                toast.error('Failed to read image file');
+                toast.error(t('business_card_scanner.image_read_error'));
                 setIsProcessing(false);
             };
             
@@ -232,7 +234,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
         } catch (error) {
             toast.dismiss('scanning-toast');
             console.error('Processing error:', error);
-            toast.error('Failed to process business card');
+            toast.error(t('business_card_scanner.processing_failed'));
             setIsProcessing(false);
         }
     };
@@ -268,7 +270,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                 {/* Header - Mobile optimized */}
                 <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-white flex-shrink-0">
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                        📷 Scan Business Card
+                        📷 {t('business_card_scanner.title')}
                     </h3>
                     <button
                         onClick={handleClose}
@@ -292,10 +294,10 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                     </svg>
                                 </div>
                                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                                    Capture Business Card
+                                    {t('business_card_scanner.capture_title')}
                                 </h3>
                                 <p className="text-gray-600 text-sm sm:text-base max-w-sm">
-                                    Choose how to capture the business card. For best results, ensure good lighting and the card fills most of the frame.
+                                    {t('business_card_scanner.capture_description')}
                                 </p>
                             </div>
                             
@@ -309,8 +311,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0118.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    <span className="font-medium text-sm sm:text-base">Take Photo</span>
-                                    <span className="text-xs text-blue-100">Use your camera</span>
+                                    <span className="font-medium text-sm sm:text-base">{t('business_card_scanner.take_photo')}</span>
+                                    <span className="text-xs text-blue-100">{t('business_card_scanner.use_camera')}</span>
                                 </button>
 
                                 {/* File upload button - Mobile optimized */}
@@ -321,8 +323,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                     <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                     </svg>
-                                    <span className="font-medium text-sm sm:text-base">Upload Image</span>
-                                    <span className="text-xs text-gray-500">From your device</span>
+                                    <span className="font-medium text-sm sm:text-base">{t('business_card_scanner.upload_image')}</span>
+                                    <span className="text-xs text-gray-500">{t('business_card_scanner.from_device')}</span>
                                 </button>
 
                                 <input
@@ -369,7 +371,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                             
                                             {/* Instructions - mobile optimized */}
                                             <div className="absolute -bottom-8 sm:-bottom-12 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 rounded-lg whitespace-nowrap">
-                                                Position card within frame
+                                                {t('business_card_scanner.position_card_instruction')}
                                             </div>
                                         </div>
                                     </div>
@@ -380,7 +382,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                         onClick={stopCamera}
                                         className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium text-sm sm:text-base"
                                     >
-                                        Cancel
+                                        {t('common.cancel')}
                                     </button>
                                     <button
                                         onClick={capturePhoto}
@@ -389,8 +391,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0118.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                         </svg>
-                                        <span className="hidden sm:inline">Capture Photo</span>
-                                        <span className="sm:hidden">Capture</span>
+                                        <span className="hidden sm:inline">{t('business_card_scanner.capture_photo')}</span>
+                                        <span className="sm:hidden">{t('business_card_scanner.capture')}</span>
                                     </button>
                                 </div>
                             </div>
@@ -402,13 +404,13 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                         <div className="p-3 sm:p-4 flex flex-col items-center min-h-full">
                             <div className="w-full max-w-2xl">
                                 <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 text-center">
-                                    Ready to Scan
+                                    {t('business_card_scanner.ready_to_scan')}
                                 </h4>
                                 
                                 <div className="bg-gray-100 rounded-lg sm:rounded-xl p-2 sm:p-4 mb-3 sm:mb-4">
                                     <img
                                         src={previewUrl}
-                                        alt="Captured business card"
+                                        alt={t('business_card_scanner.captured_card_alt')}
                                         className="w-full h-auto max-h-[300px] sm:max-h-[400px] object-contain rounded-lg shadow-sm"
                                         onLoad={(e) => {
                                             console.log('✅ Final preview loaded successfully:', {
@@ -426,7 +428,7 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                                 naturalWidth: e.target.naturalWidth,
                                                 naturalHeight: e.target.naturalHeight
                                             });
-                                            toast.error('Failed to display the image');
+                                            toast.error(t('business_card_scanner.image_display_failed'));
                                         }}
                                     />
                                 </div>
@@ -437,8 +439,8 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                         disabled={isProcessing}
                                         className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors font-medium text-sm sm:text-base"
                                     >
-                                        <span className="hidden sm:inline">Retake Photo</span>
-                                        <span className="sm:hidden">Retake</span>
+                                        <span className="hidden sm:inline">{t('business_card_scanner.retake_photo')}</span>
+                                        <span className="sm:hidden">{t('business_card_scanner.retake')}</span>
                                     </button>
                                     <button
                                         onClick={processImage}
@@ -448,13 +450,13 @@ export default function BusinessCardScanner({ isOpen, onClose, onContactParsed }
                                         {isProcessing && (
                                             <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
                                         )}
-                                        {isProcessing ? 'Processing...' : (
+                                        {isProcessing ? t('business_card_scanner.processing') : (
                                             <>
                                                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                                 </svg>
-                                                <span className="hidden sm:inline">Scan Card</span>
-                                                <span className="sm:hidden">Scan</span>
+                                                <span className="hidden sm:inline">{t('business_card_scanner.scan_card')}</span>
+                                                <span className="sm:hidden">{t('business_card_scanner.scan')}</span>
                                             </>
                                         )}
                                     </button>
