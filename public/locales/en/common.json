@@ -1,7 +1,5 @@
 {
-
-
-"exchange": {
+  "exchange": {
     "title": "Exchange Contact",
     "description": "Share your contact information to connect with this profile owner.",
     "close_modal": "Close modal",
@@ -61,84 +59,76 @@
     "image_read_error": "Failed to read image file",
     "image_display_failed": "Failed to display the image"
   },
-"contacts": {
-  "welcome" : "Welcome back,",
-  "All" : "All", 
-  "team_sharing" : "Team sharing",
-  "fast_lookup" : "Fast lookup",
-  "team_sharing_avaible" : "Team sharing available",
-  "team_shearing" : "Team sharing",
-  "live_updates" : "Live updates",
-  "Clear" : "Clear",
-  "team_contact" : "Team contact sharing enabled", 
-  "Share" : "Share",
-  "selected" : "selected",
-  "fast_look" : "Fast lookup enabled",
-  "sharing_enabled" : "Team contact sharing enabled",
-"edit_contact": "Edit Contact",
-"edit": "Edit",
-"modified": "Modified",
-"last_modified": "Last Modified",
-"contact_updated_successfully": "Contact updated successfully",
-"failed_to_update_contact": "Failed to update contact",
-"name": "Name",
-"email": "Email",
-"phone": "Phone",
-"company": "Company",
-"message": "Message",
-"status": "Status",
-"contact_info": "Contact Information",
-"submitted_at": "Submitted At",
-"contact_id": "Contact ID",
-"save_changes": "Save Changes",
-"saving": "Saving...",
-"location_for_contact": "Location for {name}",
-"all_contact_locations": "All Contact Locations",
-"title": "Contact List",
-"subtitle": "Manage contacts who have shared their information through your profile",
-"loading": "Loading contacts...",
-"loading_map": "Loading map...",
-"live_updates_enabled": "Live updates enabled",
-"offline_updates_enabled": "Live updates not enabled",
-"contacts_with_location": "{count} contacts with location",
-"new_contacts_notification": "{count} new contact{plural} received!{location}",
-"failed_to_load": "Failed to load contacts",
-"status_updated": "Contact status updated",
-"failed_to_update_status": "Failed to update contact status",
-"bulk_update_success": "{count} contacts updated",
-"failed_to_update_contacts": "Failed to update contacts",
-"filter_by_status" : "Filter by status",
-    
-    
+  "contacts": {
+    "welcome": "Welcome back,",
+    "All": "All",
+    "team_sharing": "Team sharing",
+    "fast_lookup": "Fast lookup",
+    "team_sharing_avaible": "Team sharing available",
+    "team_shearing": "Team sharing",
+    "live_updates": "Live updates",
+    "Clear": "Clear",
+    "team_contact": "Team contact sharing enabled",
+    "Share": "Share",
+    "selected": "selected",
+    "fast_look": "Fast lookup enabled",
+    "sharing_enabled": "Team contact sharing enabled",
+    "edit_contact": "Edit Contact",
+    "edit": "Edit",
+    "modified": "Modified",
+    "last_modified": "Last Modified",
+    "contact_updated_successfully": "Contact updated successfully",
+    "failed_to_update_contact": "Failed to update contact",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "company": "Company",
+    "message": "Message",
+    "status": "Status",
+    "contact_info": "Contact Information",
+    "submitted_at": "Submitted At",
+    "contact_id": "Contact ID",
+    "save_changes": "Save Changes",
+    "saving": "Saving...",
+    "location_for_contact": "Location for {name}",
+    "all_contact_locations": "All Contact Locations",
+    "title": "Contact List",
+    "subtitle": "Manage contacts who have shared their information through your profile",
+    "loading": "Loading contacts...",
+    "loading_map": "Loading map...",
+    "live_updates_enabled": "Live updates enabled",
+    "offline_updates_enabled": "Live updates not enabled",
+    "contacts_with_location": "{count} contacts with location",
+    "new_contacts_notification": "You have {count} new contact{plural}{location}!",
+    "failed_to_load": "Failed to load contacts",
+    "status_updated": "Contact status updated",
+    "failed_to_update_status": "Failed to update contact status",
+    "bulk_update_success": "{count} contacts updated",
+    "failed_to_update_contacts": "Failed to update contacts",
+    "filter_by_status": "Filter by status",
     "filter_all": "All",
     "filter_new": "New",
     "filter_viewed": "Viewed",
     "filter_archived": "Archived",
-    
     "search_placeholder": "Search contacts...",
     "no_location_data": "No contacts with location data",
     "view_all_locations": "View all contact locations",
     "map_button": "Map",
-    
     "selected_contacts": "{count} contact(s) selected",
     "mark_as_viewed": "Mark as Viewed",
     "archive": "Archive",
     "restore": "Restore",
-    
     "no_contacts_found": "No contacts found",
     "no_contacts_yet": "No contacts yet",
     "try_adjusting_filters": "Try adjusting your search or filters",
     "contacts_will_appear_here": "Contacts will appear here when visitors share their information through your profile",
-    
     "status_new": "new",
     "status_viewed": "viewed",
     "status_archived": "archived",
     "located": "Located",
-    
     "send_email": "Send Email",
     "call": "Call",
     "view_location_on_map": "View Location on Map",
-    
     "export_contacts": "Export Contacts",
     "export_headers": {
       "name": "Name",
@@ -153,7 +143,6 @@
       "longitude": "Longitude",
       "location_accuracy": "Location Accuracy"
     },
-    
     "contact_locations": "Contact Locations",
     "viewing_location_for": "Viewing location for {name}",
     "showing_contacts_with_location": "Showing {count} contacts with location data",
@@ -164,7 +153,16 @@
     "show_all_contacts": "Show all contacts",
     "open_in_google_maps": "Open in Google Maps",
     "copy_coordinates": "Copy Coordinates",
-    "coordinates_copied": "Coordinates copied to clipboard!"
+    "coordinates_copied": "Coordinates copied to clipboard!",
+    "share_with_team": "Share with Team",
+    "showing_contacts": "you have {count} of {total} contacts",
+    "personal": "personal",
+    "from_team": "from team",
+    "with_location": "with location",
+    "added": "Added:",
+    "mark_viewed": "Mark Viewed",
+    "filter_with_count": "Filter ({count})",
+    "map_with_count": "Map ({count})"
   },
   "common": {
     "login": "Log in",
@@ -181,20 +179,20 @@
     "yes": "Yes",
     "no": "No"
   },
-  "controller" : {
-    "jump _to" : "Jump to:"
+  "controller": {
+    "jump _to": "Jump to:"
   },
-    "textDetails": {
+  "textDetails": {
     "profile_title": "Profile title",
     "bio": "Bio"
   },
-    "dropdown": {
+  "dropdown": {
     "social_icons": "Social Icons",
     "support_banner": "Support banner",
     "sensitive_material": "Sensitive material",
     "seo": "SEO"
   },
-   "add_icon_modal": {
+  "add_icon_modal": {
     "title": "Add Icon",
     "search_placeholder": "Search",
     "search_label": "Search",
@@ -202,16 +200,15 @@
     "no_icons_found": "No icons found. Try something else?",
     "all_category": "All"
   },
-  "supportbanner" : {
-    "support_banner" : "Support banner"
+  "supportbanner": {
+    "support_banner": "Support banner"
   },
   "support": {
     "act_now": "Act now",
     "show_your_support": "Show your support",
     "support_banner_description": "Show your support for important causes with a profile banner. Only one banner can be active at a time."
   },
-  
-   "social": {
+  "social": {
     "social_icons": "Social Icons",
     "be_iconic": "Be iconic",
     "add_icons_description": "Add icons linking to your social profiles, email and more.",
@@ -221,29 +218,28 @@
     "display_icons_at": "Display icons at the:",
     "see_analytics": "See analytics"
   },
-   "map": {
+  "map": {
     "failed_to_load": "Failed to load Google Maps: {{error}}",
     "no_location_data_title": "No Location Data Available",
     "no_location_data_description": "No contacts have shared their location yet. When visitors submit contact forms with location permission granted, their locations will appear on this map.",
-    "location_tracking_tip": "Tip: Location tracking helps you understand your audience's geographic distribution and can be useful for local networking or events.",
     "loading_error_title": "Map Loading Error",
     "loading_error_description": "Please check your Google Maps API key configuration or try refreshing the page.",
     "loading_message": "Loading map with {{count}} contact{{plural}}...",
     "contact_locations_title": "Contact Locations",
     "legend_new_contacts": "New contacts",
-    "legend_viewed_contacts": "Viewed contacts", 
+    "legend_viewed_contacts": "Viewed contacts",
     "legend_archived_contacts": "Archived contacts",
-    "total_contacts_count": "Total:", 
+    "total_contacts_count": "Total:",
     "total_contacts": "located contact",
     "click_marker_tip": "Click any marker to focus on that contact's location"
   },
-    "themes": {
+  "themes": {
     "custom": "Custom",
     "create_your_own": "Create Your Own",
     "matrix": "Matrix",
     "new_mario": "New Mario",
     "pebble_blue": "Pebble Blue",
-    "pebble_yellow": "Pebble Yellow", 
+    "pebble_yellow": "Pebble Yellow",
     "pebble_pink": "Pebble Pink",
     "cloud_red": "Cloud Red",
     "cloud_green": "Cloud Green",
@@ -258,12 +254,12 @@
     "lake_white": "Lake White",
     "lake_black": "Lake Black"
   },
-  "fontsoptions" :{
-    "fontsoptions" : "Fonts"
+  "fontsoptions": {
+    "fontsoptions": "Fonts"
   },
-    "appearance": {
+  "appearance": {
     "profile": "Profile",
-    "themes": "Themes", 
+    "themes": "Themes",
     "custom_appearance": "Custom appearance",
     "custom_appearance_description": "Completely customize your Linktree profile. Change your background with colors, gradients and images. Choose a button style, change the typeface and more.",
     "backgrounds": "Backgrounds",
@@ -272,73 +268,64 @@
     "buttons": "Buttons",
     "fonts": "Fonts"
   },
-    "backgrounds": {
+  "backgrounds": {
     "flat_colour": "Flat Colour",
-    "gradient": "Gradient", 
+    "gradient": "Gradient",
     "image": "Image",
     "video": "Video",
     "polka": "Polka",
-    "stripe": "Stripe", 
+    "stripe": "Stripe",
     "waves": "Waves",
     "zig_zag": "Zig Zag"
   },
-    "christmas": {
+  "christmas": {
     "snow_fall": "Snow Fall"
   },
-    "fonts": {
+  "fonts": {
     "select_font": "Select a font",
     "search_by_font_name": "Search by font name",
     "classic": "Classic",
     "selected": "Selected",
     "no_fonts_found": "No fonts found."
   },
-  
-    "buttons": {
+  "buttons": {
     "fill": "Fill",
-    "outline": "Outline", 
+    "outline": "Outline",
     "hard_shadow": "Hard Shadow",
     "soft_shadow": "Soft Shadow",
     "special": "Special",
     "theme_text_color": "Theme text colour",
     "button_color": "Button colour",
-    "button_font_color": "Button font colour", 
+    "button_font_color": "Button font colour",
     "shadow_color": "Shadow colour"
   },
-  "button" : {
-    "copy_link_button" :  "Link copied",
+  "button": {
+    "copy_link_button": "Link copied",
     "link_copied": "Link copied"
-
-
   },
-  "mylinkdiv":{
-    "linktree" : "Your Linktree is live:",
-    "copy" : "Copied!",
-    "copy_url" : "Copy URL"
+  "mylinkdiv": {
+    "linktree": "Your Linktree is live:",
+    "copy": "Copied!",
+    "copy_url": "Copy URL"
   },
   "profile": {
     "add_social_icons": "Add social icons",
     "my_account": "My Account",
     "sign_out": "Sign Out"
   },
-    "share": {
+  "share": {
     "share_your_linktree": "Share your Linktree",
     "get_more_visitors": "Get more visitors to your Linktree by sharing it with your audience.",
- 
     "add_to_socials": "Add to your socials",
     "add_linktree_to_socials": "Add Linktree to your socials",
     "add_linktree_url_description": "Add your Linktree URL to your social profiles for the world to easily find your Linktree.",
-    
     "share_linktree_to": "Share my Linktree to...",
     "share_to": "Share to...",
     "share_linktree_connections": "Share your Linktree to all your connections so everyone knows about it.",
-    
     "linktree_qr_code": "My Linktree QR code",
     "qr_code": "QR Code",
     "qr_code_description": "Here is your unique Linktree QR code that will direct people to your Linktree when scanned.",
-    
     "open_my_linktree": "Open my Linktree",
-    
-  
     "snapchat": "Snapchat",
     "instagram": "Instagram",
     "facebook_profile": "Facebook Profile",
@@ -349,8 +336,6 @@
     "linkedin": "Linkedin",
     "pinterest": "Pinterest",
     "twitter": "Twitter",
-    
- 
     "share_on_snapchat": "Share on Snapchat",
     "share_on_facebook": "Share on Facebook",
     "share_on_linkedin": "Share on Linkedin",
@@ -358,33 +343,22 @@
     "share_via_whatsapp": "Share via WhatsApp",
     "share_via_messenger": "Share via Messenger",
     "share_via_email": "Share via Email",
-
     "snapchat_description": "Add your Linktree to your Snapchat Public Profile. Simply copy your Linktree URL, open Snapchat, go to My Public Profile, tap Edit, then select Linktree or Website, then Add Your Linktree and paste your Linktree URL into the Add Linktree field.",
-    
     "instagram_description": "Add your Linktree to your Instagram profile. Simply copy your Linktree URL, go to Edit Profile, and paste it into the Website field.",
-    
     "facebook_description": "Add your Linktree to your Facebook profile. Simply copy your Linktree URL, go to the About page on your profile, click on Contact and basic info, then click on + Add a website, paste your Linktree URL into the Website address field, and click Save.",
-    
     "tiktok_description": "Add your Linktree to your TikTok profile. Simply copy your Linktree URL, go your TikTok profile, click on Manage Account, click on Edit profile, and paste your Linktree URL into the Website field, then click Save. (Note you may need to switch to a TikTok business account to activate this).",
-    
     "twitch_description": "Add your Linktree to your Twitch channel. Simply copy your Linktree URL, go your Twitch channel, click About, then click Edit about & links settings, scroll down to Social Links, add Linktree in the first text field, and paste your Linktree URL into the second text field, then click Add.",
-    
     "facebook_page_description": "Add your Linktree to your Facebook page. Simply copy your Linktree URL, go to the About page, scroll to Additional Contact Info, click on Enter website, and paste your Linktree URL into the Website field.",
-    
     "youtube_description": "Add your Linktree to your YouTube channel. Simply copy your Linktree URL, go to your YouTube channel, click on Customize Channel, then click on Basic info, and under Links, add a link title and paste your Linktree URL into the URL field, then click Publish.",
-    
     "linkedin_description": "Add your Linktree to your LinkedIn profile. Simply copy your Linktree URL, go your LinkedIn profile, click on pencil icon, scroll down to Contact info, paste your Linktree URL into the Website URL field, then click Apply.",
-    
     "pinterest_description": "Add your Linktree to your Pinterest profile. Simply copy your Linktree URL, go your Pinterest settings, paste your Linktree URL into the Website URL field, then click Save.",
-    
     "twitter_description": "Add your Linktree to your Twitter profile. Simply copy your Linktree URL, go to your profile, click on Edit Profile, and paste your Linktree URL into the Website field."
   },
-  
-   "qrcode": {
+  "qrcode": {
     "download_jpg": "Download JPG",
     "high_quality_image": "High quality image"
   },
-   "seo": {
+  "seo": {
     "title": "SEO",
     "custom_metadata": "Custom metadata",
     "metadata_notice": "Changes to metadata may take some time to appear on other platforms.",
@@ -392,7 +366,7 @@
     "meta_description": "Meta description"
   },
   "email": {
-     "welcome": {
+    "welcome": {
       "subject": "Thanks for creating an account!",
       "title": "Welcome to My Linktree Clone!",
       "description": "This project is my attempt at recreating the amazing system that Linktree has developed.",
@@ -455,7 +429,7 @@
   },
   "login": {
     "title": "Log in to your Linktree",
-  "username_placeholder": "Enter your username",
+    "username_placeholder": "Enter your username",
     "password_placeholder": "Password",
     "forgot_password": "Forgot your password?",
     "submit": "Submit",
@@ -467,7 +441,7 @@
     "incorrect_password": "You entered an incorrect password!",
     "username_not_registered": "This username is not registered to any user."
   },
-   "signup": {
+  "signup": {
     "title": "Create your account",
     "username_placeholder": "Create your nickname",
     "email_placeholder": "Email",
@@ -503,19 +477,18 @@
     "remenber_password": "Remembered your password?",
     "sign_up": " Sign up"
   },
-   "sensitive": {
+  "sensitive": {
     "title": "Sensitive Content",
     "description": "This profile may contain content that is not appropriate for all audiences",
     "continue": "Continue",
     "go_back": "Go Back",
     "over_18": "I'm over 18",
-    "over_21": "I'm over 21", 
+    "over_21": "I'm over 21",
     "over_25": "I'm over 25",
     "under_18": "I'm under 18",
     "under_21": "I'm under 21",
     "under_25": "I'm under 25"
   },
-
   "reset_password": {
     "title": "Enter your new password",
     "advice": "I'll advice that your new password be different from your previous password.",
@@ -550,7 +523,7 @@
     "title": "Uh oh. Page not found",
     "description": "Sorry, the page you were looking for doesn't exist or has been hidden."
   },
-  "addBtn" : {
+  "addBtn": {
     "add_link": "Add Link",
     "enter_url": "Enter Url",
     "url": "URL",
@@ -562,21 +535,21 @@
     "instagram_handle": "Instagram Handle",
     "video_link": "Video Link",
     "music_link": "Music Link"
-  }, 
-  "manageLinks" : {
+  },
+  "manageLinks": {
     "add_header": "Add Header",
     "show_world_who_you_are": "Show the world who you are.",
     "add_link_to_get_started": "Add a link to get started."
   },
-  "pickBrandModal" : {
+  "pickBrandModal": {
     "add_to_linktree": "Add to Linktree",
     "share_your_content": "Share your content",
     "share_content_directly": "Share content directly on your Linktree"
   },
-  "brandLinks" : {
+  "brandLinks": {
     "music": "Music",
     "music_description": "Share music and get more streams",
-    "video": "Video", 
+    "video": "Video",
     "video_description": "Add videos tight to your Linktree",
     "header": "Header",
     "header_description": "Organize your links and apps",
@@ -596,7 +569,7 @@
     "audiomack_description": "Add an Audiomack player to your Linktree",
     "link": "Link"
   },
-    "special" : {
+  "special": {
     "enter_text": "Enter text",
     "headline_title": "Headline title",
     "url": "URL",
@@ -795,10 +768,7 @@
       "error": "Please enter a valid Twitch URL."
     }
   },
-  
-  
-
-   "support_groups": {
+  "support_groups": {
     "choose_cause": "Choose a cause",
     "banner_link_text": "Your banner will link to this",
     "support_creator": {
@@ -840,43 +810,14 @@
   "age_restriction": {
     "please_select_one": "Please select one:",
     "eighteen_plus": "18+",
-    "twenty_one_plus": "21+", 
+    "twenty_one_plus": "21+",
     "twenty_five_plus": "25+",
     "sensitive_content": "Sensitive Content"
   },
-    "file_manager": {
+  "file_manager": {
     "curriculum_documents": "Curriculum / Documents",
     "upload_file": "Upload File",
-    "replace_file": "Replace File", 
-    "remove": "Remove File",
-    "download": "Download",
-    "remove": "Remove",
-    "confirm_upload": "Confirm Upload",
-    "upload": "Upload",
-    "uploading": "Uploading...",
-    "uploading_file": "Uploading file...",
-    "file_uploaded": "File uploaded successfully!",
-    "file_uploaded_success": "File uploaded successfully!",
-    "file_removed_success": "File removed successfully!",
-    "error_occurred": "An error occurred",
-    "upload_error": "Failed to upload file",
-    "remove_error": "Failed to remove file",
-    "file_too_large": "File is too large. Maximum size is {maxSize}",
-    "supported_formats": "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT",
-    "max_size_50mb": "Max 50MB"
-  },
-   "file_download": {
-    "download_file": "Download File",
-    "download_document": "Download Document",
-    "download_curriculum": "Download CV/Resume",
-    "download_portfolio": "Download Portfolio",
-    "view_document": "View Document",
-    "file_not_available": "File not available"
-  },
-   "file_manager": {
-    "curriculum_documents": "Curriculum / Documents",
-    "upload_file": "Upload File",
-    "replace_file": "Replace File", 
+    "replace_file": "Replace File",
     "remove": "Remove",
     "download": "Download",
     "confirm_upload": "Confirm Upload",
@@ -894,29 +835,34 @@
     "supported_formats": "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT",
     "max_size_50mb": "Max 50MB"
   },
-  
-
-
+  "file_download": {
+    "download_file": "Download File",
+    "download_document": "Download Document",
+    "download_curriculum": "Download CV/Resume",
+    "download_portfolio": "Download Portfolio",
+    "view_document": "View Document",
+    "file_not_available": "File not available"
+  },
   "analytics": {
-    "quick_stats" : "Quick Stats",
-    "total_links_" : "Total Links:",
-    "active_links" : "Active Links:",
-    "Best_Day"  : "Best Day:",
-    "Avg_CTR" : "Avg. CTR:",
-    "Top_Links" : "Top Links",
-    "clicks" :"clicks",
-    "Profile_views" : "Profile Views",
-    "Link_clicks" : "Link Clicks",
-    "total_clicks_analytics" : "of total clicks",
-    "Most_active_period" : "Most Active Period:",
-    "Growth_trend" : "Growth Trend:",
-    "Growing" : "📈 Growing",
-    "Declining" : "📉 Declining",
-    "Performance_summary" : "Performance Summary",
-    "Total_engagement" : "Total Engagement:",
+    "quick_stats": "Quick Stats",
+    "total_links_": "Total Links:",
+    "active_links": "Active Links:",
+    "Best_Day": "Best Day:",
+    "Avg_CTR": "Avg. CTR:",
+    "Top_Links": "Top Links",
+    "clicks": "clicks",
+    "Profile_views": "Profile Views",
+    "Link_clicks": "Link Clicks",
+    "total_clicks_analytics": "of total clicks",
+    "Most_active_period": "Most Active Period:",
+    "Growth_trend": "Growth Trend:",
+    "Growing": "📈 Growing",
+    "Declining": "📉 Declining",
+    "Performance_summary": "Performance Summary",
+    "Total_engagement": "Total Engagement:",
     "link_NA": "No links data available",
-    "performance_last_7_days" : "Weekly performance",
-    "clicks_by_type" : "Clicks distribution",
+    "performance_last_7_days": "Weekly performance",
+    "clicks_by_type": "Clicks distribution",
     "live_updates_enabled": "Live updates enabled",
     "offline_updates_enabled": "Live updates not enabled",
     "title": "Analytics Dashboard",
@@ -938,44 +884,38 @@
     "total": "Total",
     "no_activity_yet": "No activity yet",
     "share_to_track": "Share your profile to start tracking views and clicks!",
-    "link_performance" : "Link performance",
-    "clicks_by_link" : "Clicks by link",
-    "click_distribution" : "Clicks distribution",
-    "total_links" : "Total links", 
-    "total_clicks" : "Total clicks",
-    "avg_clicks_per_link" : "Average clicks per link",
-    "created" : "Created",
-    "today" : "Today",
-    "week" : "This week",
-    "month" : "This month",
-    "all" : "All time",
-    "legend" : "Legend",
-
- "contacts_map": {
-    "hide_help": "Hide help",
-    "show_help": "Show help",
-    "click_markers_for_info": "Click on markers to see more information",
-    "close": "Close",
-    "api_key_missing": "Google Maps API key not found. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.",
-    "failed_to_load": "Failed to load Google Maps: {{error}}",
-    "no_location_data_title": "No location data",
-    "no_location_data_description": "No contacts with location found",
-    "loading_error_title": "Loading error",
-    "loading_contacts": "Loading {{count}} contact{{plural}}...",
-    "contact_locations": "Contact locations",
-    "new_contacts": "New contacts",
-    "viewed_contacts": "Viewed contacts", 
-    "archived_contacts": "Archived contacts",
-    "total_with_count": "Total: {{count}} contact{{plural}}"
-  },
-
-
-
-
-    
+    "link_performance": "Link performance",
+    "clicks_by_link": "Clicks by link",
+    "click_distribution": "Clicks distribution",
+    "total_links": "Total links",
+    "total_clicks": "Total clicks",
+    "avg_clicks_per_link": "Average clicks per link",
+    "created": "Created",
+    "today": "Today",
+    "week": "This week",
+    "month": "This month",
+    "all": "All time",
+    "legend": "Legend",
+    "contacts_map": {
+      "hide_help": "Hide help",
+      "show_help": "Show help",
+      "click_markers_for_info": "Click on markers to see more information",
+      "close": "Close",
+      "api_key_missing": "Google Maps API key not found. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.",
+      "failed_to_load": "Failed to load Google Maps: {{error}}",
+      "no_location_data_title": "No location data",
+      "no_location_data_description": "No contacts with location found",
+      "loading_error_title": "Loading error",
+      "loading_contacts": "Loading {{count}} contact{{plural}}...",
+      "contact_locations": "Contact locations",
+      "new_contacts": "New contacts",
+      "viewed_contacts": "Viewed contacts",
+      "archived_contacts": "Archived contacts",
+      "total_with_count": "Total: {{count}} contact{{plural}}"
+    },
     "nav": {
       "today": "Today",
-      "week": "Week", 
+      "week": "Week",
       "month": "Month",
       "all_time": "All Time"
     },
@@ -989,7 +929,7 @@
     "complete_statistics": "Complete Statistics",
     "stats": {
       "today": "Today",
-      "this_week": "This Week", 
+      "this_week": "This Week",
       "this_month": "This Month",
       "all_time": "All Time",
       "views": "views",
@@ -1000,9 +940,5 @@
     "last_clicked": "Last clicked",
     "total_interactions_description": "Total interactions with your links"
   }
-  
-  
-  
-
 }
 

@@ -250,11 +250,12 @@ export default function ContactsPage() {
                         const newContactsAdded = newContactsCount - prevContactsCount;
                         const hasLocation = newContacts.slice(-newContactsAdded).some(c => c.location);
                         
-                        // Use user info from fast lookup for personalized notification
-                        const userName = userInfo?.displayName || userInfo?.username || 'there';
-                        
                         toast.success(
-                            `${userName}, you have ${newContactsAdded} new contact${newContactsAdded > 1 ? 's' : ''}${hasLocation ? ' with location data 📍' : ''}!`,
+                            t('contacts.new_contacts_notification', {
+                                count: newContactsAdded,
+                                plural: newContactsAdded > 1 ? 's' : '',
+                                location: hasLocation ? ' with location data 📍' : ''
+                            }),
                             {
                                 style: {
                                     border: '1px solid #10B981',
@@ -406,11 +407,11 @@ export default function ContactsPage() {
                 <div className="flex flex-col items-center space-y-3">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                     <span className="text-sm text-gray-600">
-                        {userLookupLoading ? 'Loading user information...' : t('contacts.loading')}
+                        {userLookupLoading ? t('contacts.loading') : t('contacts.loading')}
                     </span>
                     {userInfo && !loading && (
                         <span className="text-xs text-green-600">
-                            {t('contacts.welcome')}, {userInfo.displayName || userInfo.username}!
+                            {t('contacts.welcome')} {userInfo.displayName || userInfo.username}!
                         </span>
                     )}
                 </div>
@@ -468,7 +469,7 @@ export default function ContactsPage() {
                             </h1>
                             {userInfo && (
                                 <p className="text-xs sm:text-sm text-gray-600 mb-2 truncate">
-                                   {t('contacts.welcome')}, <span className="font-medium text-purple-600">
+                                   {t('contacts.welcome')} <span className="font-medium text-purple-600">
                                         {userInfo.displayName || userInfo.username}
                                     </span>
                                 </p>
@@ -489,7 +490,7 @@ export default function ContactsPage() {
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0118.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                     </svg>
-                                    <span className="hidden xs:inline">📇 Scan</span>
+                                    <span className="hidden xs:inline">📇 {t('business_card_scanner.scan')}</span>
                                     <span className="xs:hidden">📇</span>
                                 </button>
                                 
@@ -504,13 +505,13 @@ export default function ContactsPage() {
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                                 </svg>
-                                                <span className="hidden sm:inline">{t('contacts.share_with_team') || 'Share'}</span>
-                                                <span className="sm:hidden"> {t('contacts.Share')}</span>
+                                                <span className="hidden sm:inline">{t('contacts.share_with_team')}</span>
+                                                <span className="sm:hidden">{t('contacts.Share')}</span>
                                             </button>
                                         ) : (
                                             <div className="flex items-center gap-1.5">
                                                 <span className="text-xs text-gray-600 whitespace-nowrap">
-                                                    {selectedContacts.length}  {t('contacts.selected')}
+                                                    {selectedContacts.length} {t('contacts.selected')}
                                                 </span>
                                                 <button
                                                     onClick={selectAllContacts}
@@ -554,8 +555,8 @@ export default function ContactsPage() {
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
-                                    <span className="hidden sm:inline">   {t('contacts.team_contact')} </span>
-                                    <span className="sm:hidden">  {t('contacts.team_shearing')} </span>
+                                    <span className="hidden sm:inline">{t('contacts.team_contact')}</span>
+                                    <span className="sm:hidden">{t('contacts.team_shearing')}</span>
                                 </div>
                             )}
                         </div>
@@ -566,20 +567,20 @@ export default function ContactsPage() {
                         <div className="flex items-center text-green-600 whitespace-nowrap">
                             <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
                             <span className="hidden sm:inline">{t('contacts.live_updates_enabled')}</span>
-                            <span className="sm:hidden"> {t('contacts.live_updates')} </span>
+                            <span className="sm:hidden">{t('contacts.live_updates')}</span>
                         </div>
                         {userInfo && (
                             <div className="flex items-center text-blue-600 whitespace-nowrap">
                                 <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
-                                <span className="hidden sm:inline"> {t('contacts.fast_look')} </span>
-                                <span className="sm:hidden"> {t('contacts.fast_lookup')} </span>
+                                <span className="hidden sm:inline">{t('contacts.fast_look')}</span>
+                                <span className="sm:hidden">{t('contacts.fast_lookup')}</span>
                             </div>
                         )}
                         {teamSharingEnabled && (
                             <div className="flex items-center text-purple-600 whitespace-nowrap">
                                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-1"></div>
-                                <span className="hidden sm:inline"> {t('contacts.team_sharing_avaible')} </span>
-                                <span className="sm:hidden"> {t('contacts.team_sharing')}  </span>
+                                <span className="hidden sm:inline">{t('contacts.team_sharing_avaible')}</span>
+                                <span className="sm:hidden">{t('contacts.team_sharing')}</span>
                             </div>
                         )}
                     </div>
@@ -621,7 +622,7 @@ export default function ContactsPage() {
                            <div className="bg-blue-50 rounded-lg p-3 mb-4">
                                 <div className="text-sm font-medium text-blue-900 mb-1">
                                     {userInfo?.displayName || userInfo?.username ? 
-                                        `${userInfo.displayName || userInfo.username}, you have ${filteredContacts.length} of ${contacts.length} contacts` :
+                                        `${userInfo.displayName || userInfo.username}, ${t('contacts.showing_contacts', { count: filteredContacts.length, total: contacts.length })}` :
                                         t('contacts.showing_contacts', { 
                                             count: filteredContacts.length,
                                             total: contacts.length 
@@ -629,12 +630,12 @@ export default function ContactsPage() {
                                     }
                                 </div>
                                 <div className="text-xs text-blue-700 flex flex-wrap items-center gap-2 sm:gap-4">
-                                    <span className="whitespace-nowrap">📧 {filteredContacts.filter(contact => !contact.isSharedContact).length} personal</span>
+                                    <span className="whitespace-nowrap">📧 {filteredContacts.filter(contact => !contact.isSharedContact).length} {t('contacts.personal')}</span>
                                     {filteredContacts.filter(contact => contact.isSharedContact).length > 0 && (
-                                        <span className="whitespace-nowrap">👥 {filteredContacts.filter(contact => contact.isSharedContact).length} from team</span>
+                                        <span className="whitespace-nowrap">👥 {filteredContacts.filter(contact => contact.isSharedContact).length} {t('contacts.from_team')}</span>
                                     )}
                                     {locationStats.withLocation > 0 && (
-                                        <span className="whitespace-nowrap">📍 {locationStats.withLocation} with location</span>
+                                        <span className="whitespace-nowrap">📍 {locationStats.withLocation} {t('contacts.with_location')}</span>
                                     )}
                                 </div>
                             </div>
@@ -766,8 +767,8 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
               !d.label.toLowerCase().includes('email')
           )
         : [
-              contact.phone && { label: 'Phone', value: contact.phone },
-              contact.company && { label: 'Company', value: contact.company },
+              contact.phone && { label: t('contacts.phone'), value: contact.phone },
+              contact.company && { label: t('contacts.company'), value: contact.company },
           ].filter(Boolean);
 
     const isFromTeamMember = contact.sharedBy || contact.teamMemberSource;
@@ -828,7 +829,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                         {/* Display the old message field only if it exists and it's not a dynamic contact */}
                         {!isDynamicContact && contact.message && (
                             <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                                <p className="text-sm text-gray-700 italic">&ldquo;{contact.message}&rdquo;</p>
+                                <p className="text-sm text-gray-700 italic">“{contact.message}”</p>
                             </div>
                         )}
 
@@ -837,7 +838,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>Added: {formatDate(contact.submittedAt)}</span>
+                            <span>{t('contacts.added')} {formatDate(contact.submittedAt)}</span>
                         </div>
                     </div>
 
@@ -867,7 +868,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span className="hidden sm:inline">{t('contacts.mark_as_viewed')}</span>
-                                    <span className="sm:hidden">Mark Viewed</span>
+                                    <span className="sm:hidden">{t('contacts.mark_viewed')}</span>
                                 </button>
                             )}
                             
@@ -905,7 +906,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
-                                <span className="hidden sm:inline">Email</span>
+                                <span className="hidden sm:inline">{t('contacts.email')}</span>
                                 <span className="sm:hidden">✉️</span>
                             </button>
                             
@@ -917,7 +918,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                     </svg>
-                                    <span className="hidden sm:inline">Appel</span>
+                                    <span className="hidden sm:inline">{t('contacts.call')}</span>
                                     <span className="sm:hidden">📞</span>
                                 </button>
                             )}
@@ -931,7 +932,7 @@ function ContactCard({ contact, onEdit, onStatusUpdate, onContactAction, onMapVi
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    <span className="hidden sm:inline">Carte</span>
+                                    <span className="hidden sm:inline">{t('contacts.map_button')}</span>
                                     <span className="sm:hidden">📍</span>
                                 </button>
                             )}
@@ -1166,7 +1167,7 @@ function MobileFilters({
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
                     </svg>
-                    <span className="truncate">Filter ({counts[filter]})</span>
+                    <span className="truncate">{t('contacts.filter_with_count', { count: counts[filter] })}</span>
                     <svg className={`w-4 h-4 transform transition-transform ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -1183,7 +1184,7 @@ function MobileFilters({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span className="truncate">Map ({locationStats.withLocation})</span>
+                    <span className="truncate">{t('contacts.map_with_count', { count: locationStats.withLocation })}</span>
                 </button>
             </div>         
 
