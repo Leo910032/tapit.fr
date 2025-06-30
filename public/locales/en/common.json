@@ -532,7 +532,7 @@
   },
   "addBtn": {
     "add_link": "Add Link",
-    "enter_url": "Enter Url",
+    "enter_url": "Enter URL (the website will be automatically recognized)",
     "url": "URL",
     "add": "Add",
     "inspired_by_interest": "Inspired by your interest",

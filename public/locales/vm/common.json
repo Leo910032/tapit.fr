@@ -529,7 +529,7 @@
   },
   "addBtn": {
     "add_link": "Thêm liên kết",
-    "enter_url": "Nhập Url",
+    "enter_url": "Nhập URL (hệ thống sẽ tự động nhận diện website)",
     "url": "URL",
     "add": "Thêm",
     "inspired_by_interest": "Lấy cảm hứng từ sở thích của bạn",

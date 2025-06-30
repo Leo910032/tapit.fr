@@ -529,7 +529,7 @@
   },
   "addBtn": {
     "add_link": "Añadir Enlace",
-    "enter_url": "Introduce la URL",
+    "enter_url": "Ingrese la URL (el sitio web se detectará automáticamente)",
     "url": "URL",
     "add": "Añadir",
     "inspired_by_interest": "Inspirado por tus intereses",

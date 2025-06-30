@@ -529,7 +529,7 @@
   },
   "addBtn": {
     "add_link": "添加链接",
-    "enter_url": "输入网址",
+    "enter_url": "输入网址（系统将自动识别网站）",
     "url": "URL",
     "add": "添加",
     "inspired_by_interest": "受您的兴趣启发",
