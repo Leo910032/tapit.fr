@@ -16,6 +16,7 @@ import SensitiveWarning from "./components/SensitiveWarning";
 import { LanguageProvider } from "@/lib/languageContext";
 import PublicLanguageSwitcher from "./components/PublicLanguageSwitcher";
 import { recordProfileView } from "@/lib/analytics/viewTracker";
+import SaveContactButton from "./components/SaveContactButton";
 
 export const HouseContext = React.createContext();
 
@@ -172,6 +173,9 @@ export default function House({ userId }) {
                                 
                                 {/* ✅ File Download Button - Only shows if user has uploaded a file */}
                                 <FileDownloadButton userId={userId} />
+                                     {/* ✅ NEW: Save Contact Button - Only shows if user has contact info */}
+                <SaveContactButton userId={userId} />
+                
                                 
                                 {/* Exchange Button */}
                                 <div className="w-full px-5 mb-4">
