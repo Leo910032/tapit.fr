@@ -428,7 +428,7 @@
     "contacts": "Contacts"
   },
   "login": {
-    "login.continue_with_google" : "Continue with Google",
+    "continue_with_google" : "Continue with Google",
     "google_signin_success" : "Google sign-in successful!",
     "google_signin_failed"  : "Google sign-in failed",
     "title": "Log in to your Linktree",
