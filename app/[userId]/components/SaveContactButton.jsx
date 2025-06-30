@@ -1,4 +1,4 @@
-// app/[userId]/components/SaveContactButton.jsx - VERSION INSTANTANÉE
+// app/[userId]/components/SaveContactButton.jsx - FIXED VERSION
 "use client"
 import { useState, useEffect } from 'react';
 import { fireApp } from "@/important/firebase";
@@ -62,48 +62,62 @@ export default function SaveContactButton({ userId }) {
         fetchContactData();
     }, [userId]);
 
-    // Générer le lien vCard data URL
-    const generateVCardDataURL = () => {
+    // 🔧 FIXED: Better vCard generation with proper escaping
+    const generateVCard = () => {
         if (!contactData) return '';
 
-        let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
+        // Helper function to escape vCard values
+        const escapeVCardValue = (value) => {
+            if (!value) return '';
+            return value
+                .replace(/\\/g, '\\\\')  // Escape backslashes
+                .replace(/,/g, '\\,')    // Escape commas
+                .replace(/;/g, '\\;')    // Escape semicolons
+                .replace(/\n/g, '\\n')   // Escape newlines
+                .replace(/\r/g, '');     // Remove carriage returns
+        };
+
+        let vcard = 'BEGIN:VCARD\r\nVERSION:3.0\r\n';
         
         if (contactData.displayName) {
-            vcard += `FN:${contactData.displayName}\n`;
-            vcard += `N:${contactData.displayName};;;;\n`;
+            const name = escapeVCardValue(contactData.displayName);
+            vcard += `FN:${name}\r\n`;
+            vcard += `N:${name};;;;\r\n`;
         }
         
         if (contactData.email) {
-            vcard += `EMAIL:${contactData.email}\n`;
+            vcard += `EMAIL:${escapeVCardValue(contactData.email)}\r\n`;
         }
         
         if (contactData.phone) {
-            vcard += `TEL:${contactData.phone}\n`;
+            vcard += `TEL:${escapeVCardValue(contactData.phone)}\r\n`;
         }
         
         if (contactData.website) {
-            const websiteUrl = contactData.website.startsWith('http') ? contactData.website : `https://${contactData.website}`;
-            vcard += `URL:${websiteUrl}\n`;
+            const websiteUrl = contactData.website.startsWith('http') 
+                ? contactData.website 
+                : `https://${contactData.website}`;
+            vcard += `URL:${escapeVCardValue(websiteUrl)}\r\n`;
         }
         
         if (contactData.company) {
-            vcard += `ORG:${contactData.company}\n`;
+            vcard += `ORG:${escapeVCardValue(contactData.company)}\r\n`;
         }
         
         if (contactData.bio) {
-            vcard += `NOTE:${contactData.bio}\n`;
+            vcard += `NOTE:${escapeVCardValue(contactData.bio)}\r\n`;
         }
         
         if (contactData.profilePhoto && contactData.profilePhoto.startsWith('http')) {
-            vcard += `PHOTO:${contactData.profilePhoto}\n`;
+            vcard += `PHOTO:${contactData.profilePhoto}\r\n`;
         }
         
         vcard += 'END:VCARD';
         
-        return `data:text/vcard;charset=utf-8,${encodeURIComponent(vcard)}`;
+        return vcard;
     };
 
-    // Méthode 1: Partage natif (Web Share API)
+    // 🔧 FIXED: Improved native share with better error handling
     const handleNativeShare = async () => {
         if (!navigator.share) {
             toast.error('Sharing not supported on this device');
@@ -111,17 +125,28 @@ export default function SaveContactButton({ userId }) {
         }
 
         try {
-            const vCardContent = generateVCardDataURL().split(',')[1];
-            const blob = new Blob([decodeURIComponent(vCardContent)], { type: 'text/vcard' });
-            const file = new File([blob], `${contactData.displayName || 'contact'}.vcf`, { type: 'text/vcard' });
-
-            await navigator.share({
-                title: `Contact: ${contactData.displayName || 'Unknown'}`,
-                text: `Save ${contactData.displayName || 'this contact'} to your contacts`,
-                files: [file]
+            const vCardContent = generateVCard();
+            const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8' });
+            const file = new File([blob], `${contactData.displayName || 'contact'}.vcf`, { 
+                type: 'text/vcard' 
             });
 
-            toast.success('Contact shared successfully!');
+            // Check if files are supported
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: `Contact: ${contactData.displayName || 'Unknown'}`,
+                    text: `Save ${contactData.displayName || 'this contact'} to your contacts`,
+                    files: [file]
+                });
+                toast.success('Contact shared successfully!');
+            } else {
+                // Fallback: share just text
+                await navigator.share({
+                    title: `Contact: ${contactData.displayName || 'Unknown'}`,
+                    text: generateContactText()
+                });
+                toast.success('Contact info shared!');
+            }
         } catch (error) {
             if (error.name !== 'AbortError') {
                 console.error('Error sharing:', error);
@@ -130,62 +155,156 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-    // Méthode 2: Ouverture directe avec data URL
-    const handleDirectOpen = () => {
+    // 🔧 FIXED: Better download method with multiple fallbacks
+    const handleDirectDownload = () => {
         try {
-            const dataURL = generateVCardDataURL();
+            const vCardContent = generateVCard();
+            const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
             const link = document.createElement('a');
-            link.href = dataURL;
+            link.href = url;
             link.download = `${contactData.displayName || 'contact'}.vcf`;
             
-            // Tentative d'ouverture directe
-            if (navigator.userAgent.includes('Mobile') || navigator.userAgent.includes('Android') || navigator.userAgent.includes('iPhone')) {
-                // Sur mobile, essayer d'ouvrir directement
-                window.location.href = dataURL;
-            } else {
-                // Sur desktop, télécharger le fichier
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+            // Force download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
-            toast.success('Contact ready to save!', {
+            // Clean up the URL
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+            
+            toast.success('Contact downloaded successfully!', {
                 duration: 3000,
                 icon: '📱'
             });
         } catch (error) {
-            console.error('Error opening contact:', error);
-            toast.error('Failed to open contact');
+            console.error('Error downloading contact:', error);
+            
+            // Fallback: try data URL method
+            try {
+                const vCardContent = generateVCard();
+                const dataURL = `data:text/vcard;charset=utf-8,${encodeURIComponent(vCardContent)}`;
+                
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = `${contactData.displayName || 'contact'}.vcf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                toast.success('Contact downloaded!');
+            } catch (fallbackError) {
+                console.error('Fallback download failed:', fallbackError);
+                toast.error('Download failed. Try copying the contact info instead.');
+            }
         }
     };
 
-    // Méthode 3: Copier les informations
+    // 🔧 NEW: Generate clean contact text
+    const generateContactText = () => {
+        const parts = [
+            contactData.displayName && `Name: ${contactData.displayName}`,
+            contactData.email && `Email: ${contactData.email}`,
+            contactData.phone && `Phone: ${contactData.phone}`,
+            contactData.website && `Website: ${contactData.website}`,
+            contactData.company && `Company: ${contactData.company}`,
+            contactData.bio && `Bio: ${contactData.bio}`
+        ].filter(Boolean);
+        
+        return parts.join('\n');
+    };
+
+    // 🔧 IMPROVED: Copy contact with better formatting
     const handleCopyContact = async () => {
         try {
-            const contactText = [
-                contactData.displayName && `Name: ${contactData.displayName}`,
-                contactData.email && `Email: ${contactData.email}`,
-                contactData.phone && `Phone: ${contactData.phone}`,
-                contactData.website && `Website: ${contactData.website}`,
-                contactData.company && `Company: ${contactData.company}`
-            ].filter(Boolean).join('\n');
-
+            const contactText = generateContactText();
             await navigator.clipboard.writeText(contactText);
             toast.success('Contact info copied to clipboard!');
         } catch (error) {
             console.error('Error copying:', error);
-            toast.error('Failed to copy contact info');
+            
+            // Fallback: try to use the old method
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = generateContactText();
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                toast.success('Contact info copied!');
+            } catch (fallbackError) {
+                toast.error('Failed to copy contact info');
+            }
         }
     };
 
-    // Méthode 4: Afficher un QR Code (optionnel)
+    // 🔧 IMPROVED: QR Code with better encoding
     const handleShowQR = () => {
-        const vCardData = generateVCardDataURL().split(',')[1];
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(decodeURIComponent(vCardData))}`;
+        try {
+            const vCardContent = generateVCard();
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=${encodeURIComponent(vCardContent)}`;
+            
+            // Open QR code in a popup
+            const popup = window.open('', '_blank', 'width=350,height=400,scrollbars=no,resizable=no');
+            if (popup) {
+                popup.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>QR Code - ${contactData.displayName || 'Contact'}</title>
+                        <style>
+                            body { 
+                                margin: 0; 
+                                padding: 20px; 
+                                text-align: center; 
+                                font-family: Arial, sans-serif;
+                                background: #f5f5f5;
+                            }
+                            .container {
+                                background: white;
+                                padding: 20px;
+                                border-radius: 10px;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                            }
+                            img { 
+                                max-width: 100%; 
+                                border: 1px solid #ddd;
+                                border-radius: 8px;
+                            }
+                            h3 { margin-top: 0; color: #333; }
+                            p { color: #666; font-size: 14px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h3>📱 Scan to Save Contact</h3>
+                            <img src="${qrUrl}" alt="QR Code" />
+                            <p>Scan this QR code with your phone to add<br><strong>${contactData.displayName || 'this contact'}</strong> to your contacts</p>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                popup.document.close();
+            }
+            
+            toast.success('QR code opened! Scan to save contact.');
+        } catch (error) {
+            console.error('Error showing QR:', error);
+            toast.error('Failed to generate QR code');
+        }
+    };
+
+    // 🔧 IMPROVED: Smart detection for best method
+    const handleSmartSave = () => {
+        const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const hasNativeShare = navigator.share && navigator.canShare;
         
-        // Ouvrir le QR code dans une nouvelle fenêtre
-        window.open(qrUrl, '_blank', 'width=250,height=250');
-        toast.success('Scan QR code to save contact!');
+        if (isMobile && hasNativeShare) {
+            handleNativeShare();
+        } else {
+            handleDirectDownload();
+        }
     };
 
     if (isLoading || !contactData) {
@@ -195,22 +314,15 @@ export default function SaveContactButton({ userId }) {
     return (
         <div className="w-full px-5 mb-4 relative">
             <div className="flex gap-2">
-                {/* Bouton principal - Action la plus rapide selon l'appareil */}
+                {/* 🔧 MAIN BUTTON: Smart detection */}
                 <button
-                    onClick={() => {
-                        // Détection intelligente de la meilleure méthode
-                        if (navigator.share && /Mobile|Android|iPhone/.test(navigator.userAgent)) {
-                            handleNativeShare();
-                        } else {
-                            handleDirectOpen();
-                        }
-                    }}
+                    onClick={handleSmartSave}
                     className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
                 >
                     <FaAddressCard className="w-5 h-5" />
                     <div className="flex-1 text-center">
                         <div className="text-sm font-semibold">
-                            {navigator.share && /Mobile|Android|iPhone/.test(navigator.userAgent) 
+                            {(/Mobile|Android|iPhone/i.test(navigator.userAgent) && navigator.share) 
                                 ? (t('save_contact.share_contact') || 'Share Contact')
                                 : (t('save_contact.save_contact') || 'Save Contact')
                             }
@@ -219,13 +331,13 @@ export default function SaveContactButton({ userId }) {
                             {contactData.displayName && `Add ${contactData.displayName}`}
                         </div>
                     </div>
-                    {navigator.share && /Mobile|Android|iPhone/.test(navigator.userAgent) 
+                    {(/Mobile|Android|iPhone/i.test(navigator.userAgent) && navigator.share) 
                         ? <FaShare className="w-4 h-4" />
                         : <FaDownload className="w-4 h-4" />
                     }
                 </button>
 
-                {/* Bouton options alternatives */}
+                {/* OPTIONS MENU BUTTON */}
                 <button
                     onClick={() => setShowOptions(!showOptions)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
@@ -237,11 +349,11 @@ export default function SaveContactButton({ userId }) {
                 </button>
             </div>
 
-            {/* Menu d'options */}
+            {/* 🔧 IMPROVED OPTIONS MENU */}
             {showOptions && (
                 <div className="absolute right-5 top-full mt-2 bg-white rounded-lg shadow-lg border z-50 min-w-[200px] overflow-hidden">
                     <div className="py-2">
-                        {/* Option Partage natif (si disponible) */}
+                        {/* Native Share Option */}
                         {navigator.share && (
                             <button
                                 onClick={() => {
@@ -255,10 +367,10 @@ export default function SaveContactButton({ userId }) {
                             </button>
                         )}
 
-                        {/* Option Download direct */}
+                        {/* Download Option */}
                         <button
                             onClick={() => {
-                                handleDirectOpen();
+                                handleDirectDownload();
                                 setShowOptions(false);
                             }}
                             className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
@@ -267,7 +379,7 @@ export default function SaveContactButton({ userId }) {
                             <span className="text-sm">Download vCard</span>
                         </button>
 
-                        {/* Option Copier */}
+                        {/* Copy Option */}
                         <button
                             onClick={() => {
                                 handleCopyContact();
@@ -281,7 +393,7 @@ export default function SaveContactButton({ userId }) {
                             <span className="text-sm">Copy Contact Info</span>
                         </button>
 
-                        {/* Option QR Code */}
+                        {/* QR Code Option */}
                         <button
                             onClick={() => {
                                 handleShowQR();
@@ -298,7 +410,7 @@ export default function SaveContactButton({ userId }) {
                 </div>
             )}
 
-            {/* Fermer le menu en cliquant ailleurs */}
+            {/* Close menu overlay */}
             {showOptions && (
                 <div 
                     className="fixed inset-0 z-40" 
