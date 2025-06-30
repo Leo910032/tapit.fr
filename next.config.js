@@ -4,7 +4,8 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Your existing images configuration
+  // REMOVED: output: 'standalone',
+
   images: {
     remotePatterns: [
       {
@@ -21,8 +22,6 @@ const nextConfig = {
       },
     ],
   },
-  
-  // Your existing webpack configuration
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -43,51 +42,6 @@ const nextConfig = {
       '@/app': path.resolve(__dirname, 'app')
     };
     return config;
-  },
-
-  // ✅ ADDED: Security Headers Configuration
-  async headers() {
-    return [
-      {
-        // Apply these headers to all routes in your application.
-        source: '/:path*',
-        headers: [
-          // Prevents Clickjacking
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          // Controls which resources the browser is allowed to load
-          {
-            key: 'Content-Security-Policy',
-            value: `
-              default-src 'self' vercel.live;
-              script-src 'self' 'unsafe-eval' 'unsafe-inline' cdn.vercel-insights.com vercel.live;
-              style-src 'self' 'unsafe-inline';
-              img-src 'self' blob: data: firebasestorage.googleapis.com lh3.googleusercontent.com linktree.sirv.com;
-              media-src 'none';
-              connect-src *;
-              font-src 'self';
-            `.replace(/\s{2,}/g, ' ').trim(), // This cleans up the multiline string
-          },
-          // Prevents MIME-sniffing
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          // Controls referrer information
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-          // Controls browser feature access
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-        ],
-      },
-    ];
   },
 };
 
