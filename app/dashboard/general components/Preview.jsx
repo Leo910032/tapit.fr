@@ -1,15 +1,26 @@
-// app/dashboard/general components/Preview.jsx - ENHANCED WORKING VERSION
+// app/dashboard/general components/Preview.jsx - SMART RELOAD SYSTEM
 "use client"
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import "../../styles/3d.css";
 import { getSessionCookie } from '@/lib/authentication/session';
 import { fetchUserData } from '@/lib/fetch data/fetchUserData';
+import { fireApp } from "@/important/firebase";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 
 export default function Preview() {
     const [username, setUsername] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [iframeKey, setIframeKey] = useState(0); // For forcing iframe reload
+    const [lastContentHash, setLastContentHash] = useState(''); // Track content changes
+    const iframeRef = useRef(null);
+
+    // 🔧 Function to force iframe reload (only when content changes)
+    const reloadPreview = () => {
+        console.log('🔄 Reloading preview - content changed');
+        setIframeKey(prev => prev + 1);
+    };
 
     useEffect(() => {
         async function initializePreview() {
@@ -34,10 +45,16 @@ export default function Preview() {
                     console.log('✅ Preview: Setting username:', data.username);
                     setUsername(data.username);
                     setError(null);
+                    
+                    // 🔧 Start listening for content changes after we have the username
+                    setupContentListener(data.username, sessionUsername);
                 } else {
                     console.log('⚠️ Preview: No username in data, using session username');
                     setUsername(sessionUsername);
                     setError(null);
+                    
+                    // Still setup listener with session username
+                    setupContentListener(sessionUsername, sessionUsername);
                 }
                 
             } catch (err) {
@@ -48,8 +65,65 @@ export default function Preview() {
             }
         }
 
+        // 🔧 Setup real-time listener for profile content changes
+        async function setupContentListener(profileUsername, sessionUsername) {
+            try {
+                console.log('🔍 Setting up content change listener for:', profileUsername);
+                
+                // Get the actual user ID for Firestore
+                const userId = await fetchUserData(sessionUsername);
+                if (!userId) return;
+
+                const collectionRef = collection(fireApp, "AccountData");
+                const docRef = doc(collectionRef, userId);
+
+                // Listen for changes in real-time
+                const unsubscribe = onSnapshot(docRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        
+                        // 🔧 Create a hash of the content that affects the preview
+                        const contentToTrack = {
+                            links: data.links || [],
+                            displayName: data.displayName || '',
+                            bio: data.bio || '',
+                            profilePhoto: data.profilePhoto || '',
+                            selectedTheme: data.selectedTheme || '',
+                            // Add other fields that should trigger a reload
+                        };
+                        
+                        const newContentHash = JSON.stringify(contentToTrack);
+                        
+                        if (lastContentHash && lastContentHash !== newContentHash) {
+                            console.log('📝 Content changed detected, reloading preview');
+                            console.log('🔍 Old hash:', lastContentHash.substring(0, 50) + '...');
+                            console.log('🔍 New hash:', newContentHash.substring(0, 50) + '...');
+                            
+                            // Small delay to ensure changes are saved
+                            setTimeout(() => {
+                                reloadPreview();
+                            }, 500);
+                        }
+                        
+                        setLastContentHash(newContentHash);
+                    }
+                }, (error) => {
+                    console.error('❌ Content listener error:', error);
+                });
+
+                // Cleanup function
+                return () => {
+                    console.log('🔧 Cleaning up content listener');
+                    unsubscribe();
+                };
+                
+            } catch (error) {
+                console.error('❌ Error setting up content listener:', error);
+            }
+        }
+
         initializePreview();
-    }, []);
+    }, []); // Empty dependency array - runs once on mount
 
     useEffect(() => {
         // 3D animation setup - only run if elements exist
@@ -138,6 +212,12 @@ export default function Preview() {
         };
     }, []);
 
+    // 🔧 Manual refresh function (for debug purposes)
+    const handleManualRefresh = () => {
+        console.log('🔄 Manual refresh triggered');
+        reloadPreview();
+    };
+
     // 🔧 Show loading state until we have a username
     const showIframe = !isLoading && username && !error;
     const showLoading = isLoading || (!username && !error);
@@ -152,7 +232,15 @@ export default function Preview() {
                     <div>Loading: {isLoading ? 'Yes' : 'No'}</div>
                     <div>Username: {username || 'None'}</div>
                     <div>Show iframe: {showIframe ? 'Yes' : 'No'}</div>
+                    <div>Iframe key: {iframeKey}</div>
+                    <div>Content hash: {lastContentHash ? '✅' : '❌'}</div>
                     {error && <div className="text-red-300">Error: {error}</div>}
+                    <button 
+                        onClick={handleManualRefresh}
+                        className="mt-2 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                    >
+                        🔄 Manual Refresh
+                    </button>
                 </div>
             )}
 
@@ -176,17 +264,28 @@ export default function Preview() {
                             </div>
                         )}
                         
+                        {/* Content change indicator */}
+                        {iframeKey > 0 && (
+                            <div className='top-6 right-6 absolute pointer-events-none z-10'>
+                                <div className="bg-green-500 text-white text-xs px-2 py-1 rounded animate-pulse">
+                                    Updated!
+                                </div>
+                            </div>
+                        )}
+                        
                         {/* Main content area */}
                         <div className="h-full w-full">
                             {showIframe ? (
-                                // 🔧 Enhanced iframe with better error handling
+                                // 🔧 Smart iframe with key-based reloading
                                 <iframe 
-                                    src={`https://www.tapit.fr/${username}?preview=true&t=${Date.now()}`}
+                                    key={`preview-${username}-${iframeKey}`} // Only changes when content changes
+                                    ref={iframeRef}
+                                    src={`https://www.tapit.fr/${username}?preview=true&v=${iframeKey}`}
                                     frameBorder="0" 
                                     className='h-full bg-white w-full'
                                     title={`Preview for ${username}`}
                                     onLoad={() => {
-                                        console.log('✅ Preview iframe loaded successfully for:', username);
+                                        console.log(`✅ Preview iframe loaded (v${iframeKey}) for:`, username);
                                     }}
                                     onError={(e) => {
                                         console.error('❌ Preview iframe failed to load:', e);
