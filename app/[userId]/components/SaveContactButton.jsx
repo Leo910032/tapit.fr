@@ -1,4 +1,4 @@
-// app/[userId]/components/SaveContactButton.jsx
+// app/[userId]/components/SaveContactButton.jsx - VERSION SIMPLIFIÉE
 "use client"
 import { useState, useEffect } from 'react';
 import { fireApp } from "@/important/firebase";
@@ -6,7 +6,6 @@ import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { useTranslation } from "@/lib/useTranslation";
 import { FaDownload, FaAddressCard } from "react-icons/fa6";
-import { recordLinkClick } from "@/lib/analytics/linkClickTracker";
 
 export default function SaveContactButton({ userId }) {
     const { t } = useTranslation();
@@ -15,10 +14,15 @@ export default function SaveContactButton({ userId }) {
     const [username, setUsername] = useState("");
 
     useEffect(() => {
+        console.log('🚀 SaveContactButton - Starting for userId:', userId);
+        
         async function fetchContactData() {
             try {
                 const currentUser = await fetchUserData(userId);
+                console.log('👤 SaveContactButton - Current user:', currentUser);
+                
                 if (!currentUser) {
+                    console.log('❌ SaveContactButton - No current user found');
                     setIsLoading(false);
                     return;
                 }
@@ -29,11 +33,13 @@ export default function SaveContactButton({ userId }) {
                 const docRef = doc(collectionRef, `${currentUser}`);
 
                 const unsubscribe = onSnapshot(docRef, (docSnap) => {
+                    console.log('📄 SaveContactButton - Document snapshot received');
+                    
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         console.log('🔍 SaveContactButton - Raw profile data:', data);
                         
-                        // Extract contact information from the profile
+                        // Extraire les données de contact directement
                         const contact = {
                             displayName: data.displayName || '',
                             email: data.email || '',
@@ -44,122 +50,29 @@ export default function SaveContactButton({ userId }) {
                             bio: data.bio || ''
                         };
                         
-                        console.log('📋 SaveContactButton - Extracted contact data:', contact);
-
-                        // Extract contact information from the profile
-                        const contact = {
-                            displayName: data.displayName || '',
-                            email: data.email || '',
-                            phone: data.phone || '',
-                            website: data.website || '', // ✅ Utiliser directement le champ website
-                            company: data.company || '',
-                            profilePhoto: data.profilePhoto || '',
-                            bio: data.bio || ''
-                        };
+                        console.log('📋 SaveContactButton - Extracted contact:', contact);
                         
-                        console.log('📋 SaveContactButton - Extracted contact data:', contact);
-
-                        // Extract email and phone from links array
-                        if (data.links && Array.isArray(data.links)) {
-                            console.log('🔗 SaveContactButton - Processing links:', data.links);
-                            data.links.forEach((link, index) => {
-                                console.log(`🔗 Processing link ${index}:`, link);
-                                if (link.isActive !== false && link.url) {
-                                    const url = link.url.toLowerCase();
-                                    const title = (link.title || '').toLowerCase();
-                                    
-                                    // Check for email
-                                    if (url.includes('mailto:') || url.includes('@') || title.includes('email')) {
-                                        contact.email = url.replace('mailto:', '');
-                                        console.log('📧 Found email in link:', contact.email);
-                                    }
-                                    
-                                    // Check for phone
-                                    if (url.includes('tel:') || title.includes('phone') || title.includes('call')) {
-                                        contact.phone = url.replace('tel:', '').replace(/\D/g, '');
-                                        console.log('📞 Found phone in link:', contact.phone);
-                                    }
-                                    
-                                    // Check for website (exclude social media and current website)
-                                    if (!contact.website && 
-                                        !url.includes('instagram') && 
-                                        !url.includes('twitter') && 
-                                        !url.includes('facebook') && 
-                                        !url.includes('linkedin') && 
-                                        !url.includes('tiktok') &&
-                                        (url.startsWith('http') || url.startsWith('www'))) {
-                                        contact.website = url.startsWith('http') ? url : `https://${url}`;
-                                        console.log('🌐 Found website in link:', contact.website);
-                                    }
-                                }
-                            });
-                        }
-
-                        // Extract social media and other info from socials array
-                        if (data.socials && Array.isArray(data.socials)) {
-                            console.log('📱 SaveContactButton - Processing socials:', data.socials);
-                            data.socials.forEach((social, index) => {
-                                console.log(`📱 Processing social ${index}:`, social);
-                                if (social.active && social.value) {
-                                    switch (social.type) {
-                                        case 'email':
-                                            if (!contact.email) {
-                                                contact.email = social.value;
-                                                console.log('📧 Found email in social:', contact.email);
-                                            }
-                                            break;
-                                        case 'phone':
-                                            if (!contact.phone) {
-                                                contact.phone = social.value.replace(/\D/g, '');
-                                                console.log('📞 Found phone in social:', contact.phone);
-                                            }
-                                            break;
-                                        case 'website':
-                                            if (!contact.website) {
-                                                contact.website = social.value;
-                                                console.log('🌐 Found website in social:', contact.website);
-                                            }
-                                            break;
-                                        case 'linkedin':
-                                            contact.linkedin = `https://linkedin.com/in/${social.value}`;
-                                            break;
-                                        case 'twitter':
-                                            contact.twitter = `https://twitter.com/${social.value}`;
-                                            break;
-                                        case 'instagram':
-                                            contact.instagram = `https://instagram.com/${social.value}`;
-                                            break;
-                                    }
-                                }
-                            });
-                        }
-
-                        // ✅ SOLUTION TEMPORAIRE : Utiliser toutes les données disponibles
-                        const finalContact = {
-                            ...contact,
-                            // Si on a un website direct, l'utiliser
-                            website: data.website || contact.website || '',
-                            // Utiliser displayName même s'il n'y a pas d'email/phone pour tester
-                            displayName: data.displayName || data.username || ''
-                        };
-
-                        console.log('📋 SaveContactButton - Final contact data:', finalContact);
-
-                        // ✅ CONDITION TEMPORAIRE : Afficher si on a au moins displayName ET website
-                        if (finalContact.displayName || finalContact.email || finalContact.phone || finalContact.website) {
-                            console.log('✅ SaveContactButton - Setting contact data:', finalContact);
-                            setContactData(finalContact);
+                        // Vérifier si on a des données utiles
+                        const hasData = contact.displayName || contact.email || contact.phone || contact.website;
+                        console.log('🔍 SaveContactButton - Has data:', hasData);
+                        
+                        if (hasData) {
+                            setContactData(contact);
+                            console.log('✅ SaveContactButton - Contact data set');
                         } else {
-                            console.log('❌ SaveContactButton - No meaningful contact data found');
                             setContactData(null);
+                            console.log('❌ SaveContactButton - No useful data found');
                         }
+                    } else {
+                        console.log('❌ SaveContactButton - Document does not exist');
+                        setContactData(null);
                     }
                     setIsLoading(false);
                 });
 
                 return () => unsubscribe();
             } catch (error) {
-                console.error("Error fetching contact data:", error);
+                console.error("❌ SaveContactButton - Error fetching contact data:", error);
                 setIsLoading(false);
             }
         }
@@ -173,49 +86,32 @@ export default function SaveContactButton({ userId }) {
         let vcard = 'BEGIN:VCARD\n';
         vcard += 'VERSION:3.0\n';
         
-        // Name
         if (contactData.displayName) {
             vcard += `FN:${contactData.displayName}\n`;
             vcard += `N:${contactData.displayName};;;;\n`;
         }
         
-        // Email
         if (contactData.email) {
             vcard += `EMAIL:${contactData.email}\n`;
         }
         
-        // Phone
         if (contactData.phone) {
-            vcard += `TEL:+${contactData.phone}\n`;
+            vcard += `TEL:${contactData.phone}\n`;
         }
         
-        // Website
         if (contactData.website) {
-            vcard += `URL:${contactData.website}\n`;
+            const websiteUrl = contactData.website.startsWith('http') ? contactData.website : `https://${contactData.website}`;
+            vcard += `URL:${websiteUrl}\n`;
         }
         
-        // Company/Organization
         if (contactData.company) {
             vcard += `ORG:${contactData.company}\n`;
         }
         
-        // Note/Bio
         if (contactData.bio) {
             vcard += `NOTE:${contactData.bio}\n`;
         }
         
-        // Social media URLs
-        if (contactData.linkedin) {
-            vcard += `URL:${contactData.linkedin}\n`;
-        }
-        if (contactData.twitter) {
-            vcard += `URL:${contactData.twitter}\n`;
-        }
-        if (contactData.instagram) {
-            vcard += `URL:${contactData.instagram}\n`;
-        }
-        
-        // Profile photo (if it's a URL)
         if (contactData.profilePhoto && contactData.profilePhoto.startsWith('http')) {
             vcard += `PHOTO:${contactData.profilePhoto}\n`;
         }
@@ -225,31 +121,20 @@ export default function SaveContactButton({ userId }) {
     };
 
     const handleSaveContact = async () => {
-        if (!contactData) return;
+        console.log('🎯 SaveContactButton - Save button clicked');
+        
+        if (!contactData) {
+            console.log('❌ SaveContactButton - No contact data available');
+            return;
+        }
 
         try {
-            // Track the contact save action
-            if (username) {
-                await recordLinkClick(username, {
-                    linkId: `save_contact_${contactData.displayName || 'contact'}`,
-                    linkTitle: `Save Contact - ${contactData.displayName || 'Contact'}`,
-                    linkUrl: window.location.href,
-                    linkType: "save_contact"
-                }, {
-                    userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
-                    referrer: typeof window !== 'undefined' ? document.referrer : '',
-                    recordDetailed: false
-                });
-            }
-
-            // Generate vCard content
             const vCardContent = generateVCard();
+            console.log('📄 SaveContactButton - Generated vCard:', vCardContent);
             
-            // Create blob and download
             const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8' });
             const url = window.URL.createObjectURL(blob);
             
-            // Create download link
             const link = document.createElement('a');
             link.href = url;
             link.download = `${contactData.displayName || 'contact'}.vcf`;
@@ -257,33 +142,33 @@ export default function SaveContactButton({ userId }) {
             link.click();
             document.body.removeChild(link);
             
-            // Clean up
             window.URL.revokeObjectURL(url);
             
-            console.log("✅ Contact saved successfully");
+            console.log("✅ SaveContactButton - Contact saved successfully");
         } catch (error) {
-            console.error('❌ Failed to save contact:', error);
+            console.error('❌ SaveContactButton - Failed to save contact:', error);
         }
     };
 
-    // Don't render if loading or no meaningful contact data
-    if (isLoading || !contactData) {
+    console.log('🎨 SaveContactButton - Render check:', {
+        isLoading,
+        contactData,
+        willRender: !isLoading && contactData
+    });
+
+    // Ne pas afficher si en cours de chargement
+    if (isLoading) {
+        console.log('⏳ SaveContactButton - Still loading, not rendering');
         return null;
     }
 
-    // ✅ CONDITION TEMPORAIRE : Accepter aussi le website
-    const hasContactInfo = contactData.email || contactData.phone || contactData.website || contactData.displayName;
-    console.log('🔍 SaveContactButton - Render check:', {
-        isLoading,
-        contactData,
-        hasContactInfo,
-        willRender: !isLoading && contactData && hasContactInfo
-    });
-    
-    if (!hasContactInfo) {
-        console.log('❌ SaveContactButton - No contact info, not rendering');
+    // Ne pas afficher si pas de données de contact
+    if (!contactData) {
+        console.log('❌ SaveContactButton - No contact data, not rendering');
         return null;
     }
+
+    console.log('✅ SaveContactButton - Rendering button');
 
     return (
         <div className="w-full px-5 mb-4">
