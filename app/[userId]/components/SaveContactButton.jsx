@@ -31,36 +31,56 @@ export default function SaveContactButton({ userId }) {
                 const unsubscribe = onSnapshot(docRef, (docSnap) => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
+                        console.log('🔍 SaveContactButton - Raw profile data:', data);
                         
                         // Extract contact information from the profile
                         const contact = {
                             displayName: data.displayName || '',
-                            email: '',
-                            phone: '',
-                            website: '',
-                            company: '',
+                            email: data.email || '',
+                            phone: data.phone || '',
+                            website: data.website || '',
+                            company: data.company || '',
                             profilePhoto: data.profilePhoto || '',
                             bio: data.bio || ''
                         };
+                        
+                        console.log('📋 SaveContactButton - Extracted contact data:', contact);
+
+                        // Extract contact information from the profile
+                        const contact = {
+                            displayName: data.displayName || '',
+                            email: data.email || '',
+                            phone: data.phone || '',
+                            website: data.website || '', // ✅ Utiliser directement le champ website
+                            company: data.company || '',
+                            profilePhoto: data.profilePhoto || '',
+                            bio: data.bio || ''
+                        };
+                        
+                        console.log('📋 SaveContactButton - Extracted contact data:', contact);
 
                         // Extract email and phone from links array
-                        if (data.links) {
-                            data.links.forEach(link => {
-                                if (link.isActive !== false) {
-                                    const url = link.url?.toLowerCase() || '';
-                                    const title = link.title?.toLowerCase() || '';
+                        if (data.links && Array.isArray(data.links)) {
+                            console.log('🔗 SaveContactButton - Processing links:', data.links);
+                            data.links.forEach((link, index) => {
+                                console.log(`🔗 Processing link ${index}:`, link);
+                                if (link.isActive !== false && link.url) {
+                                    const url = link.url.toLowerCase();
+                                    const title = (link.title || '').toLowerCase();
                                     
                                     // Check for email
                                     if (url.includes('mailto:') || url.includes('@') || title.includes('email')) {
                                         contact.email = url.replace('mailto:', '');
+                                        console.log('📧 Found email in link:', contact.email);
                                     }
                                     
                                     // Check for phone
-                                    if (url.includes('tel:') || url.includes('phone') || title.includes('phone') || title.includes('call')) {
-                                        contact.phone = url.replace('tel:', '').replace(/\D/g, ''); // Remove non-digits
+                                    if (url.includes('tel:') || title.includes('phone') || title.includes('call')) {
+                                        contact.phone = url.replace('tel:', '').replace(/\D/g, '');
+                                        console.log('📞 Found phone in link:', contact.phone);
                                     }
                                     
-                                    // Check for website (exclude social media)
+                                    // Check for website (exclude social media and current website)
                                     if (!contact.website && 
                                         !url.includes('instagram') && 
                                         !url.includes('twitter') && 
@@ -69,24 +89,36 @@ export default function SaveContactButton({ userId }) {
                                         !url.includes('tiktok') &&
                                         (url.startsWith('http') || url.startsWith('www'))) {
                                         contact.website = url.startsWith('http') ? url : `https://${url}`;
+                                        console.log('🌐 Found website in link:', contact.website);
                                     }
                                 }
                             });
                         }
 
                         // Extract social media and other info from socials array
-                        if (data.socials) {
-                            data.socials.forEach(social => {
+                        if (data.socials && Array.isArray(data.socials)) {
+                            console.log('📱 SaveContactButton - Processing socials:', data.socials);
+                            data.socials.forEach((social, index) => {
+                                console.log(`📱 Processing social ${index}:`, social);
                                 if (social.active && social.value) {
                                     switch (social.type) {
                                         case 'email':
-                                            if (!contact.email) contact.email = social.value;
+                                            if (!contact.email) {
+                                                contact.email = social.value;
+                                                console.log('📧 Found email in social:', contact.email);
+                                            }
                                             break;
                                         case 'phone':
-                                            if (!contact.phone) contact.phone = social.value.replace(/\D/g, '');
+                                            if (!contact.phone) {
+                                                contact.phone = social.value.replace(/\D/g, '');
+                                                console.log('📞 Found phone in social:', contact.phone);
+                                            }
                                             break;
                                         case 'website':
-                                            if (!contact.website) contact.website = social.value;
+                                            if (!contact.website) {
+                                                contact.website = social.value;
+                                                console.log('🌐 Found website in social:', contact.website);
+                                            }
                                             break;
                                         case 'linkedin':
                                             contact.linkedin = `https://linkedin.com/in/${social.value}`;
@@ -102,9 +134,24 @@ export default function SaveContactButton({ userId }) {
                             });
                         }
 
-                        // Only set contact data if we have meaningful information
-                        if (contact.displayName || contact.email || contact.phone) {
-                            setContactData(contact);
+                        // ✅ SOLUTION TEMPORAIRE : Utiliser toutes les données disponibles
+                        const finalContact = {
+                            ...contact,
+                            // Si on a un website direct, l'utiliser
+                            website: data.website || contact.website || '',
+                            // Utiliser displayName même s'il n'y a pas d'email/phone pour tester
+                            displayName: data.displayName || data.username || ''
+                        };
+
+                        console.log('📋 SaveContactButton - Final contact data:', finalContact);
+
+                        // ✅ CONDITION TEMPORAIRE : Afficher si on a au moins displayName ET website
+                        if (finalContact.displayName || finalContact.email || finalContact.phone || finalContact.website) {
+                            console.log('✅ SaveContactButton - Setting contact data:', finalContact);
+                            setContactData(finalContact);
+                        } else {
+                            console.log('❌ SaveContactButton - No meaningful contact data found');
+                            setContactData(null);
                         }
                     }
                     setIsLoading(false);
@@ -224,9 +271,17 @@ export default function SaveContactButton({ userId }) {
         return null;
     }
 
-    // Check if we have at least some contact information worth saving
-    const hasContactInfo = contactData.email || contactData.phone || contactData.website;
+    // ✅ CONDITION TEMPORAIRE : Accepter aussi le website
+    const hasContactInfo = contactData.email || contactData.phone || contactData.website || contactData.displayName;
+    console.log('🔍 SaveContactButton - Render check:', {
+        isLoading,
+        contactData,
+        hasContactInfo,
+        willRender: !isLoading && contactData && hasContactInfo
+    });
+    
     if (!hasContactInfo) {
+        console.log('❌ SaveContactButton - No contact info, not rendering');
         return null;
     }
 
