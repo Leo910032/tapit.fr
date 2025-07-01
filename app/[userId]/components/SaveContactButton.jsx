@@ -307,10 +307,7 @@ export default function SaveContactButton({ userId }) {
                                 className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
                                 onClick={handleDirectSave}
                             />
-                            {/* Save icon inside the box */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                            </div>
+                         
                         </div>
                     </div>
                     
