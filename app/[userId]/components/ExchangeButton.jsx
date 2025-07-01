@@ -12,7 +12,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     
-  
+   
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -20,6 +20,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
+    
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -70,22 +71,21 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
         }
     }, [userId]);
 
-    
+
     const getButtonClasses = () => {
         let baseClasses = "w-full font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
-       
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-        
+       
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
         
         switch (btnType) {
-            case 0: 
+            case 0:
                 return `${baseClasses}`;
             case 1: 
                 return `${baseClasses} rounded-lg`;
@@ -99,13 +99,13 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
             case 6: 
                 return `${baseClasses} bg-white border border-black`;
-            case 7: 
+            case 7:
                 return `${baseClasses} bg-white border border-black rounded-lg`;
             case 8: 
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
             case 9: 
                 return `${baseClasses} bg-white`;
-            case 10: 
+            case 10:
                 return `${baseClasses} bg-white rounded-lg`;
             case 11: 
                 return `${baseClasses} bg-white rounded-3xl`;
@@ -174,7 +174,6 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             )}
             
             {selectedTheme === "New Mario" ? (
-                // Mario theme special button - FIXED VERSION
                 <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
                     {/* Mario brick background */}
                     {Array(9).fill("").map((_, brick_index) => (
@@ -207,14 +206,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                             </div>
                             
                             {/* Mario-style text */}
-                            <div className="text-white font-bold MariaFont md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-                                <span className="hidden md:block">
-                                    {t('exchange.button_text') || 'Exchange Contact'}
-                                </span>
-                                <span className="block md:hidden">
-                                    Exchange
-                                </span>
-                            </div>
+                           
                         </div>
                         
                         {/* Right side - Copy button */}
@@ -244,15 +236,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
                         
-                        {/* Text - Hidden on small screens, visible on md+ */}
-                        <span className="hidden md:block">
-                            {t('exchange.button_text') || 'Exchange Contact'}
-                        </span>
-                        
-                        {/* Mobile-only text (shorter) */}
-                        <span className="block md:hidden text-sm">
-                            Exchange
-                        </span>
+                
                     </button>
                 </div>
             )}

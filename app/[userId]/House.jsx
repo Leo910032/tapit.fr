@@ -261,6 +261,7 @@ export default function House({ userId }) {
 
 
 
+
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {isClient && (
     <div className="w-full px-5 mb-4">
