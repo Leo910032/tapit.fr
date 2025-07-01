@@ -82,6 +82,16 @@ export default function SaveContactButton({ userId }) {
     const getButtonClasses = () => {
         let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
+        // Special handling for 3D Blocks theme
+        if (selectedTheme === "3D Blocks") {
+            return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px]`;
+        }
+        
+        // Special handling for Mario theme
+        if (selectedTheme === "New Mario") {
+            return `${baseClasses} relative overflow-hidden h-16 mario-button`;
+        }
+        
         switch (btnType) {
             case 0: // Flat
                 return `${baseClasses}`;
@@ -116,9 +126,29 @@ export default function SaveContactButton({ userId }) {
 
     // Generate button styles
     const getButtonStyles = () => {
+        // Special handling for 3D Blocks theme
+        if (selectedTheme === "3D Blocks") {
+            return {
+                color: "#fff",
+                backgroundColor: "#10B981" // Green color for save button
+            };
+        }
+        
+        // Special handling for Mario theme
+        if (selectedTheme === "New Mario") {
+            return {
+                color: "#fff",
+                backgroundColor: "transparent",
+                backgroundImage: `url('https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png')`,
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center"
+            };
+        }
+        
         let styles = {
-            color: btnFontColor,
-            backgroundColor: btnColor
+            color: btnFontColor || "#000",
+            backgroundColor: btnColor || "#fff"
         };
 
         // Add shadow for specific button types
@@ -149,7 +179,7 @@ export default function SaveContactButton({ userId }) {
         return styles;
     };
 
-    // vCard generation (same as before)
+    // vCard generation
     const generateVCard = () => {
         if (!contactData) return '';
 
@@ -202,7 +232,7 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
-    // Direct save method (same as before)
+    // Direct save method
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -256,7 +286,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-    // Copy contact info (same as before)
+    // Copy contact info
     const handleCopyContact = async () => {
         try {
             const contactText = [
@@ -288,7 +318,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-    // QR Code display (same as before)
+    // QR Code display
     const handleShowQR = () => {
         try {
             const vCardContent = generateVCard();
@@ -386,26 +416,68 @@ export default function SaveContactButton({ userId }) {
     return (
         <div className="relative">
             <div className="flex gap-2">
-                {/* MAIN BUTTON - Now themed */}
-                <button
-                    onClick={handleDirectSave}
-                    className={getButtonClasses()}
-                    style={getButtonStyles()}
-                >
-                    <FaAddressCard className="w-5 h-5 flex-shrink-0" />
-                    
-                    {/* Desktop text */}
-                    <span className="hidden md:block">
-                        {isMobile ? 'Save Contact' : 'Download Contact'}
-                    </span>
-                    
-                    {/* Mobile text (shorter) */}
-                    <span className="block md:hidden text-sm">
-                        Save
-                    </span>
-                    
-                    <FaDownload className="w-4 h-4 flex-shrink-0" />
-                </button>
+                {/* MAIN BUTTON - Now themed with special theme support */}
+                {selectedTheme === "New Mario" ? (
+                    // Mario theme special button
+                    <div className="flex-1 relative overflow-hidden flex justify-between items-center h-16">
+                        {/* Mario brick background */}
+                        {Array(9).fill("").map((_, brick_index) => (
+                            <img
+                                key={brick_index}
+                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                                alt="Mario Brick"
+                                onClick={handleDirectSave}
+                                className="h-16 w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
+                                style={{ width: '11.11%' }}
+                            />
+                        ))}
+                        
+                        {/* Button content overlay */}
+                        <div 
+                            className="absolute top-0 left-0 z-30 w-full h-full flex items-center justify-center gap-2 cursor-pointer text-white font-bold"
+                            onClick={handleDirectSave}
+                            style={{ 
+                                textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                                fontSize: 'clamp(0.75rem, 2vw, 1rem)'
+                            }}
+                        >
+                            <FaAddressCard className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" />
+                            
+                            {/* Desktop text */}
+                            <span className="hidden md:block">
+                                {isMobile ? 'Save Contact' : 'Download Contact'}
+                            </span>
+                            
+                            {/* Mobile text (shorter) */}
+                            <span className="block md:hidden text-xs">
+                                Save
+                            </span>
+                            
+                            <FaDownload className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" />
+                        </div>
+                    </div>
+                ) : (
+                    // Regular themed button
+                    <button
+                        onClick={handleDirectSave}
+                        className={getButtonClasses()}
+                        style={getButtonStyles()}
+                    >
+                        <FaAddressCard className="w-5 h-5 flex-shrink-0" />
+                        
+                        {/* Desktop text */}
+                        <span className="hidden md:block">
+                            {isMobile ? 'Save Contact' : 'Download Contact'}
+                        </span>
+                        
+                        {/* Mobile text (shorter) */}
+                        <span className="block md:hidden text-sm">
+                            Save
+                        </span>
+                        
+                        <FaDownload className="w-4 h-4 flex-shrink-0" />
+                    </button>
+                )}
 
                 {/* OPTIONS MENU BUTTON - Themed to match */}
                 <button
@@ -413,7 +485,8 @@ export default function SaveContactButton({ userId }) {
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
                     title="More options"
                     style={{
-                        borderColor: selectedTheme === "Matrix" ? themeTextColour : undefined
+                        borderColor: selectedTheme === "Matrix" ? themeTextColour : undefined,
+                        height: selectedTheme === "New Mario" ? "64px" : "auto" // Match Mario button height
                     }}
                 >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
