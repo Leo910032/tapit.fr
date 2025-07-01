@@ -75,16 +75,6 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const getButtonClasses = () => {
         let baseClasses = "w-full font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
-        // Special handling for 3D Blocks theme
-        if (selectedTheme === "3D Blocks") {
-            return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px]`;
-        }
-        
-        // Special handling for Mario theme
-        if (selectedTheme === "New Mario") {
-            return `${baseClasses} relative overflow-hidden h-16 mario-button`;
-        }
-        
         switch (btnType) {
             case 0: // Flat
                 return `${baseClasses}`;
@@ -119,26 +109,6 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
 
     // Generate button styles
     const getButtonStyles = () => {
-        // Special handling for 3D Blocks theme
-        if (selectedTheme === "3D Blocks") {
-            return {
-                color: "#fff",
-                backgroundColor: "#191414" // Default dark color, will be overridden by brand colors
-            };
-        }
-        
-        // Special handling for Mario theme
-        if (selectedTheme === "New Mario") {
-            return {
-                color: "#fff",
-                backgroundColor: "transparent",
-                backgroundImage: `url('https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png')`,
-                backgroundSize: "cover",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center"
-            };
-        }
-        
         let styles = {
             color: btnFontColor || "#000",
             backgroundColor: btnColor || "#fff"
@@ -170,7 +140,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
         }
 
         // Debug log to check if styles are being applied
-        console.log("🎨 Exchange Button Styles:", styles, "Button Type:", btnType, "Theme:", selectedTheme);
+        console.log("🎨 Exchange Button Styles:", styles, "Button Type:", btnType);
 
         return styles;
     };
@@ -180,72 +150,30 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             {/* Debug info - remove this after fixing */}
             {process.env.NODE_ENV === 'development' && (
                 <div className="text-xs text-gray-500 mb-1">
-                    ExchangeButton Debug: Type={btnType}, Color={btnColor}, Theme={selectedTheme}, UserId={userId ? '✓' : '✗'}
+                    ExchangeButton Debug: Type={btnType}, Color={btnColor}, UserId={userId ? '✓' : '✗'}
                 </div>
             )}
             
-            {selectedTheme === "New Mario" ? (
-                // Mario theme special button
-                <div className="relative overflow-hidden flex justify-between items-center h-16 w-full">
-                    {/* Mario brick background */}
-                    {Array(9).fill("").map((_, brick_index) => (
-                        <img
-                            key={brick_index}
-                            src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
-                            alt="Mario Brick"
-                            onClick={() => setIsModalOpen(true)}
-                            className="h-16 w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
-                            style={{ width: '11.11%' }}
-                        />
-                    ))}
-                    
-                    {/* Button content overlay */}
-                    <div 
-                        className="absolute top-0 left-0 z-30 w-full h-full flex items-center justify-center gap-2 cursor-pointer text-white font-bold text-shadow-mario"
-                        onClick={() => setIsModalOpen(true)}
-                        style={{ 
-                            textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                            fontSize: 'clamp(0.75rem, 2vw, 1rem)'
-                        }}
-                    >
-                        {/* Exchange Icon */}
-                        <svg className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
-                        
-                        {/* Text */}
-                        <span className="hidden md:block">
-                            {t('exchange.button_text') || 'Exchange Contact'}
-                        </span>
-                        
-                        <span className="block md:hidden text-xs">
-                            Exchange
-                        </span>
-                    </div>
-                </div>
-            ) : (
-                // Regular themed button
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className={getButtonClasses()}
-                    style={getButtonStyles()}
-                >
-                    {/* Exchange Icon */}
-                    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                    
-                    {/* Text - Hidden on small screens, visible on md+ */}
-                    <span className="hidden md:block">
-                        {t('exchange.button_text') || 'Exchange Contact'}
-                    </span>
-                    
-                    {/* Mobile-only text (shorter) */}
-                    <span className="block md:hidden text-sm">
-                        Exchange
-                    </span>
-                </button>
-            )}
+            <button
+                onClick={() => setIsModalOpen(true)}
+                className={getButtonClasses()}
+                style={getButtonStyles()}
+            >
+                {/* Exchange Icon */}
+                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                
+                {/* Text - Hidden on small screens, visible on md+ */}
+                <span className="hidden md:block">
+                    {t('exchange.button_text') || 'Exchange Contact'}
+                </span>
+                
+                {/* Mobile-only text (shorter) */}
+                <span className="block md:hidden text-sm">
+                    Exchange
+                </span>
+            </button>
             
             <ExchangeModal 
                 isOpen={isModalOpen}
