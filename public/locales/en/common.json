@@ -2,8 +2,8 @@
 
   
   "exchange": {
-    "button_text": "Contact",
-    "button_text_short": "Contact",
+    "button_text": "Exchange",
+    "button_text_short": "Exchange",
     "title": "Contact",
     "description": "Share your contact information to connect with this profile owner.",
     "close_modal": "Close modal",
@@ -44,9 +44,9 @@
   },
 
   "save_contact": {
-    "button_text": "Save Contact",
+    "button_text": "Save ",
     "download_contact": "Download Contact",
-    "save_contact": "Save Contact",
+    "save_contact": "Save ",
     "copy_contact_info": "Copy Contact Info",
     "show_qr_code": "Show QR Code",
     "more_options": "More options",
