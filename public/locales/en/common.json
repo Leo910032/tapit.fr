@@ -3,6 +3,7 @@
   
   "exchange": {
     "button_text": "Contact",
+    "button_text_short": "Contact",
     "title": "Contact",
     "description": "Share your contact information to connect with this profile owner.",
     "close_modal": "Close modal",
