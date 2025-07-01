@@ -335,10 +335,7 @@ export default function SaveContactButton({ userId }) {
                         </span>
                     </div>
                     
-                    {/* Download icon */}
-                    <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
-                        <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                    </div>
+                  
                 </div>
             ) : selectedTheme === "3D Blocks" ? (
                 <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
