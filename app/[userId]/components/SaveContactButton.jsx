@@ -396,7 +396,7 @@ export default function SaveContactButton({ userId }) {
         <>
             {selectedTheme === "New Mario" ? (
                 <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
-                    {Array(9).fill("").map((_, brick_index) => (
+                    {Array(4).fill("").map((_, brick_index) => (
                         <img
                             key={brick_index}
                             src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
