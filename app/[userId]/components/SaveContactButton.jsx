@@ -446,15 +446,7 @@ export default function SaveContactButton({ userId }) {
                                 </div>
                             </div>
                             
-                            {/* Mario-style text */}
-                            <div className="text-white font-bold MariaFont md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-                                <span className="hidden md:block">
-                                    {isMobile ? 'Save Contact' : 'Download Contact'}
-                                </span>
-                                <span className="block md:hidden">
-                                    Save
-                                </span>
-                            </div>
+                          
                         </div>
                         
                         {/* Clickable overlay */}
