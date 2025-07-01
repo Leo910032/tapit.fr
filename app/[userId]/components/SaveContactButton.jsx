@@ -84,7 +84,7 @@ export default function SaveContactButton({ userId }) {
         
         // Special handling for 3D Blocks theme
         if (selectedTheme === "3D Blocks") {
-            return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
+            return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px]`;
         }
         
         // Special handling for Mario theme
@@ -138,7 +138,11 @@ export default function SaveContactButton({ userId }) {
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
-                backgroundColor: "transparent"
+                backgroundColor: "transparent",
+                backgroundImage: `url('https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png')`,
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center"
             };
         }
         
@@ -414,8 +418,8 @@ export default function SaveContactButton({ userId }) {
             <div className="flex gap-2">
                 {/* MAIN BUTTON - Now themed with special theme support */}
                 {selectedTheme === "New Mario" ? (
-                    // Mario theme special button - IMPROVED VERSION
-                    <div className="flex-1 userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16">
+                    // Mario theme special button
+                    <div className="flex-1 relative overflow-hidden flex justify-between items-center h-16">
                         {/* Mario brick background */}
                         {Array(9).fill("").map((_, brick_index) => (
                             <img
@@ -428,51 +432,16 @@ export default function SaveContactButton({ userId }) {
                             />
                         ))}
                         
-                        {/* Button content overlay with Mario Box icon */}
+                        {/* Button content overlay */}
                         <div 
-                            className="absolute top-0 left-0 z-30 w-full h-full flex items-center justify-center gap-3 cursor-pointer pointer-events-none"
+                            className="absolute top-0 left-0 z-30 w-full h-full flex items-center justify-center gap-2 cursor-pointer text-white font-bold"
+                            onClick={handleDirectSave}
                             style={{ 
-                                textShadow: '4px 4px 0px rgba(0,0,0,1)'
+                                textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                                fontSize: 'clamp(0.75rem, 2vw, 1rem)'
                             }}
                         >
-                            {/* Mario Box with icon inside */}
-                            <div className="grid place-items-center">
-                                <img
-                                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
-                                    alt="Mario Box"
-                                    className="h-12 w-auto object-contain"
-                                />
-                                <div className="absolute">
-                                    <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                                </div>
-                            </div>
-                            
-                            {/* Mario-style text */}
-                            <div className="text-white font-bold MariaFont md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
-                                <span className="hidden md:block">
-                                    {isMobile ? 'Save Contact' : 'Download Contact'}
-                                </span>
-                                <span className="block md:hidden">
-                                    Save
-                                </span>
-                            </div>
-                        </div>
-                        
-                        {/* Clickable overlay */}
-                        <div 
-                            className="absolute top-0 left-0 w-full h-full cursor-pointer z-40"
-                            onClick={handleDirectSave}
-                        />
-                    </div>
-                ) : (
-                    // Regular themed button with proper container for 3D Blocks
-                    <div className={selectedTheme === "3D Blocks" ? "flex-1 userBtn" : "flex-1"}>
-                        <button
-                            onClick={handleDirectSave}
-                            className={getButtonClasses()}
-                            style={getButtonStyles()}
-                        >
-                            <FaAddressCard className="w-5 h-5 flex-shrink-0" />
+                            <FaAddressCard className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" />
                             
                             {/* Desktop text */}
                             <span className="hidden md:block">
@@ -480,13 +449,34 @@ export default function SaveContactButton({ userId }) {
                             </span>
                             
                             {/* Mobile text (shorter) */}
-                            <span className="block md:hidden text-sm">
+                            <span className="block md:hidden text-xs">
                                 Save
                             </span>
                             
-                            <FaDownload className="w-4 h-4 flex-shrink-0" />
-                        </button>
+                            <FaDownload className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" />
+                        </div>
                     </div>
+                ) : (
+                    // Regular themed button
+                    <button
+                        onClick={handleDirectSave}
+                        className={getButtonClasses()}
+                        style={getButtonStyles()}
+                    >
+                        <FaAddressCard className="w-5 h-5 flex-shrink-0" />
+                        
+                        {/* Desktop text */}
+                        <span className="hidden md:block">
+                            {isMobile ? 'Save Contact' : 'Download Contact'}
+                        </span>
+                        
+                        {/* Mobile text (shorter) */}
+                        <span className="block md:hidden text-sm">
+                            Save
+                        </span>
+                        
+                        <FaDownload className="w-4 h-4 flex-shrink-0" />
+                    </button>
                 )}
 
                 {/* OPTIONS MENU BUTTON - Themed to match */}
@@ -496,7 +486,7 @@ export default function SaveContactButton({ userId }) {
                     title="More options"
                     style={{
                         borderColor: selectedTheme === "Matrix" ? themeTextColour : undefined,
-                        height: selectedTheme === "New Mario" ? "64px" : "auto"
+                        height: selectedTheme === "New Mario" ? "64px" : "auto" // Match Mario button height
                     }}
                 >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
