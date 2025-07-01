@@ -186,7 +186,8 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             
             {selectedTheme === "New Mario" ? (
                 
-        <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
+                <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 py-3 w-full">
+
                     {/* Mario brick background */}
                     {Array(9).fill("").map((_, brick_index) => (
                         <img
