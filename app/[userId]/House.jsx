@@ -257,27 +257,31 @@ export default function House({ userId }) {
                                 <FileDownloadButton userId={userId} />
                                 
                                 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-                                {isClient && (
-                                    <div className="w-full px-5 mb-4">
-                                        <div className="flex gap-3">
-                                            {/* Exchange Button - Left Side */}
-                                            <div className="flex-1">
-                                                <ExchangeButton 
-                                                    username={username} 
-                                                    userInfo={userLookupData}
-                                                    fastLookupUsed={fastLookupUsed}
-                                                    userId={userId} // ✅ ADD THIS LINE - This was missing!
+                               // In your House.jsx file, replace the COMBINED BUTTONS SECTION with this:
 
-                                                />
-                                            </div>
-                                            
-                                            {/* Save Contact Button - Right Side */}
-                                            <div className="flex-1">
-                                                <SaveContactButton userId={userId} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
+{isClient && (
+    <div className="w-full px-5 mb-4">
+        {/* Check if Mario theme for special layout */}
+        {/* You'll need to access the theme from your state - add this to House.jsx state */}
+        <div className="flex gap-3">
+            {/* Exchange Button - Left Side */}
+            <div className="flex-1">
+                <ExchangeButton 
+                    username={username} 
+                    userInfo={userLookupData}
+                    fastLookupUsed={fastLookupUsed}
+                    userId={userId}
+                />
+            </div>
+            
+            {/* Save Contact Button - Right Side */}
+            <div className="flex-1">
+                <SaveContactButton userId={userId} />
+            </div>
+        </div>
+    </div>
+)}
                             </div>
                         </div>
                         <SupportBanner userId={userId} />
