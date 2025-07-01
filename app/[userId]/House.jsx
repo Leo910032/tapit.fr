@@ -253,8 +253,8 @@ export default function House({ userId }) {
                                 <UserInfo userId={userId} hasSensitiveContent={hasSensitiveContent} />
                                 <MyLinks userId={userId} hasSensitiveContent={hasSensitiveContent} />
                                 
-                                {/* File Download Button - Only shows if user has uploaded a file */}
-                                <FileDownloadButton userId={userId} />
+                                {/* File Download Button - Only shows if user has uploaded a file 
+                                <FileDownloadButton userId={userId} />*/}
                                 
                                 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
   {isClient && (
