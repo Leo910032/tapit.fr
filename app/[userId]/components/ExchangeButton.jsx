@@ -186,66 +186,64 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             
             {selectedTheme === "New Mario" ? (
                 
-<div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">         
-
-                    {/* Mario brick background */}
-                    {Array(4).fill("").map((_, brick_index) => (
-                        <img
-                            key={brick_index}
-                            src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
-                            alt="Mario Brick"
-                            onClick={() => setIsModalOpen(true)}
-                            className="h-full w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
-                            style={{ width: '11.11%' }}
-                        />
-                    ))}
-                    
-                    {/* Mario box with icon */}
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
-                        <div className="relative">
-                            <img
-                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
-                                alt="Mario Box"
-                                className="h-8 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
-                                onClick={() => setIsModalOpen(true)}
-                            />
-                            {/* Exchange icon inside the box */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <svg className="w-4 h-4 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Button text overlay */}
-                    <div 
-                        className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
-                        onClick={() => setIsModalOpen(true)}
-                        style={{ 
-                            textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                            fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                            paddingLeft: '3rem' // Space for the box
-                        }}
-                    >
-                        {/* Text */}
-                        <span className="hidden md:block">
-                            {t('exchange.button_text') || 'Exchange Contact'}
-                        </span>
-                        
-                        <span className="block md:hidden text-sm">
-                            Exchange
-                        </span>
-                    </div>
-                    
-                    {/* Copy button */}
-                    <div className="absolute p-1 h-6 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90 z-30">
-                        <svg className="w-3 h-3 rotate-10 group-hover:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                    </div>
+ <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
+        {/* Mario brick background - 4 bricks for side-by-side buttons */}
+        {Array(4).fill("").map((_, brick_index) => (
+            <img
+                key={brick_index}
+                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                alt="Mario Brick"
+                onClick={() => setIsModalOpen(true)}
+                className="h-full w-1/4 object-cover hover:-translate-y-2 cursor-pointer transition-transform"
+            />
+        ))}
+        
+        {/* Mario box with icon */}
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
+            <div className="relative">
+                <img
+                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                    alt="Mario Box"
+                    className="h-8 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
+                    onClick={() => setIsModalOpen(true)}
+                />
+                {/* Exchange icon inside the box */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
                 </div>
-            ) : selectedTheme === "3D Blocks" ? (
+            </div>
+        </div>
+        
+        {/* Button text overlay */}
+        <div 
+            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
+            onClick={() => setIsModalOpen(true)}
+            style={{ 
+                textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
+                paddingLeft: '3rem' // Space for the box
+            }}
+        >
+            {/* Text */}
+            <span className="hidden md:block">
+                {t('exchange.button_text') || 'Exchange Contact'}
+            </span>
+            
+            <span className="block md:hidden text-sm">
+                Exchange
+            </span>
+        </div>
+        
+        {/* Copy button */}
+        <div className="absolute p-1 h-6 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90 z-30">
+            <svg className="w-3 h-3 rotate-10 group-hover:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+        </div>
+    </div>
+) :  selectedTheme === "3D Blocks" ? (
              
                 <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
                     <button
