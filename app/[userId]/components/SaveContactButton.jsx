@@ -15,7 +15,7 @@ export default function SaveContactButton({ userId }) {
     const [isLoading, setIsLoading] = useState(true);
     const [showOptions, setShowOptions] = useState(false);
     
-    // Theme state
+   
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -23,7 +23,7 @@ export default function SaveContactButton({ userId }) {
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-    // Fetch theme data
+  
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -37,7 +37,7 @@ export default function SaveContactButton({ userId }) {
                     if (docSnapshot.exists()) {
                         const data = docSnapshot.data();
                         
-                        // Set theme data
+                        
                         setBtnType(data.btnType || 0);
                         setBtnShadowColor(data.btnShadowColor || "#000");
                         setBtnFontColor(data.btnFontColor || "#000");
@@ -45,7 +45,7 @@ export default function SaveContactButton({ userId }) {
                         setSelectedTheme(data.selectedTheme || '');
                         setThemeTextColour(data.themeFontColor || "");
                         
-                        // Set contact data
+                        
                         const contact = {
                             displayName: data.displayName || '',
                             email: data.email || '',
@@ -78,53 +78,52 @@ export default function SaveContactButton({ userId }) {
         fetchThemeData();
     }, [userId]);
 
-    // Generate button classes based on theme
+    
     const getButtonClasses = () => {
         let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
-        // Special handling for 3D Blocks theme
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-        // Special handling for Mario theme
+      
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
         
         switch (btnType) {
-            case 0: // Flat
+            case 0: 
                 return `${baseClasses}`;
-            case 1: // Rounded
+            case 1: 
                 return `${baseClasses} rounded-lg`;
-            case 2: // Pill
+            case 2: 
                 return `${baseClasses} rounded-3xl`;
-            case 3: // Outline
+            case 3: 
                 return `${baseClasses} border border-black bg-opacity-0`;
-            case 4: // Outline Rounded
+            case 4: 
                 return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
-            case 5: // Outline Pill
+            case 5: 
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
-            case 6: // Hard Shadow
+            case 6: 
                 return `${baseClasses} bg-white border border-black`;
-            case 7: // Hard Shadow Rounded
+            case 7: 
                 return `${baseClasses} bg-white border border-black rounded-lg`;
-            case 8: // Hard Shadow Pill
+            case 8: 
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
-            case 9: // Soft Shadow
+            case 9: 
                 return `${baseClasses} bg-white`;
-            case 10: // Soft Shadow Rounded
+            case 10: 
                 return `${baseClasses} bg-white rounded-lg`;
-            case 11: // Soft Shadow Pill
+            case 11: 
                 return `${baseClasses} bg-white rounded-3xl`;
-            case 15: // Black Pill
+            case 15: 
                 return `${baseClasses} border border-black bg-black rounded-3xl`;
             default:
                 return baseClasses;
         }
     };
 
-    // Generate button styles
+
     const getButtonStyles = () => {
         // Special handling for 3D Blocks theme
         if (selectedTheme === "3D Blocks") {
@@ -134,7 +133,7 @@ export default function SaveContactButton({ userId }) {
             };
         }
         
-        // Special handling for Mario theme
+        
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
@@ -151,7 +150,7 @@ export default function SaveContactButton({ userId }) {
             backgroundColor: btnColor || "#fff"
         };
 
-        // Add shadow for specific button types
+       
         switch (btnType) {
             case 6:
             case 7:
@@ -179,7 +178,7 @@ export default function SaveContactButton({ userId }) {
         return styles;
     };
 
-    // vCard generation
+   
     const generateVCard = () => {
         if (!contactData) return '';
 
@@ -232,7 +231,7 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
-    // Direct save method
+   
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -286,7 +285,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-    // Copy contact info
+    
     const handleCopyContact = async () => {
         try {
             const contactText = [
@@ -318,7 +317,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-    // QR Code display
+
     const handleShowQR = () => {
         try {
             const vCardContent = generateVCard();
@@ -418,7 +417,7 @@ export default function SaveContactButton({ userId }) {
             <div className="flex gap-2">
                 {/* MAIN BUTTON - Now themed with special theme support */}
                 {selectedTheme === "New Mario" ? (
-                    // Mario theme special button - constrained width like main buttons
+                    
                     <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 w-full">
                         {/* Mario brick background */}
                         {Array(9).fill("").map((_, brick_index) => (
@@ -475,7 +474,7 @@ export default function SaveContactButton({ userId }) {
                         </div>
                     </div>
                 ) : selectedTheme === "3D Blocks" ? (
-                    // 3D Blocks theme with proper width constraints
+                    
                     <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
                         <button
                             onClick={handleDirectSave}
@@ -498,7 +497,7 @@ export default function SaveContactButton({ userId }) {
                         </button>
                     </div>
                 ) : (
-                    // Regular themed button
+                   
                     <button
                         onClick={handleDirectSave}
                         className={getButtonClasses()}

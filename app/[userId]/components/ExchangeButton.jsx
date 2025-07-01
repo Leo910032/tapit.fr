@@ -20,7 +20,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-    // Fetch theme data
+
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -71,63 +71,63 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
         }
     }, [userId]);
 
-    // Generate button classes based on theme
+    
     const getButtonClasses = () => {
         let baseClasses = "w-full font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
-        // Special handling for 3D Blocks theme
+       
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-        // Special handling for Mario theme
+       
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
         
         switch (btnType) {
-            case 0: // Flat
+            case 0: 
                 return `${baseClasses}`;
-            case 1: // Rounded
+            case 1: 
                 return `${baseClasses} rounded-lg`;
-            case 2: // Pill
+            case 2: 
                 return `${baseClasses} rounded-3xl`;
-            case 3: // Outline
+            case 3: 
                 return `${baseClasses} border border-black bg-opacity-0`;
-            case 4: // Outline Rounded
+            case 4: 
                 return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
-            case 5: // Outline Pill
+            case 5: 
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
-            case 6: // Hard Shadow
+            case 6: 
                 return `${baseClasses} bg-white border border-black`;
-            case 7: // Hard Shadow Rounded
+            case 7: 
                 return `${baseClasses} bg-white border border-black rounded-lg`;
-            case 8: // Hard Shadow Pill
+            case 8:
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
-            case 9: // Soft Shadow
+            case 9: 
                 return `${baseClasses} bg-white`;
-            case 10: // Soft Shadow Rounded
+            case 10: 
                 return `${baseClasses} bg-white rounded-lg`;
-            case 11: // Soft Shadow Pill
+            case 11: 
                 return `${baseClasses} bg-white rounded-3xl`;
-            case 15: // Black Pill
+            case 15: 
                 return `${baseClasses} border border-black bg-black rounded-3xl`;
             default:
                 return baseClasses;
         }
     };
 
-    // Generate button styles
+   
     const getButtonStyles = () => {
-        // Special handling for 3D Blocks theme
+       
         if (selectedTheme === "3D Blocks") {
             return {
                 color: "#fff",
-                backgroundColor: "#191414" // Default dark color, will be overridden by brand colors
+                backgroundColor: "#191414" 
             };
         }
         
-        // Special handling for Mario theme
+   
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
@@ -144,7 +144,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             backgroundColor: btnColor || "#fff"
         };
 
-        // Add shadow for specific button types
+       
         switch (btnType) {
             case 6:
             case 7:
@@ -164,12 +164,12 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 break;
         }
 
-        // Matrix theme override
+        
         if (selectedTheme === "Matrix") {
             styles.borderColor = themeTextColour;
         }
 
-        // Debug log to check if styles are being applied
+        
         console.log("🎨 Exchange Button Styles:", styles, "Button Type:", btnType, "Theme:", selectedTheme);
 
         return styles;
@@ -185,8 +185,8 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             )}
             
             {selectedTheme === "New Mario" ? (
-                // Mario theme special button
-                <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 w-full">
+                
+                <div className="userBtn relative overflow-hidden flex justify-between items-center min-h-10 py-3 w-full">
                     {/* Mario brick background */}
                     {Array(9).fill("").map((_, brick_index) => (
                         <img
@@ -194,7 +194,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                             src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
                             alt="Mario Brick"
                             onClick={() => setIsModalOpen(true)}
-                            className="h-16 w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
+                            className="h-full w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
                             style={{ width: '11.11%' }}
                         />
                     ))}
@@ -205,12 +205,12 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                             <img
                                 src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
                                 alt="Mario Box"
-                                className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
+                                className="h-8 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
                                 onClick={() => setIsModalOpen(true)}
                             />
                             {/* Exchange icon inside the box */}
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <svg className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                 </svg>
                             </div>
@@ -224,7 +224,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                         style={{ 
                             textShadow: '4px 4px 0px rgba(0,0,0,1)',
                             fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                            paddingLeft: '4rem' // Space for the box
+                            paddingLeft: '3rem' // Space for the box
                         }}
                     >
                         {/* Text */}
@@ -238,14 +238,14 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     </div>
                     
                     {/* Copy button */}
-                    <div className="absolute p-2 h-9 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90 z-30">
-                        <svg className="w-4 h-4 rotate-10 group-hover:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="absolute p-1 h-6 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90 z-30">
+                        <svg className="w-3 h-3 rotate-10 group-hover:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                         </svg>
                     </div>
                 </div>
             ) : selectedTheme === "3D Blocks" ? (
-                // 3D Blocks theme with proper width constraints
+             
                 <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
                     <button
                         onClick={() => setIsModalOpen(true)}
@@ -269,7 +269,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     </button>
                 </div>
             ) : (
-                // Regular themed button
+       
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className={getButtonClasses()}
