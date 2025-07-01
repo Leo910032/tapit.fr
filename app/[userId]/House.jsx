@@ -7,7 +7,6 @@ import BgDiv from "./components/BgDiv";
 import MyLinks from "./components/MyLinks";
 import SupportBanner from "./components/SupportBanner";
 import ExchangeButton from "./components/ExchangeButton";
-import FileDownloadButton from "./components/FileDownloadButton";
 import React, { useEffect, useState } from "react";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { fastUserLookup } from "@/lib/userLookup";
