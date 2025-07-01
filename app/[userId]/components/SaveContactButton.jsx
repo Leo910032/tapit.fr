@@ -1,11 +1,10 @@
-// app/[userId]/components/SaveContactButton.jsx - THEMED VERSION FOR SIDE-BY-SIDE
 "use client"
 import { useState, useEffect } from 'react';
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { useTranslation } from "@/lib/useTranslation";
-import { FaAddressCard, FaShare, FaDownload, FaCopy } from "react-icons/fa6";
+import { FaAddressCard, FaDownload, FaCopy } from "react-icons/fa6";
 import { toast } from 'react-hot-toast';
 import { hexToRgba } from "@/lib/utilities";
 
@@ -15,14 +14,12 @@ export default function SaveContactButton({ userId }) {
     const [isLoading, setIsLoading] = useState(true);
     const [showOptions, setShowOptions] = useState(false);
     
-   
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
     const [btnColor, setBtnColor] = useState('');
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
-
 
     useEffect(() => {
         async function fetchThemeData() {
@@ -37,7 +34,6 @@ export default function SaveContactButton({ userId }) {
                     if (docSnapshot.exists()) {
                         const data = docSnapshot.data();
                         
-                        
                         setBtnType(data.btnType || 0);
                         setBtnShadowColor(data.btnShadowColor || "#000");
                         setBtnFontColor(data.btnFontColor || "#000");
@@ -45,7 +41,6 @@ export default function SaveContactButton({ userId }) {
                         setSelectedTheme(data.selectedTheme || '');
                         setThemeTextColour(data.themeFontColor || "");
                         
-                 
                         const contact = {
                             displayName: data.displayName || '',
                             email: data.email || '',
@@ -78,62 +73,57 @@ export default function SaveContactButton({ userId }) {
         fetchThemeData();
     }, [userId]);
 
-
     const getButtonClasses = () => {
-        let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
-        
+        let baseClasses = "font-semibold py-3 px-3 transition-all duration-200 transform hover:scale-[1.025] flex items-center justify-between cursor-pointer min-h-10 w-full";
         
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-       
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
         
         switch (btnType) {
-            case 0: 
+            case 0:
                 return `${baseClasses}`;
-            case 1: 
+            case 1:
                 return `${baseClasses} rounded-lg`;
-            case 2: 
+            case 2:
                 return `${baseClasses} rounded-3xl`;
-            case 3: 
+            case 3:
                 return `${baseClasses} border border-black bg-opacity-0`;
-            case 4: 
+            case 4:
                 return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
-            case 5: 
+            case 5:
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
-            case 6: 
+            case 6:
                 return `${baseClasses} bg-white border border-black`;
-            case 7: 
+            case 7:
                 return `${baseClasses} bg-white border border-black rounded-lg`;
-            case 8: 
+            case 8:
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
-            case 9: 
+            case 9:
                 return `${baseClasses} bg-white`;
-            case 10: 
+            case 10:
                 return `${baseClasses} bg-white rounded-lg`;
             case 11:
                 return `${baseClasses} bg-white rounded-3xl`;
-            case 15: 
+            case 15:
                 return `${baseClasses} border border-black bg-black rounded-3xl`;
             default:
                 return baseClasses;
         }
     };
 
-
     const getButtonStyles = () => {
-     
         if (selectedTheme === "3D Blocks") {
             return {
                 color: "#fff",
                 backgroundColor: "#10B981"
             };
         }
-
+        
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
@@ -146,7 +136,6 @@ export default function SaveContactButton({ userId }) {
             backgroundColor: btnColor || "#fff"
         };
 
-    
         switch (btnType) {
             case 6:
             case 7:
@@ -166,7 +155,6 @@ export default function SaveContactButton({ userId }) {
                 break;
         }
 
-   
         if (selectedTheme === "Matrix") {
             styles.borderColor = themeTextColour;
         }
@@ -174,7 +162,6 @@ export default function SaveContactButton({ userId }) {
         return styles;
     };
 
-   
     const generateVCard = () => {
         if (!contactData) return '';
 
@@ -227,7 +214,6 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
- 
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -281,7 +267,6 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-
     const handleCopyContact = async () => {
         try {
             const contactText = [
@@ -313,7 +298,6 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-   
     const handleShowQR = () => {
         try {
             const vCardContent = generateVCard();
@@ -409,33 +393,22 @@ export default function SaveContactButton({ userId }) {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     return (
-        <div className="relative">
-            <div className="flex gap-2">
-                {/* MAIN BUTTON - Now themed with special theme support */}
-                {selectedTheme === "New Mario" ? (
-               
-                    <div className="flex-1 userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16">
-                        {/* Mario brick background */}
-                        {Array(9).fill("").map((_, brick_index) => (
-                            <img
-                                key={brick_index}
-                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
-                                alt="Mario Brick"
-                                onClick={handleDirectSave}
-                                className="h-16 w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
-                                style={{ width: '11.11%' }}
-                            />
-                        ))}
-                        
-                        {/* Button content overlay with Mario Box icon */}
-                        <div 
-                            className="absolute top-0 left-0 z-30 w-full h-full flex items-center justify-center gap-3 cursor-pointer pointer-events-none"
-                            style={{ 
-                                textShadow: '4px 4px 0px rgba(0,0,0,1)'
-                            }}
-                        >
-                            {/* Mario Box with icon inside */}
-                            <div className="grid place-items-center">
+        <>
+            {selectedTheme === "New Mario" ? (
+                <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
+                    {Array(9).fill("").map((_, brick_index) => (
+                        <img
+                            key={brick_index}
+                            src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                            alt="Mario Brick"
+                            onClick={handleDirectSave}
+                            className="h-16 w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
+                        />
+                    ))}
+                    
+                    <div className="absolute top-0 left-0 z-30 w-full h-full flex items-center cursor-pointer pointer-events-none">
+                        <div className="flex items-center gap-3 px-3">
+                            <div className="grid place-items-center relative">
                                 <img
                                     src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
                                     alt="Mario Box"
@@ -446,89 +419,40 @@ export default function SaveContactButton({ userId }) {
                                 </div>
                             </div>
                             
-                          
+                            <div className="text-white font-bold MariaFont md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+                                <span className="hidden md:block">
+                                    DOWNLOAD CONTACT
+                                </span>
+                                <span className="block md:hidden">
+                                    SAVE
+                                </span>
+                            </div>
                         </div>
-                        
-                        {/* Clickable overlay */}
+                    </div>
+                    
+                    <div className="absolute top-0 left-0 w-full h-full cursor-pointer z-20" onClick={handleDirectSave} />
+                </div>
+            ) : (
+                <div className={selectedTheme === "3D Blocks" ? "userBtn md:w-[35rem] sm:w-[30rem] w-clamp" : "userBtn md:w-[35rem] sm:w-[30rem] w-clamp"}>
+                    <div className={getButtonClasses()} style={getButtonStyles()} onClick={handleDirectSave}>
+                        <div className="h-[2rem] w-fit rounded-lg p-[2px] bg-white aspect-square">
+                            <FaAddressCard className="object-fit h-full aspect-square text-green-500" />
+                        </div>
+                        <span className="font-semibold truncate max-w-[90%] flex-1 px-3">
+                            {isMobile ? 'Save Contact' : 'Download Contact'}
+                        </span>
                         <div 
-                            className="absolute top-0 left-0 w-full h-full cursor-pointer z-40"
-                            onClick={handleDirectSave}
-                        />
-                    </div>
-                ) : (
-                   
-                    <div className={selectedTheme === "3D Blocks" ? "flex-1 userBtn" : "flex-1"}>
-                        <button
-                            onClick={handleDirectSave}
-                            className={getButtonClasses()}
-                            style={getButtonStyles()}
-                        >
-                            <FaAddressCard className="w-5 h-5 flex-shrink-0" />
-                            
-                        
-                            
-                            <FaDownload className="w-4 h-4 flex-shrink-0" />
-                        </button>
-                    </div>
-                )}
-
-                {/* OPTIONS MENU BUTTON - Themed to match */}
-                <button
-                    onClick={() => setShowOptions(!showOptions)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
-                    title="More options"
-                    style={{
-                        borderColor: selectedTheme === "Matrix" ? themeTextColour : undefined,
-                        height: selectedTheme === "New Mario" ? "64px" : "auto"
-                    }}
-                >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                </button>
-            </div>
-
-            {/* OPTIONS MENU */}
-            {showOptions && (
-                <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border z-50 min-w-[220px] overflow-hidden">
-                    <div className="py-2">
-                        
-                        {/* Copy Option */}
-                        <button
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 handleCopyContact();
-                                setShowOptions(false);
-                            }}
-                            className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+                            }} 
+                            className="absolute p-2 h-9 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90"
                         >
-                            <FaCopy className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm">Copy Contact Info</span>
-                        </button>
-
-                        {/* QR Code Option */}
-                        <button
-                            onClick={() => {
-                                handleShowQR();
-                                setShowOptions(false);
-                            }}
-                            className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                        >
-                            <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                            </svg>
-                            <span className="text-sm">Show QR Code</span>
-                        </button>
+                            <FaCopy className="rotate-10 group-hover:rotate-0" />
+                        </div>
                     </div>
                 </div>
             )}
-
-            {/* Close menu overlay */}
-            {showOptions && (
-                <div 
-                    className="fixed inset-0 z-40" 
-                    onClick={() => setShowOptions(false)}
-                />
-            )}
-        </div>
+        </>
     );
 }
