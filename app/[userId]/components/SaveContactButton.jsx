@@ -1,11 +1,11 @@
-// app/[userId]/components/SaveContactButton.jsx - COMPLETE VERSION WITH TRANSLATIONS
+// app/[userId]/components/SaveContactButton.jsx - SIMPLIFIED VERSION WITHOUT EXTRA FUNCTIONS
 "use client"
 import { useState, useEffect } from 'react';
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { useTranslation } from "@/lib/useTranslation";
-import { FaAddressCard, FaShare, FaDownload, FaCopy } from "react-icons/fa6";
+import { FaAddressCard, FaDownload } from "react-icons/fa6";
 import { toast } from 'react-hot-toast';
 import { hexToRgba } from "@/lib/utilities";
 
@@ -13,7 +13,6 @@ export default function SaveContactButton({ userId }) {
     const { t } = useTranslation();
     const [contactData, setContactData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [showOptions, setShowOptions] = useState(false);
     
     // Theme state
     const [btnType, setBtnType] = useState(0);
@@ -78,7 +77,7 @@ export default function SaveContactButton({ userId }) {
     }, [userId]);
 
     const getButtonClasses = () => {
-        let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
+        let baseClasses = "w-full font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
@@ -274,126 +273,6 @@ export default function SaveContactButton({ userId }) {
         } catch (error) {
             console.error('Save error:', error);
             toast.error(t('save_contact.failed_save') || 'Failed to save contact');
-            handleCopyContact();
-        }
-    };
-
-    const handleCopyContact = async () => {
-        try {
-            const contactText = [
-                contactData.displayName && `Name: ${contactData.displayName}`,
-                contactData.email && `Email: ${contactData.email}`,
-                contactData.phone && `Phone: ${contactData.phone}`,
-                contactData.website && `Website: ${contactData.website}`,
-                contactData.company && `Company: ${contactData.company}`,
-                contactData.bio && `Bio: ${contactData.bio}`
-            ].filter(Boolean).join('\n');
-
-            if (navigator.clipboard) {
-                await navigator.clipboard.writeText(contactText);
-            } else {
-                const textArea = document.createElement('textarea');
-                textArea.value = contactText;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-            }
-            
-            toast.success(t('save_contact.contact_copied') || '📋 Contact info copied!', {
-                duration: 3000
-            });
-        } catch (error) {
-            console.error('Copy error:', error);
-            toast.error(t('save_contact.failed_copy') || 'Failed to copy contact info');
-        }
-    };
-
-    const handleShowQR = () => {
-        try {
-            const vCardContent = generateVCard();
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(vCardContent)}`;
-            
-            const popup = window.open('', '_blank', 'width=450,height=500,scrollbars=no,resizable=no');
-            if (popup) {
-                popup.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>QR Code - ${contactData.displayName || 'Contact'}</title>
-                        <meta name="viewport" content="width=device-width, initial-scale=1">
-                        <style>
-                            body { 
-                                margin: 0; 
-                                padding: 20px; 
-                                text-align: center; 
-                                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                                background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-                                color: white;
-                                min-height: 100vh;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                            }
-                            .container {
-                                background: white;
-                                padding: 30px;
-                                border-radius: 20px;
-                                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-                                color: #333;
-                                max-width: 90%;
-                            }
-                            img { 
-                                max-width: 100%; 
-                                border: 3px solid #f0f0f0;
-                                border-radius: 15px;
-                                margin: 20px 0;
-                            }
-                            h2 { 
-                                margin-top: 0; 
-                                color: #333; 
-                                font-size: 24px;
-                            }
-                            p { 
-                                color: #666; 
-                                font-size: 16px; 
-                                line-height: 1.5;
-                            }
-                            .name {
-                                color: #10B981;
-                                font-weight: bold;
-                            }
-                            .close-btn {
-                                background: #10B981;
-                                color: white;
-                                border: none;
-                                padding: 10px 20px;
-                                border-radius: 10px;
-                                margin-top: 20px;
-                                cursor: pointer;
-                                font-size: 16px;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="container">
-                            <h2>📱 Scan to Save Contact</h2>
-                            <img src="${qrUrl}" alt="QR Code" />
-                            <p>Scan this QR code with your phone camera to add<br><span class="name">${contactData.displayName || 'this contact'}</span> to your contacts</p>
-                            <button class="close-btn" onclick="window.close()">Close</button>
-                        </div>
-                    </body>
-                    </html>
-                `);
-                popup.document.close();
-            }
-            
-            toast.success(t('save_contact.scan_qr_phone') || '📱 Scan QR code with your phone!', {
-                duration: 3000
-            });
-        } catch (error) {
-            console.error('QR error:', error);
-            toast.error(t('save_contact.failed_qr') || 'Failed to generate QR code');
         }
     };
 
@@ -405,86 +284,64 @@ export default function SaveContactButton({ userId }) {
 
     return (
         <div className="relative">
-            <div className="flex gap-2">
-                {/* MAIN BUTTON - Now themed with special theme support */}
-                {selectedTheme === "New Mario" ? (
-                    <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
-                        {/* Mario brick background - 4 bricks for side-by-side buttons */}
-                        {Array(4).fill("").map((_, brick_index) => (
+            {/* MAIN BUTTON - Now themed with special theme support */}
+            {selectedTheme === "New Mario" ? (
+                <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
+                    {/* Mario brick background - 4 bricks for side-by-side buttons */}
+                    {Array(4).fill("").map((_, brick_index) => (
+                        <img
+                            key={brick_index}
+                            src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                            alt="Mario Brick"
+                            onClick={handleDirectSave}
+                            className="h-full w-1/4 object-cover hover:-translate-y-2 cursor-pointer transition-transform"
+                        />
+                    ))}
+                    
+                    {/* Mario box with icon */}
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
+                        <div className="relative">
                             <img
-                                key={brick_index}
-                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
-                                alt="Mario Brick"
+                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                                alt="Mario Box"
+                                className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
                                 onClick={handleDirectSave}
-                                className="h-full w-1/4 object-cover hover:-translate-y-2 cursor-pointer transition-transform"
                             />
-                        ))}
-                        
-                        {/* Mario box with icon */}
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
-                            <div className="relative">
-                                <img
-                                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
-                                    alt="Mario Box"
-                                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
-                                    onClick={handleDirectSave}
-                                />
-                                {/* Save icon inside the box */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                                </div>
+                            {/* Save icon inside the box */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
                             </div>
                         </div>
-                        
-                        {/* Button text overlay */}
-                        <div 
-                            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
-                            onClick={handleDirectSave}
-                            style={{ 
-                                textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                                paddingLeft: '4rem' // Space for the box
-                            }}
-                        >
-                            {/* Desktop text */}
-                            <span className="hidden md:block">
-                                {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
-                            </span>
-                            
-                            {/* Mobile text (shorter) */}
-                            <span className="block md:hidden text-sm">
-                                {t('save_contact.button_text') || 'Save'}
-                            </span>
-                        </div>
-                        
-                        {/* Download icon */}
-                        <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
-                            <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                        </div>
                     </div>
-                ) : selectedTheme === "3D Blocks" ? (
-                    <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
-                        <button
-                            onClick={handleDirectSave}
-                            className={getButtonClasses()}
-                            style={getButtonStyles()}
-                        >
-                            <FaAddressCard className="w-5 h-5 flex-shrink-0" />
-                            
-                            {/* Desktop text */}
-                            <span className="hidden md:block">
-                                {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
-                            </span>
-                            
-                            {/* Mobile text (shorter) */}
-                            <span className="block md:hidden text-sm">
-                                {t('save_contact.button_text') || 'Save'}
-                            </span>
-                            
-                            <FaDownload className="w-4 h-4 flex-shrink-0" />
-                        </button>
+                    
+                    {/* Button text overlay */}
+                    <div 
+                        className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
+                        onClick={handleDirectSave}
+                        style={{ 
+                            textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                            fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
+                            paddingLeft: '4rem' // Space for the box
+                        }}
+                    >
+                        {/* Desktop text */}
+                        <span className="hidden md:block">
+                            {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
+                        </span>
+                        
+                        {/* Mobile text (shorter) */}
+                        <span className="block md:hidden text-sm">
+                            {t('save_contact.button_text') || 'Save'}
+                        </span>
                     </div>
-                ) : (
+                    
+                    {/* Download icon */}
+                    <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
+                        <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                    </div>
+                </div>
+            ) : selectedTheme === "3D Blocks" ? (
+                <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
                     <button
                         onClick={handleDirectSave}
                         className={getButtonClasses()}
@@ -504,63 +361,27 @@ export default function SaveContactButton({ userId }) {
                         
                         <FaDownload className="w-4 h-4 flex-shrink-0" />
                     </button>
-                )}
-
-                {/* OPTIONS MENU BUTTON - Themed to match */}
-                <button
-    onClick={() => setShowOptions(!showOptions)}
-    className={`${getButtonClasses().replace('flex-1', 'px-3')} w-auto`} 
-    style={{
-        ...getButtonStyles(), 
-        height: selectedTheme === "New Mario" ? "64px" : "auto" 
-    }}
-    title={t('save_contact.more_options') || 'More options'}
->
-    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-    </svg>
-</button>
-            </div>
-
-            {/* OPTIONS MENU */}
-            {showOptions && (
-                <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border z-50 min-w-[220px] overflow-hidden">
-                    <div className="py-2">
-                        {/* Copy Option */}
-                        <button
-                            onClick={() => {
-                                handleCopyContact();
-                                setShowOptions(false);
-                            }}
-                            className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                        >
-                            <FaCopy className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm">{t('save_contact.copy_contact_info') || 'Copy Contact Info'}</span>
-                        </button>
-
-                        {/* QR Code Option */}
-                        <button
-                            onClick={() => {
-                                handleShowQR();
-                                setShowOptions(false);
-                            }}
-                            className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                        >
-                            <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                            </svg>
-                            <span className="text-sm">{t('save_contact.show_qr_code') || 'Show QR Code'}</span>
-                        </button>
-                    </div>
                 </div>
-            )}
-
-            {/* Close menu overlay */}
-            {showOptions && (
-                <div 
-                    className="fixed inset-0 z-40" 
-                    onClick={() => setShowOptions(false)}
-                />
+            ) : (
+                <button
+                    onClick={handleDirectSave}
+                    className={getButtonClasses()}
+                    style={getButtonStyles()}
+                >
+                    <FaAddressCard className="w-5 h-5 flex-shrink-0" />
+                    
+                    {/* Desktop text */}
+                    <span className="hidden md:block">
+                        {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
+                    </span>
+                    
+                    {/* Mobile text (shorter) */}
+                    <span className="block md:hidden text-sm">
+                        {t('save_contact.button_text') || 'Save'}
+                    </span>
+                    
+                    <FaDownload className="w-4 h-4 flex-shrink-0" />
+                </button>
             )}
         </div>
     );
