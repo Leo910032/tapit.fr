@@ -266,17 +266,24 @@ export default function House({ userId }) {
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
+{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {isClient && (
     <div className="w-full px-5 mb-4">
-        <div className="flex gap-3 w-full">
-            <ExchangeButton 
-                username={username} 
-                userInfo={userLookupData}
-                fastLookupUsed={fastLookupUsed}
-                userId={userId}
-            />
+        <div className="flex gap-3">
+            {/* Exchange Button - Left Side */}
+            <div className="flex-1">
+                <ExchangeButton 
+                    username={username} 
+                    userInfo={userLookupData}
+                    fastLookupUsed={fastLookupUsed}
+                    userId={userId} // ✅ ADD THIS LINE - This was missing!
+                />
+            </div>
             
-            <SaveContactButton userId={userId} />
+            {/* Save Contact Button - Right Side */}
+            <div className="flex-1">
+                <SaveContactButton userId={userId} />
+            </div>
         </div>
     </div>
 )}
