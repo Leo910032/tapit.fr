@@ -257,7 +257,7 @@ export default function House({ userId }) {
                                 <FileDownloadButton userId={userId} />
                                 
                                 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-                               {isClient && (
+  {isClient && (
     <div className="w-full px-5 mb-4">
         <div className="flex gap-3">
             {/* Exchange Button - Left Side */}
@@ -266,7 +266,7 @@ export default function House({ userId }) {
                     username={username} 
                     userInfo={userLookupData}
                     fastLookupUsed={fastLookupUsed}
-                    userId={userId} 
+                    userId={userId} // ✅ ADD THIS LINE - This was missing!
                 />
             </div>
             
