@@ -1,5 +1,6 @@
 // app/[userId]/House.jsx - HYDRATION ERROR PREVENTION
 "use client"
+import FileDownloadButton from "./components/FileDownloadButton";
 import ProfilePic from "./components/ProfilePic";
 import UserInfo from "./components/UserInfo";
 import BgDiv from "./components/BgDiv";
@@ -251,6 +252,7 @@ export default function House({ userId }) {
                             <div className="flex flex-col items-center flex-1 overflow-auto py-6">
                                 <ProfilePic userId={userId} />
                                 <UserInfo userId={userId} hasSensitiveContent={hasSensitiveContent} />
+                                <FileDownloadButton userId={userId} />
                                 <MyLinks userId={userId} hasSensitiveContent={hasSensitiveContent} />
                                 
                                 {/* File Download Button - Only shows if user has uploaded a file 
