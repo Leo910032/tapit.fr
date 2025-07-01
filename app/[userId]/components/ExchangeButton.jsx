@@ -12,7 +12,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     
-    // Theme state
+ 
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -20,7 +20,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-    // Fetch theme data
+   
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -71,10 +71,9 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
         }
     }, [userId]);
 
-    
+   
     const getButtonClasses = () => {
         let baseClasses = "w-full font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
-        
         
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
@@ -90,7 +89,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 return `${baseClasses}`;
             case 1: 
                 return `${baseClasses} rounded-lg`;
-            case 2:
+            case 2: 
                 return `${baseClasses} rounded-3xl`;
             case 3: 
                 return `${baseClasses} border border-black bg-opacity-0`;
@@ -100,11 +99,11 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
             case 6:
                 return `${baseClasses} bg-white border border-black`;
-            case 7:
+            case 7: 
                 return `${baseClasses} bg-white border border-black rounded-lg`;
             case 8: 
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
-            case 9:
+            case 9: 
                 return `${baseClasses} bg-white`;
             case 10: 
                 return `${baseClasses} bg-white rounded-lg`;
@@ -119,15 +118,15 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
 
 
     const getButtonStyles = () => {
-      
+       
         if (selectedTheme === "3D Blocks") {
             return {
                 color: "#fff",
-                backgroundColor: "#191414" lors
+                backgroundColor: "#191414" 
             };
         }
         
-    
+     
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
@@ -144,7 +143,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             backgroundColor: btnColor || "#fff"
         };
 
-        
+      
         switch (btnType) {
             case 6:
             case 7:
@@ -164,7 +163,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 break;
         }
 
-       
+        
         if (selectedTheme === "Matrix") {
             styles.borderColor = themeTextColour;
         }
@@ -185,7 +184,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             )}
             
             {selectedTheme === "New Mario" ? (
-                
+               
                 <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
                     {/* Mario brick background */}
                     {Array(9).fill("").map((_, brick_index) => (
@@ -224,7 +223,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                         style={{ 
                             textShadow: '4px 4px 0px rgba(0,0,0,1)',
                             fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                            paddingLeft: '4rem' 
+                            paddingLeft: '4rem' // Space for the box
                         }}
                     >
                         {/* Text */}
@@ -245,7 +244,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     </div>
                 </div>
             ) : selectedTheme === "3D Blocks" ? (
-               
+             
                 <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] md:w-[35rem] sm:w-[30rem] w-clamp">
                     <button
                         onClick={() => setIsModalOpen(true)}
@@ -269,7 +268,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     </button>
                 </div>
             ) : (
-                
+             
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className={getButtonClasses()}

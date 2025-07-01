@@ -15,7 +15,7 @@ export default function SaveContactButton({ userId }) {
     const [isLoading, setIsLoading] = useState(true);
     const [showOptions, setShowOptions] = useState(false);
     
-  
+   
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -23,7 +23,7 @@ export default function SaveContactButton({ userId }) {
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-
+   
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -37,7 +37,7 @@ export default function SaveContactButton({ userId }) {
                     if (docSnapshot.exists()) {
                         const data = docSnapshot.data();
                         
-                   
+                        
                         setBtnType(data.btnType || 0);
                         setBtnShadowColor(data.btnShadowColor || "#000");
                         setBtnFontColor(data.btnFontColor || "#000");
@@ -45,7 +45,7 @@ export default function SaveContactButton({ userId }) {
                         setSelectedTheme(data.selectedTheme || '');
                         setThemeTextColour(data.themeFontColor || "");
                         
-                     
+                       
                         const contact = {
                             displayName: data.displayName || '',
                             email: data.email || '',
@@ -78,16 +78,16 @@ export default function SaveContactButton({ userId }) {
         fetchThemeData();
     }, [userId]);
 
-  
+   
     const getButtonClasses = () => {
         let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
-      
+       
         if (selectedTheme === "3D Blocks") {
-            return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px]`;
+            return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-        
+       
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
@@ -99,7 +99,7 @@ export default function SaveContactButton({ userId }) {
                 return `${baseClasses} rounded-lg`;
             case 2: 
                 return `${baseClasses} rounded-3xl`;
-            case 3:
+            case 3: 
                 return `${baseClasses} border border-black bg-opacity-0`;
             case 4: 
                 return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
@@ -124,7 +124,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-
+    
     const getButtonStyles = () => {
 
         if (selectedTheme === "3D Blocks") {
@@ -134,7 +134,7 @@ export default function SaveContactButton({ userId }) {
             };
         }
         
-      
+
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
@@ -151,7 +151,7 @@ export default function SaveContactButton({ userId }) {
             backgroundColor: btnColor || "#fff"
         };
 
-
+        
         switch (btnType) {
             case 6:
             case 7:
@@ -179,7 +179,6 @@ export default function SaveContactButton({ userId }) {
         return styles;
     };
 
-    
     const generateVCard = () => {
         if (!contactData) return '';
 
@@ -232,7 +231,7 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
- 
+  
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -418,8 +417,8 @@ export default function SaveContactButton({ userId }) {
             <div className="flex gap-2">
                 {/* MAIN BUTTON - Now themed with special theme support */}
                 {selectedTheme === "New Mario" ? (
-                
-                    <div className="flex-1 relative overflow-hidden flex justify-between items-center h-16">
+                  
+                    <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
                         {/* Mario brick background */}
                         {Array(9).fill("").map((_, brick_index) => (
                             <img
@@ -432,16 +431,57 @@ export default function SaveContactButton({ userId }) {
                             />
                         ))}
                         
-                        {/* Button content overlay */}
+                        {/* Mario box with icon */}
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
+                            <div className="relative">
+                                <img
+                                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                                    alt="Mario Box"
+                                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
+                                    onClick={handleDirectSave}
+                                />
+                                {/* Save icon inside the box */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Button text overlay */}
                         <div 
-                            className="absolute top-0 left-0 z-30 w-full h-full flex items-center justify-center gap-2 cursor-pointer text-white font-bold"
+                            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
                             onClick={handleDirectSave}
                             style={{ 
                                 textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                                fontSize: 'clamp(0.75rem, 2vw, 1rem)'
+                                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
+                                paddingLeft: '4rem' // Space for the box
                             }}
                         >
-                            <FaAddressCard className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" />
+                            {/* Desktop text */}
+                            <span className="hidden md:block">
+                                {isMobile ? 'Save Contact' : 'Download Contact'}
+                            </span>
+                            
+                            {/* Mobile text (shorter) */}
+                            <span className="block md:hidden text-sm">
+                                Save
+                            </span>
+                        </div>
+                        
+                        {/* Download icon */}
+                        <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
+                            <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                        </div>
+                    </div>
+                ) : selectedTheme === "3D Blocks" ? (
+                    
+                    <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] md:w-[35rem] sm:w-[30rem] w-clamp">
+                        <button
+                            onClick={handleDirectSave}
+                            className={getButtonClasses()}
+                            style={getButtonStyles()}
+                        >
+                            <FaAddressCard className="w-5 h-5 flex-shrink-0" />
                             
                             {/* Desktop text */}
                             <span className="hidden md:block">
@@ -449,15 +489,14 @@ export default function SaveContactButton({ userId }) {
                             </span>
                             
                             {/* Mobile text (shorter) */}
-                            <span className="block md:hidden text-xs">
+                            <span className="block md:hidden text-sm">
                                 Save
                             </span>
                             
-                            <FaDownload className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0 drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]" />
-                        </div>
+                            <FaDownload className="w-4 h-4 flex-shrink-0" />
+                        </button>
                     </div>
-                ) : (
-                  
+                ) 
                     <button
                         onClick={handleDirectSave}
                         className={getButtonClasses()}
