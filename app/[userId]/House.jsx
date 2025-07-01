@@ -261,7 +261,7 @@ export default function House({ userId }) {
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {isClient && (
     <div className="flex flex-col gap-4 my-4 w-full px-5 py-1 items-center max-h-fit">
-        <div className="flex gap-3 w-full max-w-[35rem]"> {/* Changed: removed md:w-[35rem] sm:w-[30rem] w-clamp, added w-full max-w-[35rem] */}
+        <div className="flex gap-3 md:w-[35rem] sm:w-[30rem] w-clamp"> {/* FIXED: Now matches exact link width classes */}
             {/* Exchange Button - Left Side */}
             <div className="flex-1">
                 <ExchangeButton 
