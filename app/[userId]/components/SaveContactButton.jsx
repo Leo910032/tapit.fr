@@ -285,101 +285,101 @@ export default function SaveContactButton({ userId }) {
     return (
         <div className="relative">
             {/* MAIN BUTTON - Now themed with special theme support */}
-            {selectedTheme === "New Mario" ? (
-                <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
-                    {/* Mario brick background - 4 bricks for side-by-side buttons */}
-                    {Array(4).fill("").map((_, brick_index) => (
-                        <img
-                            key={brick_index}
-                            src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
-                            alt="Mario Brick"
-                            onClick={handleDirectSave}
-                            className="h-full w-1/4 object-cover hover:-translate-y-2 cursor-pointer transition-transform"
-                        />
-                    ))}
-                    
-                    {/* Mario box with icon */}
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
-                        <div className="relative">
-                            <img
-                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
-                                alt="Mario Box"
-                                className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
-                                onClick={handleDirectSave}
-                            />
-                            {/* Save icon inside the box */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Button text overlay */}
-                    <div 
-                        className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
-                        onClick={handleDirectSave}
-                        style={{ 
-                            textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                            fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                            paddingLeft: '4rem' // Space for the box
-                        }}
-                    >
-                        {/* Desktop text */}
-                        <span className="hidden md:block">
-                            {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
-                        </span>
-                        
-                        {/* Mobile text (shorter) */}
-                        <span className="block md:hidden text-sm">
-                            {t('save_contact.button_text') || 'Save'}
-                        </span>
-                    </div>
-                    
-                  
-                </div>
-            ) : selectedTheme === "3D Blocks" ? (
-                <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
-                    <button
-                        onClick={handleDirectSave}
-                        className={getButtonClasses()}
-                        style={getButtonStyles()}
-                    >
-                        <FaAddressCard className="w-5 h-5 flex-shrink-0" />
-                        
-                        {/* Desktop text */}
-                        <span className="hidden md:block">
-                            {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
-                        </span>
-                        
-                        {/* Mobile text (shorter) */}
-                        <span className="block md:hidden text-sm">
-                            {t('save_contact.button_text') || 'Save'}
-                        </span>
-                        
-                        <FaDownload className="w-4 h-4 flex-shrink-0" />
-                    </button>
-                </div>
-            ) : (
-                <button
+         {selectedTheme === "New Mario" ? (
+    <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
+        {/* Mario brick background - 4 bricks for side-by-side buttons */}
+        {Array(4).fill("").map((_, brick_index) => (
+            <img
+                key={brick_index}
+                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                alt="Mario Brick"
+                onClick={handleDirectSave}
+                className="h-full w-1/4 object-cover hover:-translate-y-2 cursor-pointer transition-transform"
+            />
+        ))}
+        
+        {/* Mario box with icon */}
+        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
+            <div className="relative">
+                <img
+                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                    alt="Mario Box"
+                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
                     onClick={handleDirectSave}
-                    className={getButtonClasses()}
-                    style={getButtonStyles()}
-                >
-                    <FaAddressCard className="w-5 h-5 flex-shrink-0" />
-                    
-                    {/* Desktop text */}
-                    <span className="hidden md:block">
-                        {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
-                    </span>
-                    
-                    {/* Mobile text (shorter) */}
-                    <span className="block md:hidden text-sm">
-                        {t('save_contact.button_text') || 'Save'}
-                    </span>
-                    
-                    <FaDownload className="w-4 h-4 flex-shrink-0" />
-                </button>
-            )}
+                />
+                {/* Save icon inside the box */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                </div>
+            </div>
+        </div>
+        
+        {/* Button text overlay */}
+        <div 
+            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
+            onClick={handleDirectSave}
+            style={{ 
+                textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
+                paddingLeft: '4rem' // Space for the box
+            }}
+        >
+            {/* Desktop text */}
+            <span className="hidden md:block">
+                {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
+            </span>
+            
+            {/* Mobile text (shorter) */}
+            <span className="block md:hidden text-sm">
+                {t('save_contact.button_text') || 'Save'}
+            </span>
+        </div>
+        
+        {/* REMOVED: Download icon - no extra icons in Mario theme to match Exchange button */}
+    </div>
+) : selectedTheme === "3D Blocks" ? (
+    <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
+        <button
+            onClick={handleDirectSave}
+            className={getButtonClasses()}
+            style={getButtonStyles()}
+        >
+            <FaAddressCard className="w-5 h-5 flex-shrink-0" />
+            
+            {/* Desktop text */}
+            <span className="hidden md:block">
+                {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
+            </span>
+            
+            {/* Mobile text (shorter) */}
+            <span className="block md:hidden text-sm">
+                {t('save_contact.button_text') || 'Save'}
+            </span>
+            
+            {/* REMOVED: Download icon - only one icon per button for consistency */}
+        </button>
+    </div>
+) : (
+    <button
+        onClick={handleDirectSave}
+        className={getButtonClasses()}
+        style={getButtonStyles()}
+    >
+        <FaAddressCard className="w-5 h-5 flex-shrink-0" />
+        
+        {/* Desktop text */}
+        <span className="hidden md:block">
+            {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
+        </span>
+        
+        {/* Mobile text (shorter) */}
+        <span className="block md:hidden text-sm">
+            {t('save_contact.button_text') || 'Save'}
+        </span>
+        
+        {/* REMOVED: Download icon - only one icon per button for consistency */}
+    </button>
+)}
         </div>
     );
 }
