@@ -257,16 +257,17 @@ export default function House({ userId }) {
                                 <FileDownloadButton userId={userId} />*/}
                                 
                                 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-  {isClient && (
-    <div className="w-full px-5 mb-4">
-        <div className="flex gap-3">
+{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
+{isClient && (
+    <div className="flex flex-col gap-4 my-4 w-full px-5 py-1 items-center max-h-fit">
+        <div className="flex gap-3 md:w-[35rem] sm:w-[30rem] w-clamp">
             {/* Exchange Button - Left Side */}
             <div className="flex-1">
                 <ExchangeButton 
                     username={username} 
                     userInfo={userLookupData}
                     fastLookupUsed={fastLookupUsed}
-                    userId={userId} // ✅ ADD THIS LINE - This was missing!
+                    userId={userId}
                 />
             </div>
             

@@ -12,7 +12,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     
- 
+    // Theme state
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -20,7 +20,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-   
+    // Fetch theme data
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -71,62 +71,63 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
         }
     }, [userId]);
 
-   
+    // Generate button classes based on theme
     const getButtonClasses = () => {
         let baseClasses = "w-full font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
+        // Special handling for 3D Blocks theme
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-       
+        // Special handling for Mario theme
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
         
         switch (btnType) {
-            case 0: 
+            case 0: // Flat
                 return `${baseClasses}`;
-            case 1: 
+            case 1: // Rounded
                 return `${baseClasses} rounded-lg`;
-            case 2: 
+            case 2: // Pill
                 return `${baseClasses} rounded-3xl`;
-            case 3: 
+            case 3: // Outline
                 return `${baseClasses} border border-black bg-opacity-0`;
-            case 4: 
+            case 4: // Outline Rounded
                 return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
-            case 5: 
+            case 5: // Outline Pill
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
-            case 6:
+            case 6: // Hard Shadow
                 return `${baseClasses} bg-white border border-black`;
-            case 7: 
+            case 7: // Hard Shadow Rounded
                 return `${baseClasses} bg-white border border-black rounded-lg`;
-            case 8: 
+            case 8: // Hard Shadow Pill
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
-            case 9: 
+            case 9: // Soft Shadow
                 return `${baseClasses} bg-white`;
-            case 10: 
+            case 10: // Soft Shadow Rounded
                 return `${baseClasses} bg-white rounded-lg`;
-            case 11: 
+            case 11: // Soft Shadow Pill
                 return `${baseClasses} bg-white rounded-3xl`;
-            case 15: 
+            case 15: // Black Pill
                 return `${baseClasses} border border-black bg-black rounded-3xl`;
             default:
                 return baseClasses;
         }
     };
 
-
+    // Generate button styles
     const getButtonStyles = () => {
-       
+        // Special handling for 3D Blocks theme
         if (selectedTheme === "3D Blocks") {
             return {
                 color: "#fff",
-                backgroundColor: "#191414" 
+                backgroundColor: "#191414" // Default dark color, will be overridden by brand colors
             };
         }
         
-     
+        // Special handling for Mario theme
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
@@ -143,7 +144,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             backgroundColor: btnColor || "#fff"
         };
 
-      
+        // Add shadow for specific button types
         switch (btnType) {
             case 6:
             case 7:
@@ -163,12 +164,12 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 break;
         }
 
-        
+        // Matrix theme override
         if (selectedTheme === "Matrix") {
             styles.borderColor = themeTextColour;
         }
 
-        
+        // Debug log to check if styles are being applied
         console.log("🎨 Exchange Button Styles:", styles, "Button Type:", btnType, "Theme:", selectedTheme);
 
         return styles;
@@ -184,8 +185,8 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             )}
             
             {selectedTheme === "New Mario" ? (
-               
-                <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
+                // Mario theme special button
+                <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 w-full">
                     {/* Mario brick background */}
                     {Array(9).fill("").map((_, brick_index) => (
                         <img
@@ -244,8 +245,8 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     </div>
                 </div>
             ) : selectedTheme === "3D Blocks" ? (
-             
-                <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] md:w-[35rem] sm:w-[30rem] w-clamp">
+                // 3D Blocks theme with proper width constraints
+                <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className={getButtonClasses()}
@@ -268,7 +269,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     </button>
                 </div>
             ) : (
-             
+                // Regular themed button
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className={getButtonClasses()}
