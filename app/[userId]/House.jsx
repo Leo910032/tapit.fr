@@ -258,23 +258,26 @@ export default function House({ userId }) {
                                 <FileDownloadButton userId={userId} />*/}
                                 
                                 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-{/* 🔥 COMBINED BUTTONS SECTION - Now properly centered */}
+{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
+{/* 🔥 COMBINED BUTTONS SECTION - Now properly centered and matching link width */}
 {isClient && (
-    <div className="flex flex-col gap-4 my-4 w-full px-5 py-1 items-center max-h-fit">
-        <div className="flex gap-3 md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)]"> {/* FIXED: Match link button container */}
-            {/* Exchange Button - Left Side */}
-            <div className="flex-1">
-                <ExchangeButton 
-                    username={username} 
-                    userInfo={userLookupData}
-                    fastLookupUsed={fastLookupUsed}
-                    userId={userId}
-                />
-            </div>
-            
-            {/* Save Contact Button - Right Side */}
-            <div className="flex-1">
-                <SaveContactButton userId={userId} />
+    <div className="w-full px-5 mb-4">
+        <div className="md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)] mx-auto">
+            <div className="flex gap-3">
+                {/* Exchange Button - Left Side */}
+                <div className="flex-1">
+                    <ExchangeButton 
+                        username={username} 
+                        userInfo={userLookupData}
+                        fastLookupUsed={fastLookupUsed}
+                        userId={userId}
+                    />
+                </div>
+                
+                {/* Save Contact Button - Right Side */}
+                <div className="flex-1">
+                    <SaveContactButton userId={userId} />
+                </div>
             </div>
         </div>
     </div>
