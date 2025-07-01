@@ -264,7 +264,6 @@ export default function House({ userId }) {
 
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-// In your House.jsx file, replace the COMBINED BUTTONS SECTION with this:
 
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {isClient && (
