@@ -28,18 +28,18 @@ export default function House({ userId }) {
     const [username, setUsername] = useState("");
     const [isClient, setIsClient] = useState(false); // Client-side hydration check
 
- 
+    // Fast lookup state
     const [fastLookupUsed, setFastLookupUsed] = useState(false);
     const [userLookupData, setUserLookupData] = useState(null);
 
-    
+    // 🔧 Initialize preview mode safely to avoid hydration errors
     const [isPreviewMode, setIsPreviewMode] = useState(() => {
         if (typeof window !== 'undefined') {
             const urlParams = new URLSearchParams(window.location.search);
             const preview = urlParams.get('preview') === 'true';
             const suppressHydration = urlParams.get('suppress-hydration-warning') === 'true';
             
-            
+            // If we're suppressing hydration warnings, log it
             if (suppressHydration) {
                 console.log('🔧 Hydration warning suppression enabled');
             }
@@ -49,11 +49,11 @@ export default function House({ userId }) {
         return false;
     });
 
-    
+    // 🔧 Client-side hydration detection
     useEffect(() => {
         setIsClient(true);
         
-        
+        // Double-check preview mode after hydration
         const urlParams = new URLSearchParams(window.location.search);
         const preview = urlParams.get('preview') === 'true';
         
@@ -68,14 +68,14 @@ export default function House({ userId }) {
         console.log('🔍 House: userId param:', userId);
     }, []);
 
-    
+    // Enhanced fetchUserData function that tries fast lookup first
     const enhancedFetchUserData = async (inputUserId) => {
         console.log('🚀 Enhanced fetchUserData called with:', inputUserId);
         console.log('🔍 Preview mode:', isPreviewMode);
         console.log('🔍 Is client:', isClient);
         
         try {
-            
+            // Try fast lookup first
             const lookupResult = await fastUserLookup(inputUserId);
             
             if (lookupResult && lookupResult.userId) {
@@ -95,9 +95,9 @@ export default function House({ userId }) {
         }
     };
 
-    
+    // Keep the original useEffect structure but use enhanced fetch
     useEffect(() => {
-        
+        // Only run after client-side hydration to prevent hydration mismatch
         if (!isClient) {
             console.log('🔧 Waiting for client-side hydration...');
             return;
@@ -133,7 +133,7 @@ export default function House({ userId }) {
                     setHasSensitiveContent(sensitiveStatus ? sensitiveStatus : false);
                     setSensitiveType(sensitivetype ? sensitivetype : 3);
                     
-                    
+                    // Use the best available username
                     const finalUsername = userLookupData?.username || 
                                         profileUsername || 
                                         userLookupData?.displayName || 
@@ -150,7 +150,7 @@ export default function House({ userId }) {
                 } else {
                     console.error('❌ Profile document does not exist for:', currentUser);
                     
-                    
+                    // 🔧 In preview mode, show a helpful error
                     if (isPreviewMode) {
                         console.warn('⚠️ Preview mode: Document not found, this might be normal for new users');
                     }
@@ -158,7 +158,7 @@ export default function House({ userId }) {
             } catch (error) {
                 console.error('❌ Error in fetchProfilePicture:', error);
                 
-                
+                // 🔧 Enhanced error logging for preview mode
                 if (isPreviewMode) {
                     console.error('❌ Preview mode error details:', {
                         message: error.message,
@@ -171,17 +171,17 @@ export default function House({ userId }) {
         }
         
         fetchProfilePicture();
-    }, [userId, isClient]); 
+    }, [userId, isClient]); // Wait for client hydration
 
-    
+    // Record profile view - but NOT in preview mode and only after client hydration
     useEffect(() => {
         async function recordView() {
-           
+            // 🔧 Skip if not client-side hydrated yet
             if (!isClient) {
                 return;
             }
 
-            
+            // 🔧 IMPORTANT: Skip analytics in preview mode
             if (isPreviewMode) {
                 console.log('🔍 Skipping view recording - preview mode active');
                 return;
@@ -191,7 +191,7 @@ export default function House({ userId }) {
                 try {
                     console.log('📈 Recording profile view with fast lookup data');
                     
-                  
+                    // Get some basic viewer info (without compromising privacy)
                     const viewerInfo = {
                         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
                         referrer: typeof window !== 'undefined' ? document.referrer : '',
@@ -211,13 +211,13 @@ export default function House({ userId }) {
             }
         }
 
-        
+        // Record view after a short delay to ensure it's a real view
         const timer = setTimeout(recordView, 2000);
         
         return () => clearTimeout(timer);
     }, [userId, viewRecorded, fastLookupUsed, userLookupData, isPreviewMode, isClient]);
 
-    
+    // 🔧 Show loading state until client hydration is complete
     if (!isClient) {
         return (
             <div className="w-full h-screen flex items-center justify-center bg-gray-50">
@@ -241,7 +241,7 @@ export default function House({ userId }) {
                 userInfo: userLookupData,
                 fastLookupUsed,
                 isPreviewMode,
-                isClient 
+                isClient // 🔧 Add client state to context
             }}>
                 {!sensitiveWarning ? (
                     <>
@@ -257,20 +257,7 @@ export default function House({ userId }) {
                                 <FileDownloadButton userId={userId} />
                                 
                                 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-                              
-
-
-
-
-{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-
-{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-
-
-{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-{isClient && (
+                               {isClient && (
     <div className="w-full px-5 mb-4">
         <div className="flex gap-3">
             {/* Exchange Button - Left Side */}
