@@ -197,7 +197,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     <div className="absolute top-0 left-0 w-full h-full cursor-pointer z-20" onClick={() => setIsModalOpen(true)} />
                 </div>
             ) : (
-                <div className={selectedTheme === "3D Blocks" ? "userBtn md:w-[35rem] sm:w-[30rem] w-clamp" : "userBtn md:w-[35rem] sm:w-[30rem] w-clamp"}>
+                <div className="userBtn md:w-[35rem] sm:w-[30rem] w-clamp">
                     <div className={getButtonClasses()} style={getButtonStyles()} onClick={() => setIsModalOpen(true)}>
                         <div className="h-[2rem] w-fit rounded-lg p-[2px] bg-white aspect-square">
                             <svg className="object-fit h-full aspect-square text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
