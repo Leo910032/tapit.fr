@@ -226,12 +226,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                         </span>
                     </div>
                     
-                    {/* Copy button */}
-                    <div className="absolute p-1 h-6 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90 z-30">
-                        <svg className="w-3 h-3 rotate-10 group-hover:rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                    </div>
+                   
                 </div>
             ) : selectedTheme === "3D Blocks" ? (
                 <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
