@@ -15,7 +15,7 @@ export default function SaveContactButton({ userId }) {
     const [isLoading, setIsLoading] = useState(true);
     const [showOptions, setShowOptions] = useState(false);
     
-   
+    // Theme state
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -23,7 +23,7 @@ export default function SaveContactButton({ userId }) {
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-   
+
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -37,7 +37,7 @@ export default function SaveContactButton({ userId }) {
                     if (docSnapshot.exists()) {
                         const data = docSnapshot.data();
                         
-                        
+                       
                         setBtnType(data.btnType || 0);
                         setBtnShadowColor(data.btnShadowColor || "#000");
                         setBtnFontColor(data.btnFontColor || "#000");
@@ -82,12 +82,12 @@ export default function SaveContactButton({ userId }) {
     const getButtonClasses = () => {
         let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
-       
+        
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-       
+     
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
@@ -95,7 +95,7 @@ export default function SaveContactButton({ userId }) {
         switch (btnType) {
             case 0: 
                 return `${baseClasses}`;
-            case 1: 
+            case 1:
                 return `${baseClasses} rounded-lg`;
             case 2: 
                 return `${baseClasses} rounded-3xl`;
@@ -103,11 +103,11 @@ export default function SaveContactButton({ userId }) {
                 return `${baseClasses} border border-black bg-opacity-0`;
             case 4: 
                 return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
-            case 5: 
+            case 5:
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
             case 6: 
                 return `${baseClasses} bg-white border border-black`;
-            case 7: 
+            case 7:
                 return `${baseClasses} bg-white border border-black rounded-lg`;
             case 8: 
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
@@ -126,7 +126,7 @@ export default function SaveContactButton({ userId }) {
 
     
     const getButtonStyles = () => {
-
+        
         if (selectedTheme === "3D Blocks") {
             return {
                 color: "#fff",
@@ -134,7 +134,7 @@ export default function SaveContactButton({ userId }) {
             };
         }
         
-
+       
         if (selectedTheme === "New Mario") {
             return {
                 color: "#fff",
@@ -151,7 +151,7 @@ export default function SaveContactButton({ userId }) {
             backgroundColor: btnColor || "#fff"
         };
 
-        
+       
         switch (btnType) {
             case 6:
             case 7:
@@ -171,7 +171,7 @@ export default function SaveContactButton({ userId }) {
                 break;
         }
 
-     
+
         if (selectedTheme === "Matrix") {
             styles.borderColor = themeTextColour;
         }
@@ -231,7 +231,7 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
-  
+
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -285,7 +285,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-
+    
     const handleCopyContact = async () => {
         try {
             const contactText = [
@@ -317,7 +317,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-
+    
     const handleShowQR = () => {
         try {
             const vCardContent = generateVCard();
@@ -417,7 +417,7 @@ export default function SaveContactButton({ userId }) {
             <div className="flex gap-2">
                 {/* MAIN BUTTON - Now themed with special theme support */}
                 {selectedTheme === "New Mario" ? (
-                  
+                    
                     <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
                         {/* Mario brick background */}
                         {Array(9).fill("").map((_, brick_index) => (
@@ -474,7 +474,7 @@ export default function SaveContactButton({ userId }) {
                         </div>
                     </div>
                 ) : selectedTheme === "3D Blocks" ? (
-                    
+                  
                     <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] md:w-[35rem] sm:w-[30rem] w-clamp">
                         <button
                             onClick={handleDirectSave}
@@ -496,7 +496,8 @@ export default function SaveContactButton({ userId }) {
                             <FaDownload className="w-4 h-4 flex-shrink-0" />
                         </button>
                     </div>
-                ) 
+                ) : (
+                
                     <button
                         onClick={handleDirectSave}
                         className={getButtonClasses()}
