@@ -267,7 +267,7 @@ export default function House({ userId }) {
 
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-// In your House.jsx file, update the ExchangeButton section:
+
 
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {isClient && (
@@ -279,7 +279,7 @@ export default function House({ userId }) {
                     username={username} 
                     userInfo={userLookupData}
                     fastLookupUsed={fastLookupUsed}
-                    userId={userId} // ✅ ADD THIS LINE - This was missing!
+                    userId={userId} 
                 />
             </div>
             

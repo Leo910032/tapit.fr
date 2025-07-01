@@ -12,7 +12,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     
-    // Theme state
+
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -20,7 +20,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-    // Fetch theme data
+    
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -71,50 +71,48 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
         }
     }, [userId]);
 
-    // Generate button classes based on theme
+   
     const getButtonClasses = () => {
         let baseClasses = "w-full font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
         switch (btnType) {
-            case 0: // Flat
+            case 0:
                 return `${baseClasses}`;
-            case 1: // Rounded
+            case 1: 
                 return `${baseClasses} rounded-lg`;
-            case 2: // Pill
+            case 2: 
                 return `${baseClasses} rounded-3xl`;
-            case 3: // Outline
+            case 3: 
                 return `${baseClasses} border border-black bg-opacity-0`;
-            case 4: // Outline Rounded
+            case 4: 
                 return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
-            case 5: // Outline Pill
+            case 5: 
                 return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
-            case 6: // Hard Shadow
+            case 6: 
                 return `${baseClasses} bg-white border border-black`;
-            case 7: // Hard Shadow Rounded
+            case 7: 
                 return `${baseClasses} bg-white border border-black rounded-lg`;
-            case 8: // Hard Shadow Pill
+            case 8: 
                 return `${baseClasses} bg-white border border-black rounded-3xl`;
-            case 9: // Soft Shadow
+            case 9: 
                 return `${baseClasses} bg-white`;
-            case 10: // Soft Shadow Rounded
+            case 10: 
                 return `${baseClasses} bg-white rounded-lg`;
-            case 11: // Soft Shadow Pill
+            case 11: 
                 return `${baseClasses} bg-white rounded-3xl`;
-            case 15: // Black Pill
+            case 15: 
                 return `${baseClasses} border border-black bg-black rounded-3xl`;
             default:
                 return baseClasses;
         }
     };
 
-    // Generate button styles
     const getButtonStyles = () => {
         let styles = {
             color: btnFontColor || "#000",
             backgroundColor: btnColor || "#fff"
         };
 
-        // Add shadow for specific button types
         switch (btnType) {
             case 6:
             case 7:
@@ -134,12 +132,11 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 break;
         }
 
-        // Matrix theme override
         if (selectedTheme === "Matrix") {
             styles.borderColor = themeTextColour;
         }
 
-        // Debug log to check if styles are being applied
+       
         console.log("🎨 Exchange Button Styles:", styles, "Button Type:", btnType);
 
         return styles;
