@@ -264,6 +264,9 @@ export default function House({ userId }) {
 
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
+// In your House.jsx file, replace the COMBINED BUTTONS SECTION with this:
+
+{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
 {isClient && (
     <div className="flex gap-4 my-4 w-full px-5 py-1 items-center max-h-fit">
         {/* Exchange Button - Left Side */}

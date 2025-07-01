@@ -151,8 +151,8 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     return (
         <>
             {selectedTheme === "New Mario" ? (
-                <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
-                    {Array(9).fill("").map((_, brick_index) => (
+                <div className="flex-1 userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16">
+                    {Array(4).fill("").map((_, brick_index) => (
                         <img
                             key={brick_index}
                             src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
@@ -162,32 +162,32 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     ))}
                     
                     <div className="absolute top-0 left-0 z-30 w-full h-full flex items-center cursor-pointer pointer-events-none">
-                        <div className="flex items-center gap-3 px-3">
+                        <div className="flex items-center gap-2 px-2">
                             <div className="grid place-items-center relative">
                                 <img
                                     src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
                                     alt="Mario Box"
-                                    className="h-12 w-auto object-contain"
+                                    className="h-10 w-auto object-contain"
                                 />
                                 <div className="absolute">
-                                    <svg className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-4 h-4 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                     </svg>
                                 </div>
                             </div>
                             
-                            <div className="text-white font-bold MariaFont md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+                            <div className="text-white font-bold MariaFont md:text-lg sm:text-base text-sm drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]">
                                 <span className="hidden md:block">
-                                    EXCHANGE CONTACT
+                                    EXCHANGE
                                 </span>
                                 <span className="block md:hidden">
-                                    EXCHANGE
+                                    SWAP
                                 </span>
                             </div>
                         </div>
                         
-                        <div className="absolute right-3 p-2 h-9 aspect-square rounded-full border border-white bg-black text-white hover:scale-105 active:scale-90 pointer-events-auto grid place-items-center">
-                            <svg className="w-4 h-4 rotate-10 group-hover:rotate-0" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="absolute right-2 p-1 h-7 aspect-square rounded-full border border-white bg-black text-white hover:scale-105 active:scale-90 pointer-events-auto grid place-items-center">
+                            <svg className="w-3 h-3 rotate-10 group-hover:rotate-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
                                 <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
                             </svg>
@@ -197,7 +197,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     <div className="absolute top-0 left-0 w-full h-full cursor-pointer z-20" onClick={() => setIsModalOpen(true)} />
                 </div>
             ) : (
-                <div className="userBtn md:w-[35rem] sm:w-[30rem] w-clamp">
+                <div className={selectedTheme === "3D Blocks" ? "userBtn md:w-[35rem] sm:w-[30rem] w-clamp" : "userBtn md:w-[35rem] sm:w-[30rem] w-clamp"}>
                     <div className={getButtonClasses()} style={getButtonStyles()} onClick={() => setIsModalOpen(true)}>
                         <div className="h-[2rem] w-fit rounded-lg p-[2px] bg-white aspect-square">
                             <svg className="object-fit h-full aspect-square text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
