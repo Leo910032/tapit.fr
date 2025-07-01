@@ -2,8 +2,8 @@
 
   
   "exchange": {
-    "button_text": "Exchange Contact",
-    "title": "Exchange Contact",
+    "button_text": "Contact",
+    "title": "Contact",
     "description": "Share your contact information to connect with this profile owner.",
     "close_modal": "Close modal",
     "name_label": "Full Name",
