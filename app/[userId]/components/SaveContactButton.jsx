@@ -1,4 +1,4 @@
-// app/[userId]/components/SaveContactButton.jsx - RESPONSIVE VERSION FOR SIDE-BY-SIDE
+// app/[userId]/components/SaveContactButton.jsx - THEMED VERSION FOR SIDE-BY-SIDE
 "use client"
 import { useState, useEffect } from 'react';
 import { fireApp } from "@/important/firebase";
@@ -7,29 +7,45 @@ import { collection, doc, onSnapshot } from "firebase/firestore";
 import { useTranslation } from "@/lib/useTranslation";
 import { FaAddressCard, FaShare, FaDownload, FaCopy } from "react-icons/fa6";
 import { toast } from 'react-hot-toast';
+import { hexToRgba } from "@/lib/utilities";
 
 export default function SaveContactButton({ userId }) {
     const { t } = useTranslation();
     const [contactData, setContactData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [showOptions, setShowOptions] = useState(false);
+    
+    // Theme state
+    const [btnType, setBtnType] = useState(0);
+    const [btnShadowColor, setBtnShadowColor] = useState('');
+    const [btnFontColor, setBtnFontColor] = useState('');
+    const [btnColor, setBtnColor] = useState('');
+    const [selectedTheme, setSelectedTheme] = useState('');
+    const [themeTextColour, setThemeTextColour] = useState("");
 
+    // Fetch theme data
     useEffect(() => {
-        async function fetchContactData() {
+        async function fetchThemeData() {
             try {
                 const currentUser = await fetchUserData(userId);
-                if (!currentUser) {
-                    setIsLoading(false);
-                    return;
-                }
+                if (!currentUser) return;
 
                 const collectionRef = collection(fireApp, "AccountData");
-                const docRef = doc(collectionRef, `${currentUser}`);
+                const docRef = doc(collectionRef, currentUser);
 
-                const unsubscribe = onSnapshot(docRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
+                const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
+                    if (docSnapshot.exists()) {
+                        const data = docSnapshot.data();
                         
+                        // Set theme data
+                        setBtnType(data.btnType || 0);
+                        setBtnShadowColor(data.btnShadowColor || "#000");
+                        setBtnFontColor(data.btnFontColor || "#000");
+                        setBtnColor(data.btnColor || "#fff");
+                        setSelectedTheme(data.selectedTheme || '');
+                        setThemeTextColour(data.themeFontColor || "");
+                        
+                        // Set contact data
                         const contact = {
                             displayName: data.displayName || '',
                             email: data.email || '',
@@ -54,15 +70,86 @@ export default function SaveContactButton({ userId }) {
 
                 return () => unsubscribe();
             } catch (error) {
-                console.error("Error fetching contact data:", error);
+                console.error("Error fetching data:", error);
                 setIsLoading(false);
             }
         }
 
-        fetchContactData();
+        fetchThemeData();
     }, [userId]);
 
-    // vCard generation
+    // Generate button classes based on theme
+    const getButtonClasses = () => {
+        let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
+        
+        switch (btnType) {
+            case 0: // Flat
+                return `${baseClasses}`;
+            case 1: // Rounded
+                return `${baseClasses} rounded-lg`;
+            case 2: // Pill
+                return `${baseClasses} rounded-3xl`;
+            case 3: // Outline
+                return `${baseClasses} border border-black bg-opacity-0`;
+            case 4: // Outline Rounded
+                return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
+            case 5: // Outline Pill
+                return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
+            case 6: // Hard Shadow
+                return `${baseClasses} bg-white border border-black`;
+            case 7: // Hard Shadow Rounded
+                return `${baseClasses} bg-white border border-black rounded-lg`;
+            case 8: // Hard Shadow Pill
+                return `${baseClasses} bg-white border border-black rounded-3xl`;
+            case 9: // Soft Shadow
+                return `${baseClasses} bg-white`;
+            case 10: // Soft Shadow Rounded
+                return `${baseClasses} bg-white rounded-lg`;
+            case 11: // Soft Shadow Pill
+                return `${baseClasses} bg-white rounded-3xl`;
+            case 15: // Black Pill
+                return `${baseClasses} border border-black bg-black rounded-3xl`;
+            default:
+                return baseClasses;
+        }
+    };
+
+    // Generate button styles
+    const getButtonStyles = () => {
+        let styles = {
+            color: btnFontColor,
+            backgroundColor: btnColor
+        };
+
+        // Add shadow for specific button types
+        switch (btnType) {
+            case 6:
+            case 7:
+            case 8:
+                styles.boxShadow = `4px 4px 0 0 ${hexToRgba(btnShadowColor)}`;
+                break;
+            case 9:
+            case 10:
+            case 11:
+                styles.boxShadow = `0 4px 4px 0 ${hexToRgba(btnShadowColor, 0.16)}`;
+                break;
+            case 12:
+            case 13:
+            case 15:
+                styles.color = "#fff";
+                styles.backgroundColor = "#000";
+                break;
+        }
+
+        // Matrix theme override
+        if (selectedTheme === "Matrix") {
+            styles.borderColor = themeTextColour;
+        }
+
+        return styles;
+    };
+
+    // vCard generation (same as before)
     const generateVCard = () => {
         if (!contactData) return '';
 
@@ -115,7 +202,7 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
-    // Direct save method
+    // Direct save method (same as before)
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -123,7 +210,6 @@ export default function SaveContactButton({ userId }) {
             const vCardContent = generateVCard();
             
             if (isMobile) {
-                // Mobile: Direct data URL opening
                 const dataURL = `data:text/vcard;charset=utf-8,${encodeURIComponent(vCardContent)}`;
                 
                 const link = document.createElement('a');
@@ -146,7 +232,6 @@ export default function SaveContactButton({ userId }) {
                 });
                 
             } else {
-                // Desktop: Blob download
                 const blob = new Blob([vCardContent], { type: 'text/vcard;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 
@@ -171,7 +256,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-    // Copy contact info
+    // Copy contact info (same as before)
     const handleCopyContact = async () => {
         try {
             const contactText = [
@@ -203,7 +288,7 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-    // QR Code display
+    // QR Code display (same as before)
     const handleShowQR = () => {
         try {
             const vCardContent = generateVCard();
@@ -301,10 +386,11 @@ export default function SaveContactButton({ userId }) {
     return (
         <div className="relative">
             <div className="flex gap-2">
-                {/* 🎯 MAIN BUTTON - Responsive design */}
+                {/* MAIN BUTTON - Now themed */}
                 <button
                     onClick={handleDirectSave}
-                    className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3 px-3 md:px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                    className={getButtonClasses()}
+                    style={getButtonStyles()}
                 >
                     <FaAddressCard className="w-5 h-5 flex-shrink-0" />
                     
@@ -321,11 +407,14 @@ export default function SaveContactButton({ userId }) {
                     <FaDownload className="w-4 h-4 flex-shrink-0" />
                 </button>
 
-                {/* OPTIONS MENU BUTTON */}
+                {/* OPTIONS MENU BUTTON - Themed to match */}
                 <button
                     onClick={() => setShowOptions(!showOptions)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
                     title="More options"
+                    style={{
+                        borderColor: selectedTheme === "Matrix" ? themeTextColour : undefined
+                    }}
                 >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />

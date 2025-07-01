@@ -295,7 +295,7 @@
     "selected": "Selected",
     "no_fonts_found": "No fonts found."
   },
-  "buttons": {
+  "buttons": { 
     "fill": "Fill",
     "outline": "Outline",
     "hard_shadow": "Hard Shadow",
