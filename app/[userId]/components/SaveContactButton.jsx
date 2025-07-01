@@ -508,18 +508,18 @@ export default function SaveContactButton({ userId }) {
 
                 {/* OPTIONS MENU BUTTON - Themed to match */}
                 <button
-                    onClick={() => setShowOptions(!showOptions)}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
-                    title={t('save_contact.more_options') || 'More options'}
-                    style={{
-                        borderColor: selectedTheme === "Matrix" ? themeTextColour : undefined,
-                        height: selectedTheme === "New Mario" ? "64px" : "auto" // Match Mario button height
-                    }}
-                >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                </button>
+    onClick={() => setShowOptions(!showOptions)}
+    className={`${getButtonClasses().replace('flex-1', 'px-3')} w-auto`} 
+    style={{
+        ...getButtonStyles(), 
+        height: selectedTheme === "New Mario" ? "64px" : "auto" 
+    }}
+    title={t('save_contact.more_options') || 'More options'}
+>
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+    </svg>
+</button>
             </div>
 
             {/* OPTIONS MENU */}
