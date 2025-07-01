@@ -234,62 +234,85 @@ export default function FileDownloadButton({ userId }) {
 
     return (
         <div className="w-full px-5 mb-4">
-            {selectedTheme === "New Mario" ? (
-                <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
-                    {/* Mario brick background - 9 bricks for full width file button */}
-                    {Array(9).fill("").map((_, brick_index) => (
-                        <img
-                            key={brick_index}
-                            src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
-                            alt="Mario Brick"
-                            onClick={handleDownload}
-                            className="h-full w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
-                        />
-                    ))}
-                    
-                    {/* Mario box with file icon */}
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
-                        <div className="relative">
+            <div className="md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)] mx-auto"> {/* FIXED: Added proper centering container */}
+                {selectedTheme === "New Mario" ? (
+                    <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
+                        {/* Mario brick background - 9 bricks for full width file button */}
+                        {Array(9).fill("").map((_, brick_index) => (
                             <img
-                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
-                                alt="Mario Box"
-                                className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
+                                key={brick_index}
+                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                                alt="Mario Brick"
                                 onClick={handleDownload}
+                                className="h-full w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
                             />
-                            {/* File icon inside the box */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                        ))}
+                        
+                        {/* Mario box with file icon */}
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
+                            <div className="relative">
+                                <img
+                                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                                    alt="Mario Box"
+                                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
+                                    onClick={handleDownload}
+                                />
+                                {/* File icon inside the box */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    {/* Button text overlay */}
-                    <div 
-                        className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
-                        onClick={handleDownload}
-                        style={{ 
-                            textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                            fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                            paddingLeft: '4rem' // Space for the box
-                        }}
-                    >
-                        <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold">
-                                {t('file_download.download_file') || 'Download File'}
-                            </span>
-                            <div className="text-xs opacity-90 truncate">
-                                {profileFile.name} • {formatFileSize(profileFile.size)}
+                        
+                        {/* Button text overlay */}
+                        <div 
+                            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
+                            onClick={handleDownload}
+                            style={{ 
+                                textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
+                                paddingLeft: '4rem' // Space for the box
+                            }}
+                        >
+                            <div className="flex flex-col items-center">
+                                <span className="text-sm font-semibold">
+                                    {t('file_download.download_file') || 'Download File'}
+                                </span>
+                                <div className="text-xs opacity-90 truncate">
+                                    {profileFile.name} • {formatFileSize(profileFile.size)}
+                                </div>
                             </div>
                         </div>
+                        
+                        {/* Download icon */}
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 z-30">
+                            <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                        </div>
                     </div>
-                    
-                    {/* Download icon */}
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 z-30">
-                        <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                ) : selectedTheme === "3D Blocks" ? (
+                    <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
+                        <button
+                            onClick={handleDownload}
+                            className={getButtonClasses()}
+                            style={getButtonStyles()}
+                        >
+                            {/* File icon */}
+                            <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                            
+                            <div className="flex-1 text-left">
+                                <div className="flex items-center gap-2">
+                                    <FaDownload className="w-4 h-4" />
+                                    <span className="text-sm font-semibold">
+                                        {t('file_download.download_file') || 'Download File'}
+                                    </span>
+                                </div>
+                                <div className="text-xs opacity-90 truncate">
+                                    {profileFile.name} • {formatFileSize(profileFile.size)}
+                                </div>
+                            </div>
+                        </button>
                     </div>
-                </div>
-            ) : selectedTheme === "3D Blocks" ? (
-                <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
+                ) : (
                     <button
                         onClick={handleDownload}
                         className={getButtonClasses()}
@@ -310,29 +333,8 @@ export default function FileDownloadButton({ userId }) {
                             </div>
                         </div>
                     </button>
-                </div>
-            ) : (
-                <button
-                    onClick={handleDownload}
-                    className={getButtonClasses()}
-                    style={getButtonStyles()}
-                >
-                    {/* File icon */}
-                    <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
-                    
-                    <div className="flex-1 text-left">
-                        <div className="flex items-center gap-2">
-                            <FaDownload className="w-4 h-4" />
-                            <span className="text-sm font-semibold">
-                                {t('file_download.download_file') || 'Download File'}
-                            </span>
-                        </div>
-                        <div className="text-xs opacity-90 truncate">
-                            {profileFile.name} • {formatFileSize(profileFile.size)}
-                        </div>
-                    </div>
-                </button>
-            )}
+                )}
+            </div>
         </div>
     );
 }

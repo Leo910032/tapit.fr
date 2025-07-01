@@ -258,10 +258,10 @@ export default function House({ userId }) {
                                 <FileDownloadButton userId={userId} />*/}
                                 
                                 {/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
-{/* 🔥 COMBINED BUTTONS SECTION - Only show after client hydration */}
+{/* 🔥 COMBINED BUTTONS SECTION - Now properly centered */}
 {isClient && (
     <div className="flex flex-col gap-4 my-4 w-full px-5 py-1 items-center max-h-fit">
-        <div className="flex gap-3 md:w-[35rem] sm:w-[30rem] w-clamp"> {/* FIXED: Now matches exact link width classes */}
+        <div className="flex gap-3 md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)]"> {/* FIXED: Match link button container */}
             {/* Exchange Button - Left Side */}
             <div className="flex-1">
                 <ExchangeButton 
