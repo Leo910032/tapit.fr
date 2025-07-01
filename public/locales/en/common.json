@@ -2,6 +2,7 @@
 
   
   "exchange": {
+    "button_text": "Exchange Contact",
     "title": "Exchange Contact",
     "description": "Share your contact information to connect with this profile owner.",
     "close_modal": "Close modal",
@@ -21,17 +22,49 @@
     "location_share_title": "Share your location?",
     "location_share_description": "To help visualize where connections are being made, you can share your approximate location. This is optional.",
     "share_location_button": "Share Location",
-    "location_granted_message": "Location access granted. Thank you!",
-    "geolocation_not_supported": "Geolocation is not supported by your browser.",
+    "location_shared": "Location shared successfully",
+    "location_granted": "Location access granted",
+    "location_denied": "Location access denied",
+    "location_prompt_available": "Location permission available",
+    "location_unavailable": "Location not available",
+    "location_accuracy": "Accuracy",
+    "location_obtained": "Location obtained successfully",
     "location_permission_denied": "Location access was denied. You can enable it in your browser settings.",
     "location_retrieval_failed": "Could not retrieve your location.",
+    "geolocation_not_supported": "Geolocation is not supported by your browser.",
     "cancel": "Cancel",
     "submit": "Share Contact",
     "submitting": "Sharing...",
     "success_message": "Contact information shared successfully!",
-    "error_message": "Failed to share contact information. Please try again."
+    "success_with_location": "Location data included.",
+    "error_message": "Failed to share contact information. Please try again.",
+    "profile_not_found": "Profile not found. Please try again.",
+    "validation_error": "Please check your information and try again."
   },
 
+  "save_contact": {
+    "button_text": "Save Contact",
+    "download_contact": "Download Contact",
+    "save_contact": "Save Contact",
+    "copy_contact_info": "Copy Contact Info",
+    "show_qr_code": "Show QR Code",
+    "more_options": "More options",
+    "contact_saved": "Contact saved successfully!",
+    "contact_downloaded": "Contact file downloaded!",
+    "contact_copied": "Contact info copied to clipboard!",
+    "qr_code_generated": "QR code generated successfully!",
+    "open_contacts_app": "Open with Contacts app!",
+    "file_downloaded": "File downloaded!",
+    "scan_qr_phone": "Scan QR code with your phone!",
+    "failed_save": "Failed to save contact",
+    "failed_copy": "Failed to copy contact info",
+    "failed_qr": "Failed to generate QR code"
+  },
+
+  "button": {
+    "copy_link_button": "Link copied",
+    "link_copied": "Link copied"
+  },
    "profile_image" :{
     "pick_image" : "Pick your image",
     "remove" : "Remove"
@@ -306,10 +339,7 @@
     "button_font_color": "Button font colour",
     "shadow_color": "Shadow colour"
   },
-  "button": {
-    "copy_link_button": "Link copied",
-    "link_copied": "Link copied"
-  },
+  
   "mylinkdiv": {
     "linktree": "Your Linktree is live:",
     "copy": "Copied!",

@@ -1,4 +1,4 @@
-// app/[userId]/components/SaveContactButton.jsx - THEMED VERSION FOR SIDE-BY-SIDE
+// app/[userId]/components/SaveContactButton.jsx - COMPLETE VERSION WITH TRANSLATIONS
 "use client"
 import { useState, useEffect } from 'react';
 import { fireApp } from "@/important/firebase";
@@ -15,7 +15,7 @@ export default function SaveContactButton({ userId }) {
     const [isLoading, setIsLoading] = useState(true);
     const [showOptions, setShowOptions] = useState(false);
     
-   
+    // Theme state
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
@@ -23,7 +23,6 @@ export default function SaveContactButton({ userId }) {
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
 
-  
     useEffect(() => {
         async function fetchThemeData() {
             try {
@@ -37,7 +36,7 @@ export default function SaveContactButton({ userId }) {
                     if (docSnapshot.exists()) {
                         const data = docSnapshot.data();
                         
-                        
+                        // Set theme data
                         setBtnType(data.btnType || 0);
                         setBtnShadowColor(data.btnShadowColor || "#000");
                         setBtnFontColor(data.btnFontColor || "#000");
@@ -45,7 +44,7 @@ export default function SaveContactButton({ userId }) {
                         setSelectedTheme(data.selectedTheme || '');
                         setThemeTextColour(data.themeFontColor || "");
                         
-                        
+                        // Set contact data
                         const contact = {
                             displayName: data.displayName || '',
                             email: data.email || '',
@@ -78,7 +77,6 @@ export default function SaveContactButton({ userId }) {
         fetchThemeData();
     }, [userId]);
 
-    
     const getButtonClasses = () => {
         let baseClasses = "flex-1 font-semibold py-3 px-3 md:px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2";
         
@@ -86,7 +84,6 @@ export default function SaveContactButton({ userId }) {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-      
         if (selectedTheme === "New Mario") {
             return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
@@ -123,7 +120,6 @@ export default function SaveContactButton({ userId }) {
         }
     };
 
-
     const getButtonStyles = () => {
         // Special handling for 3D Blocks theme
         if (selectedTheme === "3D Blocks") {
@@ -132,7 +128,6 @@ export default function SaveContactButton({ userId }) {
                 backgroundColor: "#10B981" // Green color for save button
             };
         }
-        
         
         if (selectedTheme === "New Mario") {
             return {
@@ -150,7 +145,6 @@ export default function SaveContactButton({ userId }) {
             backgroundColor: btnColor || "#fff"
         };
 
-       
         switch (btnType) {
             case 6:
             case 7:
@@ -178,7 +172,6 @@ export default function SaveContactButton({ userId }) {
         return styles;
     };
 
-   
     const generateVCard = () => {
         if (!contactData) return '';
 
@@ -231,7 +224,6 @@ export default function SaveContactButton({ userId }) {
         return vcard;
     };
 
-   
     const handleDirectSave = () => {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         
@@ -256,7 +248,7 @@ export default function SaveContactButton({ userId }) {
                 
                 document.body.removeChild(link);
                 
-                toast.success('📱 Open with Contacts app!', {
+                toast.success(t('save_contact.open_contacts_app') || '📱 Open with Contacts app!', {
                     duration: 4000
                 });
                 
@@ -274,18 +266,18 @@ export default function SaveContactButton({ userId }) {
                 
                 setTimeout(() => URL.revokeObjectURL(url), 100);
                 
-                toast.success('📥 File downloaded!', {
+                toast.success(t('save_contact.file_downloaded') || '📥 File downloaded!', {
                     duration: 4000
                 });
             }
             
         } catch (error) {
             console.error('Save error:', error);
+            toast.error(t('save_contact.failed_save') || 'Failed to save contact');
             handleCopyContact();
         }
     };
 
-    
     const handleCopyContact = async () => {
         try {
             const contactText = [
@@ -308,15 +300,14 @@ export default function SaveContactButton({ userId }) {
                 document.body.removeChild(textArea);
             }
             
-            toast.success('📋 Contact info copied!', {
+            toast.success(t('save_contact.contact_copied') || '📋 Contact info copied!', {
                 duration: 3000
             });
         } catch (error) {
             console.error('Copy error:', error);
-            toast.error('Failed to copy contact info');
+            toast.error(t('save_contact.failed_copy') || 'Failed to copy contact info');
         }
     };
-
 
     const handleShowQR = () => {
         try {
@@ -397,12 +388,12 @@ export default function SaveContactButton({ userId }) {
                 popup.document.close();
             }
             
-            toast.success('📱 Scan QR code with your phone!', {
+            toast.success(t('save_contact.scan_qr_phone') || '📱 Scan QR code with your phone!', {
                 duration: 3000
             });
         } catch (error) {
             console.error('QR error:', error);
-            toast.error('Failed to generate QR code');
+            toast.error(t('save_contact.failed_qr') || 'Failed to generate QR code');
         }
     };
 
@@ -417,64 +408,61 @@ export default function SaveContactButton({ userId }) {
             <div className="flex gap-2">
                 {/* MAIN BUTTON - Now themed with special theme support */}
                 {selectedTheme === "New Mario" ? (
-                    
-
-    <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
-        {/* Mario brick background - 4 bricks for side-by-side buttons */}
-        {Array(4).fill("").map((_, brick_index) => (
-            <img
-                key={brick_index}
-                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
-                alt="Mario Brick"
-                onClick={handleDirectSave} 
-                className="h-full w-1/4 object-cover hover:-translate-y-2 cursor-pointer transition-transform"
-            />
-        ))}
-        
-        {/* Mario box with icon */}
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
-            <div className="relative">
-                <img
-                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
-                    alt="Mario Box"
-                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
-                    onClick={handleDirectSave} 
-                />
-                {/* Save icon inside the box - FIXED ICON */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                </div>
-            </div>
-        </div>
-        
-        {/* Button text overlay */}
-        <div 
-            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
-            onClick={handleDirectSave} // ✅ FIXED: Use handleDirectSave instead of setIsModalOpen
-            style={{ 
-                textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                paddingLeft: '4rem' // Space for the box
-            }}
-        >
-            {/* Desktop text */}
-            <span className="hidden md:block">
-                {isMobile ? 'Save Contact' : 'Download Contact'}
-            </span>
-            
-            {/* Mobile text (shorter) */}
-            <span className="block md:hidden text-sm">
-                Save
-            </span>
-        </div>
-        
-        {/* Download icon */}
-        <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
-            <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-        </div>
-    </div>
-) : selectedTheme === "3D Blocks" ? (
-                    
+                    <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
+                        {/* Mario brick background - 4 bricks for side-by-side buttons */}
+                        {Array(4).fill("").map((_, brick_index) => (
+                            <img
+                                key={brick_index}
+                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                                alt="Mario Brick"
+                                onClick={handleDirectSave}
+                                className="h-full w-1/4 object-cover hover:-translate-y-2 cursor-pointer transition-transform"
+                            />
+                        ))}
+                        
+                        {/* Mario box with icon */}
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
+                            <div className="relative">
+                                <img
+                                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                                    alt="Mario Box"
+                                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
+                                    onClick={handleDirectSave}
+                                />
+                                {/* Save icon inside the box */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <FaAddressCard className="w-6 h-6 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Button text overlay */}
+                        <div 
+                            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
+                            onClick={handleDirectSave}
+                            style={{ 
+                                textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
+                                paddingLeft: '4rem' // Space for the box
+                            }}
+                        >
+                            {/* Desktop text */}
+                            <span className="hidden md:block">
+                                {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
+                            </span>
+                            
+                            {/* Mobile text (shorter) */}
+                            <span className="block md:hidden text-sm">
+                                {t('save_contact.button_text') || 'Save'}
+                            </span>
+                        </div>
+                        
+                        {/* Download icon */}
+                        <div className="absolute right-16 top-1/2 transform -translate-y-1/2 z-30">
+                            <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                        </div>
+                    </div>
+                ) : selectedTheme === "3D Blocks" ? (
                     <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
                         <button
                             onClick={handleDirectSave}
@@ -485,19 +473,18 @@ export default function SaveContactButton({ userId }) {
                             
                             {/* Desktop text */}
                             <span className="hidden md:block">
-                                {isMobile ? 'Save Contact' : 'Download Contact'}
+                                {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
                             </span>
                             
                             {/* Mobile text (shorter) */}
                             <span className="block md:hidden text-sm">
-                                Save
+                                {t('save_contact.button_text') || 'Save'}
                             </span>
                             
                             <FaDownload className="w-4 h-4 flex-shrink-0" />
                         </button>
                     </div>
                 ) : (
-                   
                     <button
                         onClick={handleDirectSave}
                         className={getButtonClasses()}
@@ -507,12 +494,12 @@ export default function SaveContactButton({ userId }) {
                         
                         {/* Desktop text */}
                         <span className="hidden md:block">
-                            {isMobile ? 'Save Contact' : 'Download Contact'}
+                            {isMobile ? t('save_contact.save_contact') || 'Save Contact' : t('save_contact.download_contact') || 'Download Contact'}
                         </span>
                         
                         {/* Mobile text (shorter) */}
                         <span className="block md:hidden text-sm">
-                            Save
+                            {t('save_contact.button_text') || 'Save'}
                         </span>
                         
                         <FaDownload className="w-4 h-4 flex-shrink-0" />
@@ -523,7 +510,7 @@ export default function SaveContactButton({ userId }) {
                 <button
                     onClick={() => setShowOptions(!showOptions)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
-                    title="More options"
+                    title={t('save_contact.more_options') || 'More options'}
                     style={{
                         borderColor: selectedTheme === "Matrix" ? themeTextColour : undefined,
                         height: selectedTheme === "New Mario" ? "64px" : "auto" // Match Mario button height
@@ -539,7 +526,6 @@ export default function SaveContactButton({ userId }) {
             {showOptions && (
                 <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border z-50 min-w-[220px] overflow-hidden">
                     <div className="py-2">
-                        
                         {/* Copy Option */}
                         <button
                             onClick={() => {
@@ -549,7 +535,7 @@ export default function SaveContactButton({ userId }) {
                             className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
                         >
                             <FaCopy className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm">Copy Contact Info</span>
+                            <span className="text-sm">{t('save_contact.copy_contact_info') || 'Copy Contact Info'}</span>
                         </button>
 
                         {/* QR Code Option */}
@@ -563,7 +549,7 @@ export default function SaveContactButton({ userId }) {
                             <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                             </svg>
-                            <span className="text-sm">Show QR Code</span>
+                            <span className="text-sm">{t('save_contact.show_qr_code') || 'Show QR Code'}</span>
                         </button>
                     </div>
                 </div>
