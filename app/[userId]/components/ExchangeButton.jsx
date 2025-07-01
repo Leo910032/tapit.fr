@@ -217,12 +217,10 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     >
                         {/* Desktop text */}
                         <span className="hidden md:block">
-                            {t('exchange.button_text') || 'Exchange Contact'}
                         </span>
                         
                         {/* Mobile text (shorter) */}
                         <span className="block md:hidden text-sm">
-                            {t('exchange.button_text_short') || 'Exchange'}
                         </span>
                     </div>
                     
@@ -242,12 +240,10 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                         
                         {/* Desktop text */}
                         <span className="hidden md:block">
-                            {t('exchange.button_text') || 'Exchange Contact'}
                         </span>
                         
                         {/* Mobile text (shorter) */}
                         <span className="block md:hidden text-sm">
-                            {t('exchange.button_text_short') || 'Exchange'}
                         </span>
                     </button>
                 </div>
@@ -264,12 +260,10 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     
                     {/* Desktop text */}
                     <span className="hidden md:block">
-                        {t('exchange.button_text') || 'Exchange Contact'}
                     </span>
                     
                     {/* Mobile text (shorter) */}
                     <span className="block md:hidden text-sm">
-                        {t('exchange.button_text_short') || 'Exchange'}
                     </span>
                 </button>
             )}
