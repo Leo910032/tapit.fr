@@ -320,7 +320,7 @@ export default function ExchangeModal({
     return (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden">
-                {/* Header */}
+
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -343,14 +343,14 @@ export default function ExchangeModal({
                     </button>
                 </div>
 
-                {/* Content */}
+            
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
                     <p className="text-gray-600 mb-6 text-sm">
                         {t('exchange.description')}
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Name Field */}
+                    
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 {t('exchange.name_label')} *
@@ -369,7 +369,7 @@ export default function ExchangeModal({
                             )}
                         </div>
 
-                        {/* Email Field */}
+       
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 {t('exchange.email_label')} *
@@ -388,7 +388,7 @@ export default function ExchangeModal({
                             )}
                         </div>
 
-                        {/* Phone Field */}
+              
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 {t('exchange.phone_label')}
@@ -402,7 +402,7 @@ export default function ExchangeModal({
                             />
                         </div>
 
-                        {/* Company Field */}
+        
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 {t('exchange.company_label')}
@@ -416,7 +416,7 @@ export default function ExchangeModal({
                             />
                         </div>
 
-                        {/* Message Field */}
+        
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 {t('exchange.message_label')}
@@ -430,7 +430,7 @@ export default function ExchangeModal({
                             />
                         </div>
                         
-                        {/* ✅ Enhanced Location Consent Section */}
+      
                         <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border">
                             <svg className="w-5 h-5 text-gray-400 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -447,14 +447,14 @@ export default function ExchangeModal({
                                 </div>
                                 <p className="text-xs text-gray-500 mt-1">{t('exchange.location_share_description')}</p>
                                 
-                                {/* Show location accuracy if available */}
+                        
                                 {location && location.accuracy && (
                                     <p className="text-xs text-green-600 mt-1">
                                         {t('exchange.location_accuracy')}: ~{Math.round(location.accuracy)}m
                                     </p>
                                 )}
                                 
-                                {/* Action button based on status */}
+                       
                                 {(locationStatus === 'prompt' || locationStatus === 'unavailable') && (
                                     <button
                                         type="button"
@@ -470,7 +470,7 @@ export default function ExchangeModal({
                             </div>
                         </div>
 
-                        {/* Submit Button */}
+                  
                         <div className="flex gap-3 pt-4">
                             <button
                                 type="button"

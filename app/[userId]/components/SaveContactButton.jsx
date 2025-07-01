@@ -412,11 +412,11 @@ export default function SaveContactButton({ userId }) {
     return (
         <div className="relative">
             <div className="flex gap-2">
-                {/* MAIN BUTTON - Now themed with special theme support */}
+          
                 {selectedTheme === "New Mario" ? (
-                    // Mario theme special button - IMPROVED VERSION
+           
                     <div className="flex-1 userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16">
-                        {/* Mario brick background */}
+               
                         {Array(9).fill("").map((_, brick_index) => (
                             <img
                                 key={brick_index}
@@ -428,14 +428,14 @@ export default function SaveContactButton({ userId }) {
                             />
                         ))}
                         
-                        {/* Button content overlay with Mario Box icon */}
+                       
                         <div 
                             className="absolute top-0 left-0 z-30 w-full h-full flex items-center justify-center gap-3 cursor-pointer pointer-events-none"
                             style={{ 
                                 textShadow: '4px 4px 0px rgba(0,0,0,1)'
                             }}
                         >
-                            {/* Mario Box with icon inside */}
+                         
                             <div className="grid place-items-center">
                                 <img
                                     src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
@@ -458,14 +458,14 @@ export default function SaveContactButton({ userId }) {
                             </div>
                         </div>
                         
-                        {/* Clickable overlay */}
+               
                         <div 
                             className="absolute top-0 left-0 w-full h-full cursor-pointer z-40"
                             onClick={handleDirectSave}
                         />
                     </div>
                 ) : (
-                    // Regular themed button with proper container for 3D Blocks
+                   
                     <div className={selectedTheme === "3D Blocks" ? "flex-1 userBtn" : "flex-1"}>
                         <button
                             onClick={handleDirectSave}
@@ -474,12 +474,12 @@ export default function SaveContactButton({ userId }) {
                         >
                             <FaAddressCard className="w-5 h-5 flex-shrink-0" />
                             
-                            {/* Desktop text */}
+                     
                             <span className="hidden md:block">
                                 {isMobile ? 'Save Contact' : 'Download Contact'}
                             </span>
                             
-                            {/* Mobile text (shorter) */}
+           
                             <span className="block md:hidden text-sm">
                                 Save
                             </span>
@@ -489,7 +489,7 @@ export default function SaveContactButton({ userId }) {
                     </div>
                 )}
 
-                {/* OPTIONS MENU BUTTON - Themed to match */}
+              
                 <button
                     onClick={() => setShowOptions(!showOptions)}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-lg transition-colors relative"
@@ -505,12 +505,12 @@ export default function SaveContactButton({ userId }) {
                 </button>
             </div>
 
-            {/* OPTIONS MENU */}
+       
             {showOptions && (
                 <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-lg border z-50 min-w-[220px] overflow-hidden">
                     <div className="py-2">
                         
-                        {/* Copy Option */}
+                   
                         <button
                             onClick={() => {
                                 handleCopyContact();
@@ -522,7 +522,7 @@ export default function SaveContactButton({ userId }) {
                             <span className="text-sm">Copy Contact Info</span>
                         </button>
 
-                        {/* QR Code Option */}
+                       
                         <button
                             onClick={() => {
                                 handleShowQR();
@@ -539,7 +539,7 @@ export default function SaveContactButton({ userId }) {
                 </div>
             )}
 
-            {/* Close menu overlay */}
+ 
             {showOptions && (
                 <div 
                     className="fixed inset-0 z-40" 
