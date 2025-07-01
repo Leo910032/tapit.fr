@@ -24,40 +24,50 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     useEffect(() => {
         async function fetchThemeData() {
             try {
+                console.log("🔍 ExchangeButton: Fetching theme data for userId:", userId);
+                
                 const currentUser = await fetchUserData(userId);
-                if (!currentUser) return;
+                if (!currentUser) {
+                    console.warn("❌ ExchangeButton: No current user found");
+                    return;
+                }
+
+                console.log("✅ ExchangeButton: Current user found:", currentUser);
 
                 const collectionRef = collection(fireApp, "AccountData");
                 const docRef = doc(collectionRef, currentUser);
 
                 const unsubscribe = onSnapshot(docRef, (docSnapshot) => {
                     if (docSnapshot.exists()) {
-                        const { 
-                            btnType, 
-                            btnShadowColor, 
-                            btnFontColor, 
-                            btnColor, 
-                            selectedTheme,
-                            themeFontColor
-                        } = docSnapshot.data();
+                        const data = docSnapshot.data();
+                        console.log("📊 ExchangeButton: Theme data received:", {
+                            btnType: data.btnType,
+                            btnColor: data.btnColor,
+                            btnFontColor: data.btnFontColor,
+                            selectedTheme: data.selectedTheme
+                        });
                         
-                        setBtnType(btnType || 0);
-                        setBtnShadowColor(btnShadowColor || "#000");
-                        setBtnFontColor(btnFontColor || "#000");
-                        setBtnColor(btnColor || "#fff");
-                        setSelectedTheme(selectedTheme || '');
-                        setThemeTextColour(themeFontColor || "");
+                        setBtnType(data.btnType || 0);
+                        setBtnShadowColor(data.btnShadowColor || "#000");
+                        setBtnFontColor(data.btnFontColor || "#000");
+                        setBtnColor(data.btnColor || "#fff");
+                        setSelectedTheme(data.selectedTheme || '');
+                        setThemeTextColour(data.themeFontColor || "");
+                    } else {
+                        console.warn("❌ ExchangeButton: Document does not exist");
                     }
                 });
 
                 return () => unsubscribe();
             } catch (error) {
-                console.error("Error fetching theme data:", error);
+                console.error("❌ ExchangeButton: Error fetching theme data:", error);
             }
         }
 
         if (userId) {
             fetchThemeData();
+        } else {
+            console.warn("⚠️ ExchangeButton: No userId provided");
         }
     }, [userId]);
 
@@ -100,8 +110,8 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     // Generate button styles
     const getButtonStyles = () => {
         let styles = {
-            color: btnFontColor,
-            backgroundColor: btnColor
+            color: btnFontColor || "#000",
+            backgroundColor: btnColor || "#fff"
         };
 
         // Add shadow for specific button types
@@ -129,11 +139,21 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             styles.borderColor = themeTextColour;
         }
 
+        // Debug log to check if styles are being applied
+        console.log("🎨 Exchange Button Styles:", styles, "Button Type:", btnType);
+
         return styles;
     };
 
     return (
         <>
+            {/* Debug info - remove this after fixing */}
+            {process.env.NODE_ENV === 'development' && (
+                <div className="text-xs text-gray-500 mb-1">
+                    ExchangeButton Debug: Type={btnType}, Color={btnColor}, UserId={userId ? '✓' : '✗'}
+                </div>
+            )}
+            
             <button
                 onClick={() => setIsModalOpen(true)}
                 className={getButtonClasses()}

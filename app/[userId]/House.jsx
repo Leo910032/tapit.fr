@@ -266,6 +266,8 @@ export default function House({ userId }) {
                                                     username={username} 
                                                     userInfo={userLookupData}
                                                     fastLookupUsed={fastLookupUsed}
+                                                    userId={userId} // ✅ ADD THIS LINE - This was missing!
+
                                                 />
                                             </div>
                                             
