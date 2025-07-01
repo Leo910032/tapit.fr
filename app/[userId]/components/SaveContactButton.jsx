@@ -418,7 +418,7 @@ export default function SaveContactButton({ userId }) {
                 {/* MAIN BUTTON - Now themed with special theme support */}
                 {selectedTheme === "New Mario" ? (
                     
-                    <div className="userBtn relative overflow-hidden flex justify-between items-center h-16 w-full">
+        <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp">
                         {/* Mario brick background */}
                         {Array(9).fill("").map((_, brick_index) => (
                             <img
