@@ -1,3 +1,4 @@
+//@Leo910032 ➜ /workspaces/tapit.fr/app/dashboard (main) $ ls layout.jsx layout.jsx
 import { Inter } from 'next/font/google'
 import NavBar from '../components/General Components/NavBar'
 import CheckSession from './general components/CheckSession'
