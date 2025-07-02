@@ -1,8 +1,6 @@
 // app/nfc-cards/checkout/page.jsx
-// app/nfc-cards/checkout/page.jsx
 "use client"
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import NFCLandingNav from "@/app/components/General Components/NFCLandingNav";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
@@ -10,13 +8,33 @@ import { testForActiveSession } from "@/lib/authentication/testForActiveSession"
 export default function CheckoutPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const router = useRouter();
 
-    useEffect(() => {
-        // Check if user is logged in
+    const checkAuthStatus = () => {
         const userId = testForActiveSession();
         setIsLoggedIn(!!userId);
         setIsLoading(false);
+        console.log("Auth check:", !!userId); // Debug log
+    };
+
+    useEffect(() => {
+        checkAuthStatus();
+        
+        // Listen for authentication events
+        const handleStorageChange = () => {
+            console.log("Storage changed, rechecking auth"); // Debug log
+            checkAuthStatus();
+        };
+
+        // Listen for session storage changes
+        window.addEventListener('storage', handleStorageChange);
+        
+        // Also check periodically in case of modal auth
+        const interval = setInterval(checkAuthStatus, 1000);
+        
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            clearInterval(interval);
+        };
     }, []);
 
     if (isLoading) {
@@ -82,7 +100,7 @@ export default function CheckoutPage() {
                     {/* Placeholder for checkout form */}
                     <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
                         <p className="text-gray-500 mb-4">
-                            Checkout form will be added here
+                            ✅ You are logged in! Checkout form will be added here
                         </p>
                         <p className="text-sm text-gray-400">
                             (Payment processing, shipping details, etc.)
