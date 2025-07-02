@@ -475,6 +475,7 @@
     "sign_up": "Sign up",
     "invalid_credentials": "Invalid Login credentials!",
     "success": "Login Successful",
+    "continue_with_google" : "Continue with Google",
     "validating": "Validating credentials...",
     "incorrect_password": "You entered an incorrect password!",
     "username_not_registered": "This username is not registered to any user."
