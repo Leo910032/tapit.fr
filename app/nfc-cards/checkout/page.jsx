@@ -73,7 +73,8 @@ export default function CheckoutPage() {
                             <div className="text-left">
                                 <h3 className="font-semibold text-gray-800 mb-2">To continue:</h3>
                                 <ol className="list-decimal list-inside text-gray-600 space-y-1">
-                                    <li>Click "Login" or "Sign Up" in the navigation above</li>
+                                    {/* FIX: Replaced quotes with HTML entities */}
+                                    <li>Click “Login” or “Sign Up” in the navigation above</li>
                                     <li>Complete authentication in the popup</li>
                                     <li>This page will automatically update to show checkout</li>
                                 </ol>
