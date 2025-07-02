@@ -27,7 +27,7 @@ export default function CustomizePage() {
         }
     };
 
-    if (isLoading) {
+if (isLoading) {
     return (
         <div className="min-h-screen bg-gray-50">
             <NFCLandingNav />
@@ -37,6 +37,7 @@ export default function CustomizePage() {
         </div>
     );
 }
+
 
     return (
         <div className="min-h-screen bg-gray-50">
