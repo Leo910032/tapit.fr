@@ -58,6 +58,7 @@ export default function NFCLoginModal({ onClose, onSuccess, onSwitchToSignup }) 
             const userId = await loginAccount(data);
             setSessionCookie("adminLinker", `${userId}`, (60 * 60));
             toast.success(translations.success);
+            // Don't redirect, just call onSuccess to update parent component
             onSuccess();
         } catch (error) {
             setIsLoading(false);
@@ -79,6 +80,7 @@ export default function NFCLoginModal({ onClose, onSuccess, onSwitchToSignup }) 
             
             setSessionCookie("adminLinker", result.userId, (60 * 60));
             toast.success(translations.googleSignInSuccess);
+            // Don't redirect, just call onSuccess to update parent component
             onSuccess();
         } catch (error) {
             setIsGoogleLoading(false);
@@ -204,7 +206,7 @@ export default function NFCLoginModal({ onClose, onSuccess, onSwitchToSignup }) 
                     </form>
 
                     <p className="text-center text-sm mt-6">
-                        <span className="text-gray-600">Dont have an account? </span>
+                        <span className="text-gray-600">Don't have an account? </span>
                         <button 
                             onClick={onSwitchToSignup}
                             className="text-themeGreen hover:underline font-medium"

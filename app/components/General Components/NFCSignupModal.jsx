@@ -63,6 +63,7 @@ export default function NFCSignupModal({ onClose, onSuccess, onSwitchToLogin }) 
             if (result.requiresRedirect) return;
             setSessionCookie("adminLinker", result.userId, (60 * 60));
             toast.success(result.isNewUser ? translations.accountCreated : translations.googleSignInSuccess);
+            // Don't redirect, just call onSuccess to update parent component
             onSuccess();
         } catch (error) {
             setIsGoogleLoading(false);
@@ -79,6 +80,7 @@ export default function NFCSignupModal({ onClose, onSuccess, onSwitchToLogin }) 
             const userId = await createAccount(data);
             setSessionCookie("adminLinker", `${userId}`, (60 * 60));
             toast.success(translations.accountCreated);
+            // Don't redirect, just call onSuccess to update parent component
             onSuccess();
         } catch (error) {
             setIsLoading(false);

@@ -31,11 +31,19 @@ export default function NFCLandingNav() {
     const onLoginSuccess = () => {
         setShowLoginModal(false);
         setIsLoggedIn(true);
+        // Check if we're on checkout page and reload to show authenticated content
+        if (window.location.pathname === '/nfc-cards/checkout') {
+            window.location.reload();
+        }
     };
 
     const onSignupSuccess = () => {
         setShowSignupModal(false);
         setIsLoggedIn(true);
+        // Check if we're on checkout page and reload to show authenticated content
+        if (window.location.pathname === '/nfc-cards/checkout') {
+            window.location.reload();
+        }
     };
     
     return (
