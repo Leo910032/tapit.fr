@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import LandingNav from "@/app/components/General Components/LandingNav";
+import NFCLandingNav from "@/app/components/General Components/NFCLandingNav";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
 export default function CustomizePage() {
@@ -27,17 +27,21 @@ export default function CustomizePage() {
         }
     };
 
-    if (isLoading) {
-        return (
+ if (isLoading) {
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <NFCLandingNav />
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div>Loading...</div>
             </div>
-        );
-    }
+        </div>
+    );
+}
+
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <LandingNav />
+            <NFCLandingNav />
             
             <div className="container mx-auto px-4 pt-32 pb-16">
                 <div className="max-w-2xl mx-auto text-center">

@@ -1,6 +1,6 @@
 // app/nfc-cards/page.jsx
 import Link from "next/link";
-import LandingNav from "@/app/components/General Components/LandingNav";
+import NFCLandingNav from "@/app/components/General Components/NFCLandingNav";
 
 export const generateMetadata = () => {
     return {
@@ -12,7 +12,7 @@ export const generateMetadata = () => {
 export default function NFCCardsPage() {
     return (
         <div className="min-h-screen bg-gray-50">
-            <LandingNav />
+            <NFCLandingNav />
             
             <div className="container mx-auto px-4 pt-32 pb-16">
                 <div className="max-w-2xl mx-auto text-center">

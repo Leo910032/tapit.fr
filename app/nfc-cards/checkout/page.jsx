@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import LandingNav from "@/app/components/General Components/LandingNav";
+import NFCLandingNav from "@/app/components/General Components/NFCLandingNav";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
 export default function CheckoutPage() {
@@ -36,7 +36,7 @@ export default function CheckoutPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <LandingNav />
+            <NFCLandingNav />
             
             <div className="container mx-auto px-4 pt-32 pb-16">
                 <div className="max-w-2xl mx-auto text-center">
