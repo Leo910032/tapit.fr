@@ -1,47 +1,18 @@
 // app/nfc-cards/customize/page.jsx
-"use client"
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import NFCLandingNav from "@/app/components/General Components/NFCLandingNav";
-import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
+import LandingNav from "@/app/components/General Components/LandingNav";
 
-export default function CustomizePage() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const router = useRouter();
-
-    useEffect(() => {
-        // Check if user is logged in
-        const userId = testForActiveSession();
-        setIsLoggedIn(!!userId);
-        setIsLoading(false);
-    }, []);
-
-    const handleCheckout = () => {
-        if (isLoggedIn) {
-            router.push('/nfc-cards/checkout');
-        } else {
-            // Redirect to login with return URL
-            router.push('/nfc-cards/login');
-        }
-    };
-
-if (isLoading) {
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <NFCLandingNav />
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div>Loading...</div>
-            </div>
-        </div>
-    );
+export const generateMetadata = () => {
+    return {
+        title: "TapIt | Customize NFC Card",
+        description: "Customize your NFC card design"
+    }
 }
 
-
+export default function CustomizePage() {
     return (
         <div className="min-h-screen bg-gray-50">
-            <NFCLandingNav />
+            <LandingNav />
             
             <div className="container mx-auto px-4 pt-32 pb-16">
                 <div className="max-w-2xl mx-auto text-center">
@@ -61,12 +32,12 @@ if (isLoading) {
                     </div>
                     
                     <div className="space-y-4">
-                        <button 
-                            onClick={handleCheckout}
-                            className="w-full bg-themeGreen text-white px-8 py-4 rounded-lg font-semibold hover:scale-105 active:scale-95 transition-transform"
+                        <Link 
+                            href="/nfc-cards/checkout"
+                            className="block w-full bg-themeGreen text-white px-8 py-4 rounded-lg font-semibold hover:scale-105 active:scale-95 transition-transform text-center"
                         >
-                            {isLoggedIn ? 'Proceed to Checkout' : 'Login to Checkout'}
-                        </button>
+                            Proceed to Checkout
+                        </Link>
                         
                         <Link 
                             href="/nfc-cards" 

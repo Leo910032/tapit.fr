@@ -1,4 +1,5 @@
 "use client"
+//tapit.fr/app/dashboard/general components (main) $ ls CheckSession.jsx 
 import { getSessionCookie } from "@/lib/authentication/session";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
