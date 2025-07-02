@@ -1,4 +1,4 @@
-// app/nfc-cards/login/components/NFCLoginForm.jsx
+// app/nfc-cards/login/components/NFCLoginForm.jsx - UPDATED
 "use client"
 import { useDebounce } from "@/LocalHooks/useDebounce";
 import { fireApp } from "@/important/firebase";
@@ -10,13 +10,14 @@ import GoogleSignInButton from "@/app/components/GoogleSignInButton";
 import { collection, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 export default function NFCLoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { t, isInitialized, locale } = useTranslation();
     
     const [seePassword, setSeePassword] = useState(true);
@@ -33,6 +34,9 @@ export default function NFCLoginForm() {
     
     const debouncedUsername = useDebounce(username, 500);
     const debouncedPassword = useDebounce(password, 500);
+
+    // Get return URL from search params, default to checkout
+    const returnUrl = searchParams?.get('returnUrl') || '/nfc-cards/checkout';
 
     const translations = useMemo(() => {
         if (!isInitialized) return {};
@@ -67,7 +71,7 @@ export default function NFCLoginForm() {
                     setSessionCookie("adminLinker", result.userId, (60 * 60));
                     toast.success(translations.googleSignInSuccess);
                     setTimeout(() => {
-                        router.push("/nfc-cards/checkout");
+                        router.push(returnUrl);
                     }, 1000);
                 }
             } catch (error) {
@@ -76,7 +80,7 @@ export default function NFCLoginForm() {
             }
         };
         checkRedirectResult();
-    }, [isInitialized, locale, translations, router]);
+    }, [isInitialized, locale, translations, router, returnUrl]);
 
     const handleLogin = useCallback(async(e) => {
         e.preventDefault();
@@ -88,7 +92,7 @@ export default function NFCLoginForm() {
         try {
             const userId = await loginAccount(data);
             setSessionCookie("adminLinker", `${userId}`, (60 * 60));
-            setTimeout(() => { router.push("/nfc-cards/checkout"); }, 1000);
+            setTimeout(() => { router.push(returnUrl); }, 1000);
         } catch (error) {
             setIsLoading(false);
             let errorMsg = existingUsernames.includes(String(username).toLowerCase()) 
@@ -97,7 +101,7 @@ export default function NFCLoginForm() {
             setErrorMessage(errorMsg);
             throw new Error(errorMsg);
         }
-    }, [canProceed, isLoading, username, password, existingUsernames, translations, router]);
+    }, [canProceed, isLoading, username, password, existingUsernames, translations, router, returnUrl]);
 
     const handleGoogleSignIn = useCallback(async () => {
         if (isGoogleLoading || isLoading) return;
@@ -109,12 +113,12 @@ export default function NFCLoginForm() {
             
             setSessionCookie("adminLinker", result.userId, (60 * 60));
             toast.success(translations.googleSignInSuccess);
-            setTimeout(() => { router.push("/nfc-cards/checkout"); }, 1000);
+            setTimeout(() => { router.push(returnUrl); }, 1000);
         } catch (error) {
             setIsGoogleLoading(false);
             toast.error(error.message || translations.googleSignInFailed);
         }
-    }, [isGoogleLoading, isLoading, locale, translations, router]);
+    }, [isGoogleLoading, isLoading, locale, translations, router, returnUrl]);
 
     const loginHandler = useCallback((e) => {
         e.preventDefault();
@@ -184,10 +188,10 @@ export default function NFCLoginForm() {
                 </div>
                 <p className="text-center sm:text-base text-sm">
                     <span className="opacity-60">{translations.noAccount}</span> 
-                    <Link href={"/nfc-cards/signup"} className="text-themeGreen"> {translations.signUp}</Link>
+                    <Link href={`/nfc-cards/signup?returnUrl=${encodeURIComponent(returnUrl)}`} className="text-themeGreen"> {translations.signUp}</Link>
                 </p>
                 <p className="text-center mt-4">
-                    <Link href={"/nfc-cards/customize"} className="text-gray-600 hover:text-gray-800">
+                    <Link href="/nfc-cards/customize" className="text-gray-600 hover:text-gray-800">
                         ← Back to Customize
                     </Link>
                 </p>

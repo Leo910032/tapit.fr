@@ -1,8 +1,8 @@
-// app/nfc-cards/checkout/page.jsx
+// app/nfc-cards/checkout/page.jsx - SIMPLE SOLUTION
 "use client"
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import NFCLandingNav from "@/app/components/General Components/NFCLandingNav";
+import LandingNav from "@/app/components/General Components/LandingNav";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
 export default function CheckoutPage() {
@@ -21,13 +21,7 @@ export default function CheckoutPage() {
         console.log("📦 Checkout page mounted");
         checkAuthStatus();
         
-        // Listen for authentication events (when modal login succeeds)
-        const handleStorageChange = () => {
-            console.log("🔄 Storage/session changed, rechecking auth");
-            checkAuthStatus();
-        };
-
-        // Check for session changes periodically to catch modal authentication
+        // Check for session changes periodically to catch authentication
         const interval = setInterval(() => {
             const userId = testForActiveSession();
             const currentlyLoggedIn = !!userId;
@@ -53,11 +47,11 @@ export default function CheckoutPage() {
         );
     }
 
-    // If not logged in, show login/signup prompt
+    // If not logged in, show login instructions with links to regular login/signup
     if (!isLoggedIn) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <NFCLandingNav />
+                <LandingNav />
                 
                 <div className="container mx-auto px-4 pt-32 pb-16">
                     <div className="max-w-2xl mx-auto text-center">
@@ -70,15 +64,24 @@ export default function CheckoutPage() {
                         </p>
 
                         <div className="bg-white p-8 rounded-lg shadow-sm mb-8 border-l-4 border-blue-500">
-                            <div className="text-left">
-                                <h3 className="font-semibold text-gray-800 mb-2">To continue:</h3>
-                                <ol className="list-decimal list-inside text-gray-600 space-y-1">
-                                    {/* FIX: Replaced quotes with HTML entities */}
-                                    <li>Click “Login” or “Sign Up” in the navigation above</li>
-                                    <li>Complete authentication in the popup</li>
-                                    <li>This page will automatically update to show checkout</li>
-                                </ol>
+                            <h3 className="font-semibold text-gray-800 mb-4">Continue to checkout:</h3>
+                            <div className="space-y-3">
+                                <Link 
+                                    href="/login"
+                                    className="block w-full bg-themeGreen text-white px-6 py-3 rounded-lg font-semibold hover:scale-105 active:scale-95 transition-transform"
+                                >
+                                    Login to Your Account
+                                </Link>
+                                <Link 
+                                    href="/signup"
+                                    className="block w-full border-2 border-themeGreen text-themeGreen px-6 py-3 rounded-lg font-semibold hover:scale-105 active:scale-95 transition-transform hover:bg-themeGreen hover:text-white"
+                                >
+                                    Create New Account
+                                </Link>
                             </div>
+                            <p className="text-sm text-gray-500 mt-4">
+                                After login/signup, you'll be redirected to complete your purchase
+                            </p>
                         </div>
                         
                         <Link 
@@ -96,7 +99,7 @@ export default function CheckoutPage() {
     // If logged in, show checkout form
     return (
         <div className="min-h-screen bg-gray-50">
-            <NFCLandingNav />
+            <LandingNav />
             
             <div className="container mx-auto px-4 pt-32 pb-16">
                 <div className="max-w-2xl mx-auto text-center">
