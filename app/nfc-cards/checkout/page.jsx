@@ -1,4 +1,5 @@
 // app/nfc-cards/checkout/page.jsx
+// app/nfc-cards/checkout/page.jsx
 "use client"
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,13 +15,9 @@ export default function CheckoutPage() {
     useEffect(() => {
         // Check if user is logged in
         const userId = testForActiveSession();
-        if (!userId) {
-            router.push('/nfc-cards/login');
-            return;
-        }
-        setIsLoggedIn(true);
+        setIsLoggedIn(!!userId);
         setIsLoading(false);
-    }, [router]);
+    }, []);
 
     if (isLoading) {
         return (
@@ -30,10 +27,44 @@ export default function CheckoutPage() {
         );
     }
 
+    // If not logged in, show login/signup options
     if (!isLoggedIn) {
-        return null; // Will redirect
+        return (
+            <div className="min-h-screen bg-gray-50">
+                <NFCLandingNav />
+                
+                <div className="container mx-auto px-4 pt-32 pb-16">
+                    <div className="max-w-2xl mx-auto text-center">
+                        <h1 className="text-4xl font-bold text-gray-900 mb-8">
+                            Almost There!
+                        </h1>
+                        
+                        <p className="text-lg text-gray-600 mb-12">
+                            Please log in or create an account to complete your NFC card purchase
+                        </p>
+
+                        <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
+                            <p className="text-gray-500 mb-4">
+                                You need to be logged in to checkout
+                            </p>
+                            <p className="text-sm text-gray-400">
+                                Use the login/signup buttons in the navigation above
+                            </p>
+                        </div>
+                        
+                        <Link 
+                            href="/nfc-cards/customize" 
+                            className="block text-gray-600 hover:text-gray-800"
+                        >
+                            ← Back to Customize
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
+    // If logged in, show checkout form
     return (
         <div className="min-h-screen bg-gray-50">
             <NFCLandingNav />
