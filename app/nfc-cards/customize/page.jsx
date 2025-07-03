@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - FINAL VERSION WITH LOGO UPLOAD
+// app/nfc-cards/customize/page.jsx - CORRECTED BUILD-SAFE VERSION
 "use client"
 
 import { useState, useEffect } from "react";
@@ -10,7 +10,6 @@ import { toast, Toaster } from "react-hot-toast";
 import { fetchProducts } from "@/lib/fetch data/fetchProducts";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
-// Import all components
 import CustomizationForm from "./components/CustomizationForm";
 import LivePreview from "./components/LivePreview";
 import LogoUploader from "./components/LogoUploader";
@@ -18,36 +17,39 @@ import LogoUploader from "./components/LogoUploader";
 const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="300" rx="15" fill="#e5e7eb"/><text x="250" y="150" text-anchor="middle" font-family="Arial" font-size="20" fill="#9ca3af">Select a card to begin</text></svg>`;
 
 export default function CustomizePage() {
-    const router = useRouter();
+ const router = useRouter();
     
     // Page status
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-    
     // Customization state
-    const [customValues, setCustomValues] = useState({});
+ const [customValues, setCustomValues] = useState({});
     const [displaySvg, setDisplaySvg] = useState(DEFAULT_SVG);
     const [isUploading, setIsUploading] = useState(false);
-    const [logoUrl, setLogoUrl] = useState(""); // <-- State for the logo URL
+    const [logoUrl, setLogoUrl] = useState("");
 
-    const userId = testForActiveSession(true); // Get user ID once
+    const [userId, setUserId] = useState(null);
+
 
     useEffect(() => {
+        // This code now only runs on the client-side
+        const currentUserId = testForActiveSession(true);
+        setUserId(currentUserId);
+
         const getProducts = async () => {
             const fetchedProducts = await fetchProducts();
             setProducts(fetchedProducts);
             if (fetchedProducts.length > 0) {
                 const firstProduct = fetchedProducts[0];
-                // Call the handler to properly initialize state for the first product
                 handleProductSelect(firstProduct); 
             }
             setIsLoading(false);
         };
         getProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [])
     // Effect to update the SVG preview
     useEffect(() => {
         if (!selectedProduct || !selectedProduct.templateSvg) {
@@ -84,7 +86,7 @@ export default function CustomizePage() {
     };
     
     const handleProceedToCheckout = async () => {
-        const userId = testForActiveSession(true);
+       // Use the state version of userId here
         if (!userId) {
             toast.error("Please log in to save your card.");
             router.push(`/login?returnTo=/nfc-cards/customize`);
@@ -128,31 +130,35 @@ export default function CustomizePage() {
         return <div className="pt-32 text-center">Loading products...</div>;
     }
 
-     return (
+    return (
         <div className="container mx-auto px-4 pt-32 pb-16">
             <Toaster position="bottom-center" />
             <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12">
-                <CustomizationForm
-                    products={products}
-                    selectedProduct={selectedProduct}
-                    customValues={customValues}
-                    onProductSelect={handleProductSelect}
-                    onCustomValueChange={handleCustomValueChange}
-                />
-                   <LogoUploader
+                {/* Left side: The full form */}
+                <div>
+                    <CustomizationForm
+                        products={products}
+                        selectedProduct={selectedProduct}
+                        customValues={customValues}
+                        onProductSelect={handleProductSelect}
+                        onCustomValueChange={handleCustomValueChange}
+                    />
+                    <LogoUploader
                         userId={userId}
                         isUploading={isUploading}
                         onUploadStart={() => setIsUploading(true)}
                         onUploadComplete={(url) => {
                             if (url) {
-                                setLogoUrl(url); // Update state with the new URL
-                                toast.success("Logo uploaded!");
+                                setLogoUrl(url);
                             } else {
                                 toast.error("Logo upload failed.");
                             }
                             setIsUploading(false);
                         }}
                     />
+                </div>
+                
+                {/* Right side: The preview */}
                 <LivePreview
                     displaySvg={displaySvg}
                     isSaving={isSaving}
