@@ -1,18 +1,12 @@
-// app/nfc-cards/customize/page.jsx - FIXED VERSION
+// app/nfc-cards/customize/page.jsx - FIREBASE IMPORTS FIXED
 "use client"
 
-// ✅ FIXED: Add missing import for useRef
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "react-hot-toast";
 import Image from "next/image";
 
-// ✅ FIXED: Import utilities and functions
-import { fetchProducts } from "@/lib/fetch data/fetchProducts";
-import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
-import { saveCustomCard, uploadLogo } from '@/lib/nfc/firebaseUtils';
-
-const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="300" rx="15" fill="#e5e7eb"/><text x="250" y="150" text-anchor="middle" font-family="Arial" font-size="20" fill="#9ca3af">Select a card to begin</text></svg>`;
+const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="300" rx="15" fill="#e5e7eb"/><text x="250" y="150" text-anchor="middle" font-family="Arial" font-size="20" fill="#9ca3af">Loading products...</text></svg>`;
 
 export default function CustomizePage() {
     const router = useRouter();
@@ -30,16 +24,41 @@ export default function CustomizePage() {
     const [logoUrl, setLogoUrl] = useState("");
     const [userId, setUserId] = useState(null);
 
-    // ✅ FIXED: Initialize everything on mount
+    // ✅ FIX: Client-side only Firebase operations
     useEffect(() => {
         const initializePage = async () => {
             try {
+                // Check if we're on the client side
+                if (typeof window === 'undefined') return;
+
+                // Import Firebase modules dynamically only on client
+                const [
+                    { testForActiveSession },
+                    { collection, getDocs, getFirestore },
+                    { fireApp }
+                ] = await Promise.all([
+                    import('@/lib/authentication/testForActiveSession'),
+                    import('firebase/firestore'),
+                    import('@/important/firebase')
+                ]);
+
                 // Check authentication
                 const currentUserId = testForActiveSession(true);
                 setUserId(currentUserId);
 
-                // Fetch products
-                const fetchedProducts = await fetchProducts();
+                // Initialize Firestore
+                const db = getFirestore(fireApp);
+                const productsRef = collection(db, "NFCProducts");
+                const querySnapshot = await getDocs(productsRef);
+                
+                const fetchedProducts = [];
+                querySnapshot.forEach((doc) => {
+                    fetchedProducts.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
                 setProducts(fetchedProducts);
                 
                 if (fetchedProducts.length > 0) {
@@ -48,7 +67,7 @@ export default function CustomizePage() {
                 }
             } catch (error) {
                 console.error("Error initializing page:", error);
-                toast.error("Failed to load products");
+                toast.error("Failed to load products from Firebase");
             } finally {
                 setIsLoading(false);
             }
@@ -102,31 +121,40 @@ export default function CustomizePage() {
         const loadingToast = toast.loading("Saving your custom card...");
 
         try {
-            // ✅ FIXED: Use utility function instead of direct Firebase calls
-            const cardData = {
+            // Import Firebase modules dynamically
+            const [
+                { collection, addDoc, serverTimestamp, getFirestore },
+                { fireApp }
+            ] = await Promise.all([
+                import('firebase/firestore'),
+                import('@/important/firebase')
+            ]);
+
+            const db = getFirestore(fireApp);
+            const userCardsRef = collection(db, "AccountData", userId, "userCards");
+            
+            const newCardData = {
                 productId: selectedProduct.id,
                 productName: selectedProduct.name,
                 customizedData: customValues,
                 logoUrl: logoUrl,
+                createdAt: serverTimestamp(),
+                linkedProfile: userId,
                 customizedSvg: displaySvg,
             };
             
-            const result = await saveCustomCard(userId, cardData);
+            const newCardDoc = await addDoc(userCardsRef, newCardData);
             
-            if (result.success) {
-                toast.dismiss(loadingToast);
-                toast.success("Card saved! Proceeding to checkout...");
+            toast.dismiss(loadingToast);
+            toast.success("Card saved! Proceeding to checkout...");
 
-                // Store cart item in sessionStorage
-                sessionStorage.setItem('cartItem', JSON.stringify({ 
-                    cardId: result.cardId, 
-                    price: selectedProduct.price 
-                }));
-                
-                setTimeout(() => router.push('/nfc-cards/checkout'), 1500);
-            } else {
-                throw new Error('Failed to save card');
-            }
+            // Store cart item in sessionStorage
+            sessionStorage.setItem('cartItem', JSON.stringify({ 
+                cardId: newCardDoc.id, 
+                price: selectedProduct.price 
+            }));
+            
+            setTimeout(() => router.push('/nfc-cards/checkout'), 1500);
 
         } catch (error) {
             console.error("❌ Error saving card:", error);
@@ -141,7 +169,16 @@ export default function CustomizePage() {
         return (
             <div className="pt-32 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-themeGreen mx-auto mb-4"></div>
-                <div>Loading products...</div>
+                <div>Loading products from Firebase...</div>
+            </div>
+        );
+    }
+
+    if (products.length === 0) {
+        return (
+            <div className="pt-32 text-center">
+                <div className="text-lg text-gray-600 mb-4">No products found in Firebase</div>
+                <div className="text-sm text-gray-500">Please add products to the NFCProducts collection</div>
             </div>
         );
     }
@@ -263,7 +300,7 @@ export default function CustomizePage() {
     );
 }
 
-// ✅ FIXED: Simplified Logo Uploader Component
+// Logo Uploader Component - Add missing useState import
 function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) {
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
@@ -272,19 +309,39 @@ function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) 
         const file = event.target.files?.[0];
         if (!file) return;
 
+        // Validate file
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select an image file');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            toast.error('Image size must be less than 5MB');
+            return;
+        }
+
         // Show preview immediately
         setPreview(URL.createObjectURL(file));
         onUploadStart();
 
         try {
-            // ✅ FIXED: Use utility function
-            const result = await uploadLogo(file, userId);
+            // Import Firebase Storage dynamically
+            const [
+                { ref, uploadBytes, getDownloadURL, getStorage },
+                { fireApp }
+            ] = await Promise.all([
+                import('firebase/storage'),
+                import('@/important/firebase')
+            ]);
+
+            const storage = getStorage(fireApp);
+            const fileName = `logo_${userId}_${Date.now()}.${file.name.split('.').pop()}`;
+            const storageRef = ref(storage, `nfc-logos/${fileName}`);
             
-            if (result.success) {
-                onUploadComplete(result.url);
-            } else {
-                throw new Error('Upload failed');
-            }
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            
+            onUploadComplete(downloadURL);
         } catch (error) {
             console.error('Logo upload failed:', error);
             toast.error(error.message || 'Failed to upload logo');
