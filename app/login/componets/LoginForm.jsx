@@ -1,3 +1,4 @@
+// app/login/componets/LoginForm.jsx - FIXED VERSION
 "use client"
 import { useDebounce } from "@/LocalHooks/useDebounce";
 import { fireApp } from "@/important/firebase";
@@ -9,13 +10,14 @@ import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { collection, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 export default function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { t, isInitialized, locale } = useTranslation();
     
     const [seePassword, setSeePassword] = useState(true);
@@ -32,6 +34,29 @@ export default function LoginForm() {
     
     const debouncedUsername = useDebounce(username, 500);
     const debouncedPassword = useDebounce(password, 500);
+
+    // Function to determine redirect URL
+    const getRedirectUrl = useCallback(() => {
+        // Check if there's a return URL in the query params
+        const returnUrl = searchParams?.get('returnUrl');
+        if (returnUrl) {
+            console.log('🔄 Using return URL:', returnUrl);
+            return returnUrl;
+        }
+
+        // Check if user came from NFC checkout
+        if (typeof window !== 'undefined') {
+            const referrer = document.referrer;
+            if (referrer.includes('/nfc-cards')) {
+                console.log('🔄 Came from NFC pages, redirecting to checkout');
+                return '/nfc-cards/checkout';
+            }
+        }
+
+        // Default to dashboard
+        console.log('🔄 Using default redirect: /dashboard');
+        return '/dashboard';
+    }, [searchParams]);
 
     const translations = useMemo(() => {
         if (!isInitialized) return {};
@@ -65,8 +90,11 @@ export default function LoginForm() {
                     setIsGoogleLoading(true);
                     setSessionCookie("adminLinker", result.userId, (60 * 60));
                     toast.success(translations.googleSignInSuccess);
+                    
+                    // Use context-aware redirect
+                    const redirectUrl = getRedirectUrl();
                     setTimeout(() => {
-                        router.push("/dashboard");
+                        router.push(redirectUrl);
                     }, 1000);
                 }
             } catch (error) {
@@ -75,7 +103,7 @@ export default function LoginForm() {
             }
         };
         checkRedirectResult();
-    }, [isInitialized, locale, translations, router]);
+    }, [isInitialized, locale, translations, router, getRedirectUrl]);
 
     const handleLogin = useCallback(async(e) => {
         e.preventDefault();
@@ -87,7 +115,12 @@ export default function LoginForm() {
         try {
             const userId = await loginAccount(data);
             setSessionCookie("adminLinker", `${userId}`, (60 * 60));
-            setTimeout(() => { router.push("/dashboard"); }, 1000);
+            
+            // Use context-aware redirect
+            const redirectUrl = getRedirectUrl();
+            setTimeout(() => { 
+                router.push(redirectUrl); 
+            }, 1000);
         } catch (error) {
             setIsLoading(false);
             let errorMsg = existingUsernames.includes(String(username).toLowerCase()) 
@@ -96,7 +129,7 @@ export default function LoginForm() {
             setErrorMessage(errorMsg);
             throw new Error(errorMsg);
         }
-    }, [canProceed, isLoading, username, password, existingUsernames, translations, router]);
+    }, [canProceed, isLoading, username, password, existingUsernames, translations, router, getRedirectUrl]);
 
     const handleGoogleSignIn = useCallback(async () => {
         if (isGoogleLoading || isLoading) return;
@@ -108,12 +141,17 @@ export default function LoginForm() {
             
             setSessionCookie("adminLinker", result.userId, (60 * 60));
             toast.success(translations.googleSignInSuccess);
-            setTimeout(() => { router.push("/dashboard"); }, 1000);
+            
+            // Use context-aware redirect
+            const redirectUrl = getRedirectUrl();
+            setTimeout(() => { 
+                router.push(redirectUrl); 
+            }, 1000);
         } catch (error) {
             setIsGoogleLoading(false);
             toast.error(error.message || translations.googleSignInFailed);
         }
-    }, [isGoogleLoading, isLoading, locale, translations, router]);
+    }, [isGoogleLoading, isLoading, locale, translations, router, getRedirectUrl]);
 
     const loginHandler = useCallback((e) => {
         e.preventDefault();
