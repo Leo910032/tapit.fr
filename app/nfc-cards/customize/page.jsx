@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - FIREBASE IMPORTS FIXED
+// app/nfc-cards/customize/page.jsx - FIREBASE IMPORTS FIXED FINAL
 "use client"
 
 import { useState, useEffect, useRef } from "react";
@@ -24,30 +24,35 @@ export default function CustomizePage() {
     const [logoUrl, setLogoUrl] = useState("");
     const [userId, setUserId] = useState(null);
 
-    // ✅ FIX: Client-side only Firebase operations
+    // ✅ FIX: Import Firebase correctly with proper error handling
     useEffect(() => {
         const initializePage = async () => {
             try {
                 // Check if we're on the client side
                 if (typeof window === 'undefined') return;
 
-                // Import Firebase modules dynamically only on client
-                const [
-                    { testForActiveSession },
-                    { collection, getDocs, getFirestore },
-                    { fireApp }
-                ] = await Promise.all([
-                    import('@/lib/authentication/testForActiveSession'),
-                    import('firebase/firestore'),
-                    import('@/important/firebase')
-                ]);
+                console.log('🔄 Starting Firebase initialization...');
 
-                // Check authentication
+                // ✅ FIXED: Import Firebase app first, then other modules
+                const { fireApp } = await import('@/important/firebase');
+                console.log('✅ Firebase app imported:', !!fireApp);
+
+                // ✅ FIXED: Import auth function
+                const { testForActiveSession } = await import('@/lib/authentication/testForActiveSession');
+                
+                // Check authentication first
                 const currentUserId = testForActiveSession(true);
+                console.log('👤 User ID:', currentUserId);
                 setUserId(currentUserId);
 
-                // Initialize Firestore
+                // ✅ FIXED: Import Firestore modules separately and initialize properly
+                const { getFirestore, collection, getDocs } = await import('firebase/firestore');
+                
+                console.log('🔄 Initializing Firestore...');
                 const db = getFirestore(fireApp);
+                console.log('✅ Firestore initialized');
+
+                console.log('🔄 Fetching products...');
                 const productsRef = collection(db, "NFCProducts");
                 const querySnapshot = await getDocs(productsRef);
                 
@@ -59,6 +64,7 @@ export default function CustomizePage() {
                     });
                 });
 
+                console.log('✅ Products fetched:', fetchedProducts.length);
                 setProducts(fetchedProducts);
                 
                 if (fetchedProducts.length > 0) {
@@ -66,14 +72,20 @@ export default function CustomizePage() {
                     handleProductSelect(firstProduct); 
                 }
             } catch (error) {
-                console.error("Error initializing page:", error);
-                toast.error("Failed to load products from Firebase");
+                console.error("❌ Error initializing page:", error);
+                console.error("Error details:", {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
+                toast.error(`Failed to load: ${error.message}`);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        initializePage();
+        // Add delay to ensure DOM is ready
+        setTimeout(initializePage, 100);
     }, []);
 
     // Effect to update the SVG preview
@@ -121,15 +133,13 @@ export default function CustomizePage() {
         const loadingToast = toast.loading("Saving your custom card...");
 
         try {
-            // Import Firebase modules dynamically
-            const [
-                { collection, addDoc, serverTimestamp, getFirestore },
-                { fireApp }
-            ] = await Promise.all([
-                import('firebase/firestore'),
-                import('@/important/firebase')
-            ]);
+            console.log('🔄 Starting save process...');
 
+            // ✅ FIXED: Import Firebase modules properly for saving
+            const { fireApp } = await import('@/important/firebase');
+            const { getFirestore, collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+
+            console.log('🔄 Initializing Firestore for save...');
             const db = getFirestore(fireApp);
             const userCardsRef = collection(db, "AccountData", userId, "userCards");
             
@@ -143,7 +153,9 @@ export default function CustomizePage() {
                 customizedSvg: displaySvg,
             };
             
+            console.log('🔄 Saving card data...');
             const newCardDoc = await addDoc(userCardsRef, newCardData);
+            console.log('✅ Card saved with ID:', newCardDoc.id);
             
             toast.dismiss(loadingToast);
             toast.success("Card saved! Proceeding to checkout...");
@@ -158,6 +170,10 @@ export default function CustomizePage() {
 
         } catch (error) {
             console.error("❌ Error saving card:", error);
+            console.error("Save error details:", {
+                message: error.message,
+                stack: error.stack
+            });
             toast.dismiss(loadingToast);
             toast.error(error.message || "Something went wrong. Please try again.");
         } finally {
@@ -177,8 +193,8 @@ export default function CustomizePage() {
     if (products.length === 0) {
         return (
             <div className="pt-32 text-center">
-                <div className="text-lg text-gray-600 mb-4">No products found in Firebase</div>
-                <div className="text-sm text-gray-500">Please add products to the NFCProducts collection</div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">No products found in Firebase</h1>
+                <p className="text-gray-600">Please add products to the NFCProducts collection</p>
             </div>
         );
     }
@@ -300,7 +316,7 @@ export default function CustomizePage() {
     );
 }
 
-// Logo Uploader Component - Add missing useState import
+// Logo Uploader Component
 function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) {
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
@@ -325,25 +341,32 @@ function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) 
         onUploadStart();
 
         try {
-            // Import Firebase Storage dynamically
-            const [
-                { ref, uploadBytes, getDownloadURL, getStorage },
-                { fireApp }
-            ] = await Promise.all([
-                import('firebase/storage'),
-                import('@/important/firebase')
-            ]);
+            console.log('🔄 Starting logo upload...');
 
+            // ✅ FIXED: Import Firebase Storage properly
+            const { fireApp } = await import('@/important/firebase');
+            const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+
+            console.log('🔄 Initializing Storage...');
             const storage = getStorage(fireApp);
+            
             const fileName = `logo_${userId}_${Date.now()}.${file.name.split('.').pop()}`;
             const storageRef = ref(storage, `nfc-logos/${fileName}`);
             
+            console.log('🔄 Uploading file...');
             const snapshot = await uploadBytes(storageRef, file);
+            
+            console.log('🔄 Getting download URL...');
             const downloadURL = await getDownloadURL(snapshot.ref);
             
+            console.log('✅ Logo uploaded successfully:', downloadURL);
             onUploadComplete(downloadURL);
         } catch (error) {
-            console.error('Logo upload failed:', error);
+            console.error('❌ Logo upload failed:', error);
+            console.error("Upload error details:", {
+                message: error.message,
+                stack: error.stack
+            });
             toast.error(error.message || 'Failed to upload logo');
             onUploadComplete(null);
         }
