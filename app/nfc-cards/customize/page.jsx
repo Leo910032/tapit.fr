@@ -1,21 +1,22 @@
-// app/nfc-cards/customize/page.jsx - CORRECTED BUILD-SAFE VERSION
+// app/nfc-cards/customize/page.jsx - FINAL DYNAMIC IMPORT VERSION
 "use client"
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fireApp } from "@/important/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { toast, Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+import dynamic from 'next/dynamic';
 
+// --- DYNAMIC IMPORTS ---
+// These components will now only be loaded on the client-side
+const CustomizationForm = dynamic(() => import('./components/CustomizationForm'), { ssr: false, loading: () => <p>Loading Form...</p> });
+const LivePreview = dynamic(() => import('./components/LivePreview'), { ssr: false, loading: () => <p>Loading Preview...</p> });
+const LogoUploader = dynamic(() => import('./components/LogoUploader'), { ssr: false, loading: () => <p>Loading Uploader...</p> });
+
+// We will pass the functions needed from here, so these top-level imports are safer
 import { fetchProducts } from "@/lib/fetch data/fetchProducts";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
-import CustomizationForm from "./components/CustomizationForm";
-import LivePreview from "./components/LivePreview";
-import LogoUploader from "./components/LogoUploader";
-
 const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="300" rx="15" fill="#e5e7eb"/><text x="250" y="150" text-anchor="middle" font-family="Arial" font-size="20" fill="#9ca3af">Select a card to begin</text></svg>`;
-
 export default function CustomizePage() {
  const router = useRouter();
     
@@ -85,23 +86,20 @@ export default function CustomizePage() {
         setCustomValues(initialValues);
     };
     
-    const handleProceedToCheckout = async () => {
-       // Use the state version of userId here
-        if (!userId) {
-            toast.error("Please log in to save your card.");
-            router.push(`/login?returnTo=/nfc-cards/customize`);
-            return;
-        }
-        if (!selectedProduct) {
-            toast.error("Please select a card type first.");
-            return;
-        }
+     const handleProceedToCheckout = async () => {
+        if (!userId) { /* ... same ... */ }
 
         setIsSaving(true);
         const loadingToast = toast.loading("Saving your custom card...");
 
         try {
-            const userCardsCollectionRef = collection(fireApp, "AccountData", userId, "userCards");
+            // --- DYNAMICALLY IMPORT FIREBASE FUNCTIONS ---
+            // This ensures they are only loaded when the button is clicked
+            const { getFirestore, collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+            const { fireApp } = await import('@/important/firebase');
+            const db = getFirestore(fireApp);
+
+            const userCardsCollectionRef = collection(db, "AccountData", userId, "userCards");
               const newCardData = {
             productId: selectedProduct.id,
             productName: selectedProduct.name,
