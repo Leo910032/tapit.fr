@@ -1,4 +1,4 @@
-// app/login/componets/LoginForm.jsx - FIXED VERSION
+// app/login/components/LoginForm.jsx - Add return URL handling
 "use client"
 import { useDebounce } from "@/LocalHooks/useDebounce";
 import { fireApp } from "@/important/firebase";
@@ -6,18 +6,19 @@ import { loginAccount } from "@/lib/authentication/login";
 import { signInWithGoogle, handleGoogleRedirectResult } from "@/lib/authentication/googleAuth";
 import { setSessionCookie } from "@/lib/authentication/session";
 import { useTranslation } from "@/lib/useTranslation";
-import GoogleSignInButton from "@/components/GoogleSignInButton";
+import GoogleSignInButton from "@/app/components/GoogleSignInButton";
 import { collection, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef, Suspense } from "react";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
-export default function LoginForm() {
+function LoginFormContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const returnTo = searchParams.get('returnTo') || '/dashboard';
     const { t, isInitialized, locale } = useTranslation();
     
     const [seePassword, setSeePassword] = useState(true);
@@ -34,29 +35,6 @@ export default function LoginForm() {
     
     const debouncedUsername = useDebounce(username, 500);
     const debouncedPassword = useDebounce(password, 500);
-
-    // Function to determine redirect URL
-    const getRedirectUrl = useCallback(() => {
-        // Check if there's a return URL in the query params
-        const returnUrl = searchParams?.get('returnUrl');
-        if (returnUrl) {
-            console.log('🔄 Using return URL:', returnUrl);
-            return returnUrl;
-        }
-
-        // Check if user came from NFC checkout
-        if (typeof window !== 'undefined') {
-            const referrer = document.referrer;
-            if (referrer.includes('/nfc-cards')) {
-                console.log('🔄 Came from NFC pages, redirecting to checkout');
-                return '/nfc-cards/checkout';
-            }
-        }
-
-        // Default to dashboard
-        console.log('🔄 Using default redirect: /dashboard');
-        return '/dashboard';
-    }, [searchParams]);
 
     const translations = useMemo(() => {
         if (!isInitialized) return {};
@@ -90,11 +68,8 @@ export default function LoginForm() {
                     setIsGoogleLoading(true);
                     setSessionCookie("adminLinker", result.userId, (60 * 60));
                     toast.success(translations.googleSignInSuccess);
-                    
-                    // Use context-aware redirect
-                    const redirectUrl = getRedirectUrl();
                     setTimeout(() => {
-                        router.push(redirectUrl);
+                        router.push(returnTo);
                     }, 1000);
                 }
             } catch (error) {
@@ -103,7 +78,7 @@ export default function LoginForm() {
             }
         };
         checkRedirectResult();
-    }, [isInitialized, locale, translations, router, getRedirectUrl]);
+    }, [isInitialized, locale, translations, router, returnTo]);
 
     const handleLogin = useCallback(async(e) => {
         e.preventDefault();
@@ -115,11 +90,9 @@ export default function LoginForm() {
         try {
             const userId = await loginAccount(data);
             setSessionCookie("adminLinker", `${userId}`, (60 * 60));
-            
-            // Use context-aware redirect
-            const redirectUrl = getRedirectUrl();
             setTimeout(() => { 
-                router.push(redirectUrl); 
+                console.log('🔄 Redirecting to:', returnTo);
+                router.push(returnTo); 
             }, 1000);
         } catch (error) {
             setIsLoading(false);
@@ -129,7 +102,7 @@ export default function LoginForm() {
             setErrorMessage(errorMsg);
             throw new Error(errorMsg);
         }
-    }, [canProceed, isLoading, username, password, existingUsernames, translations, router, getRedirectUrl]);
+    }, [canProceed, isLoading, username, password, existingUsernames, translations, router, returnTo]);
 
     const handleGoogleSignIn = useCallback(async () => {
         if (isGoogleLoading || isLoading) return;
@@ -141,17 +114,15 @@ export default function LoginForm() {
             
             setSessionCookie("adminLinker", result.userId, (60 * 60));
             toast.success(translations.googleSignInSuccess);
-            
-            // Use context-aware redirect
-            const redirectUrl = getRedirectUrl();
             setTimeout(() => { 
-                router.push(redirectUrl); 
+                console.log('🔄 Redirecting to:', returnTo);
+                router.push(returnTo); 
             }, 1000);
         } catch (error) {
             setIsGoogleLoading(false);
             toast.error(error.message || translations.googleSignInFailed);
         }
-    }, [isGoogleLoading, isLoading, locale, translations, router, getRedirectUrl]);
+    }, [isGoogleLoading, isLoading, locale, translations, router, returnTo]);
 
     const loginHandler = useCallback((e) => {
         e.preventDefault();
@@ -195,6 +166,11 @@ export default function LoginForm() {
             </Link>
             <section className="mx-auto py-10 w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-1/2 flex-1 flex flex-col justify-center">
                 <p className="text-2xl sm:text-5xl md:text-3xl font-extrabold text-center">{translations.title}</p>
+                {returnTo !== '/dashboard' && (
+                    <p className="text-center text-blue-600 mt-2 text-sm">
+                        You'll be redirected back to complete your purchase
+                    </p>
+                )}
                 <div className="py-8 sm:py-12 flex flex-col gap-4 sm:gap-6 w-full">
                     <GoogleSignInButton onClick={handleGoogleSignIn} isLoading={isGoogleLoading} disabled={isLoading || isGoogleLoading} text={translations.continueWithGoogle} />
                     <div className="flex items-center gap-4 my-2">
@@ -217,8 +193,19 @@ export default function LoginForm() {
                         {!isLoading && !isGoogleLoading && errorMessage && <span className="text-sm text-red-500 text-center">{errorMessage}</span>}
                     </form>
                 </div>
-                <p className="text-center sm:text-base text-sm"><span className="opacity-60">{translations.noAccount}</span> <Link href={"/signup"} className="text-themeGreen">{translations.signUp}</Link> </p>
+                <p className="text-center sm:text-base text-sm">
+                    <span className="opacity-60">{translations.noAccount}</span> 
+                    <Link href={`/signup${returnTo !== '/dashboard' ? `?returnTo=${returnTo}` : ''}`} className="text-themeGreen"> {translations.signUp}</Link>
+                </p>
             </section>
         </div>
     )
+}
+
+export default function LoginForm() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <LoginFormContent />
+        </Suspense>
+    );
 }
