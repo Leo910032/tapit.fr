@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - FULLY REFACTORED
+// app/nfc-cards/customize/page.jsx - NEW DYNAMIC VERSION
 "use client"
 
 import { useState, useEffect } from "react";
@@ -10,7 +10,6 @@ import { toast, Toaster } from "react-hot-toast";
 import { fetchProducts } from "@/lib/fetch data/fetchProducts";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
-// Import the new components
 import CustomizationForm from "./components/CustomizationForm";
 import LivePreview from "./components/LivePreview";
 
@@ -19,47 +18,68 @@ const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/sv
 export default function CustomizePage() {
     const router = useRouter();
     
-    // State for data and page status
+    // Page state
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
 
-    // State for user's customization inputs
-    const [userName, setUserName] = useState("Your Name");
-    const [companyName, setCompanyName] = useState("Your Company");
+    // DYNAMIC STATE: A single object to hold all custom field values
+    const [customValues, setCustomValues] = useState({});
     const [displaySvg, setDisplaySvg] = useState(DEFAULT_SVG);
 
-    // Fetch products when the page loads
+    // Fetch products
     useEffect(() => {
         const getProducts = async () => {
             const fetchedProducts = await fetchProducts();
             setProducts(fetchedProducts);
             if (fetchedProducts.length > 0) {
-                setSelectedProduct(fetchedProducts[0]); // Auto-select the first product
+                const firstProduct = fetchedProducts[0];
+                setSelectedProduct(firstProduct);
+                // Initialize state with default values from the first product
+                const initialValues = {};
+                firstProduct.customizableFields?.forEach(field => {
+                    initialValues[field.id] = field.defaultValue || '';
+                });
+                setCustomValues(initialValues);
             }
             setIsLoading(false);
         };
         getProducts();
     }, []);
 
-    // This effect runs whenever the user's input or the selected product changes
+    // Effect to update SVG preview - THIS IS NOW DYNAMIC
     useEffect(() => {
         if (!selectedProduct || !selectedProduct.templateSvg) {
             setDisplaySvg(DEFAULT_SVG);
             return;
         }
-        
-        // Start with the clean template from the selected product
+
         let updatedSvg = selectedProduct.templateSvg;
-        
-        // Replace placeholders with current state values
-        updatedSvg = updatedSvg.replace(/__USER_NAME__/g, userName || "");
-        updatedSvg = updatedSvg.replace(/__COMPANY_NAME__/g, companyName || "");
+        // Loop through the fields defined in the product data
+        selectedProduct.customizableFields?.forEach(field => {
+            const value = customValues[field.id] || '';
+            // Use a RegExp with 'g' flag to replace all occurrences
+            updatedSvg = updatedSvg.replace(new RegExp(field.placeholderKey, 'g'), value);
+        });
         
         setDisplaySvg(updatedSvg);
-    }, [userName, companyName, selectedProduct]);
+    }, [customValues, selectedProduct]);
 
+    // Handle updates from the form component
+    const handleCustomValueChange = (fieldId, value) => {
+        setCustomValues(prev => ({ ...prev, [fieldId]: value }));
+    };
+    
+    // When a new product is selected, reset the customValues state
+    const handleProductSelect = (product) => {
+        setSelectedProduct(product);
+        const initialValues = {};
+        product.customizableFields?.forEach(field => {
+            initialValues[field.id] = field.defaultValue || '';
+        });
+        setCustomValues(initialValues);
+    };
     const handleProceedToCheckout = async () => {
         const userId = testForActiveSession(true);
         if (!userId) {
@@ -78,14 +98,13 @@ export default function CustomizePage() {
         try {
             const userCardsCollectionRef = collection(fireApp, "AccountData", userId, "userCards");
             const newCardData = {
-                productId: selectedProduct.id,
-                productName: selectedProduct.name,
-                customName: userName.trim(),
-                companyName: companyName.trim(),
-                createdAt: serverTimestamp(),
-                linkedProfile: userId,
-                customizedSvg: displaySvg, // Save the final, generated SVG
-            };
+            productId: selectedProduct.id,
+            productName: selectedProduct.name,
+            customizedData: customValues, // Store the object with all custom values
+            createdAt: serverTimestamp(),
+            linkedProfile: testForActiveSession(true),
+            customizedSvg: displaySvg,
+        };
 
             const newCardDoc = await addDoc(userCardsCollectionRef, newCardData);
             toast.dismiss(loadingToast);
@@ -106,18 +125,16 @@ export default function CustomizePage() {
         return <div className="pt-32 text-center">Loading products...</div>;
     }
 
-    return (
+  return (
         <div className="container mx-auto px-4 pt-32 pb-16">
             <Toaster position="bottom-center" />
             <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12">
                 <CustomizationForm
                     products={products}
                     selectedProduct={selectedProduct}
-                    userName={userName}
-                    companyName={companyName}
-                    onProductSelect={setSelectedProduct}
-                    onUserNameChange={setUserName}
-                    onCompanyNameChange={setCompanyName}
+                    customValues={customValues}
+                    onProductSelect={handleProductSelect} // Pass the new handler
+                    onCustomValueChange={handleCustomValueChange}
                 />
                 <LivePreview
                     displaySvg={displaySvg}

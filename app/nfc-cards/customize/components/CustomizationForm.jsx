@@ -1,30 +1,35 @@
+// app/nfc-cards/customize/components/CustomizationForm.jsx - NEW DYNAMIC VERSION
 "use client";
 import Image from "next/image";
 
 export default function CustomizationForm({
     products,
     selectedProduct,
-    userName,
-    companyName,
+    customValues,
     onProductSelect,
-    onUserNameChange,
-    onCompanyNameChange,
+    onCustomValueChange,
 }) {
     return (
         <div>
-            {/* Step 1: Personalization Inputs */}
+            {/* Step 1: Personalization Inputs - NOW DYNAMIC */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Step 1: Personalize Your Card</h1>
                 <p className="text-gray-600">Enter the details you want to appear on the card.</p>
                 <div className="mt-6 space-y-4">
-                    <div>
-                        <label htmlFor="userName" className="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" id="userName" value={userName} onChange={(e) => onUserNameChange(e.target.value)} className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-themeGreen"/>
-                    </div>
-                    <div>
-                        <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Company / Title</label>
-                        <input type="text" id="companyName" value={companyName} onChange={(e) => onCompanyNameChange(e.target.value)} className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-themeGreen"/>
-                    </div>
+                    {/* Loop through fields from Firestore data to generate the form */}
+                    {selectedProduct?.customizableFields?.map(field => (
+                        <div key={field.id}>
+                            <label htmlFor={field.id} className="block text-sm font-medium text-gray-700">{field.label}</label>
+                            <input
+                                type="text"
+                                id={field.id}
+                                placeholder={field.placeholder}
+                                value={customValues[field.id] || ''}
+                                onChange={(e) => onCustomValueChange(field.id, e.target.value)}
+                                className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-themeGreen"
+                            />
+                        </div>
+                    ))}
                 </div>
             </div>
 
