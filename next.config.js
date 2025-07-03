@@ -7,6 +7,7 @@ const nextConfig = {
   // REMOVED: output: 'standalone',
 
   images: {
+        dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: 'https',
