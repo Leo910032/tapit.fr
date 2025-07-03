@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - FINAL VERSION
+// app/nfc-cards/customize/page.jsx - UPDATED VERSION
 "use client"
 
 import { useState, useEffect } from "react";
@@ -11,76 +11,89 @@ import { toast, Toaster } from "react-hot-toast";
 import { fetchProducts } from "@/lib/fetch data/fetchProducts";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
+// Base SVG template - in a real app, this would come from the selectedProduct
+const BASE_SVG_TEMPLATE = `
+<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg" font-family="Arial">
+  <rect x="0" y="0" width="500" height="300" rx="15" ry="15" fill="#D4AF37" /><linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFD700" /><stop offset="25%" stop-color="#FFDF00" /><stop offset="50%" stop-color="#D4AF37" /><stop offset="75%" stop-color="#CFB53B" /><stop offset="100%" stop-color="#C5B358" /></linearGradient><rect x="0" y="0" width="500" height="300" rx="15" ry="15" fill="url(#goldGradient)" opacity="0.8" /><g opacity="0.2"><rect x="50" y="20" width="400" height="5" fill="#FFFFFF" /><rect x="100" y="40" width="300" height="3" fill="#FFFFFF" /></g>
+  <text x="30" y="60" font-size="28" font-weight="bold" fill="#FFFFFF" fill-opacity="0.9">__USER_NAME__</text>
+  <text x="30" y="90" font-size="18" fill="#FFFFFF" fill-opacity="0.7">__COMPANY_NAME__</text>
+  <text x="470" y="280" text-anchor="end" font-size="16" font-weight="bold" fill="#FFFFFF" fill-opacity="0.6">Tapit.fr</text>
+</svg>
+`;
+
 export default function CustomizePage() {
     const router = useRouter();
     
-    // State for managing products from Firestore
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
-    // State for user's customization
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [customName, setCustomName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
 
-    // Fetch products from Firestore when the component mounts
+    // --- NEW STATE for customization ---
+    const [userName, setUserName] = useState("Your Name");
+    const [companyName, setCompanyName] = useState("Your Company");
+    const [displaySvg, setDisplaySvg] = useState(BASE_SVG_TEMPLATE);
+
     useEffect(() => {
         const getProducts = async () => {
             const fetchedProducts = await fetchProducts();
             setProducts(fetchedProducts);
+            // Pre-select the first product for a better UX
+            if (fetchedProducts.length > 0) {
+                setSelectedProduct(fetchedProducts[0]);
+            }
             setIsLoading(false);
         };
         getProducts();
     }, []);
 
-    const handleAddToCart = async () => {
-        // 1. Check for authentication
-        const userId = testForActiveSession(true); // true = skip redirect
+    // --- NEW useEffect to update the SVG preview in real-time ---
+    useEffect(() => {
+        let updatedSvg = BASE_SVG_TEMPLATE;
+        // In a real app, you'd get the template from `selectedProduct.templateSvg`
+        
+        updatedSvg = updatedSvg.replace('__USER_NAME__', userName || "Your Name");
+        updatedSvg = updatedSvg.replace('__COMPANY_NAME__', companyName || "Your Company");
+        
+        setDisplaySvg(updatedSvg);
+    }, [userName, companyName, selectedProduct]); // Re-run when inputs or product change
+
+    const handleProceedToCheckout = async () => {
+        const userId = testForActiveSession(true);
         if (!userId) {
             toast.error("Please log in to customize a card.");
-            // Redirect to login, passing the current page as the return destination
             router.push(`/login?returnTo=/nfc-cards/customize`);
             return;
         }
 
-        // 2. Validate user input
         if (!selectedProduct) {
             toast.error("Please select a card type first.");
             return;
         }
-        if (!customName.trim()) {
-            toast.error("Please give your card a name.");
-            return;
-        }
 
         setIsSaving(true);
-        const loadingToast = toast.loading("Adding to your account...");
+        const loadingToast = toast.loading("Saving your custom card...");
 
         try {
-            // 3. Define the path to the user's sub-collection
-            // This creates a new 'userCards' collection for each user if it doesn't exist
             const userCardsCollectionRef = collection(fireApp, "AccountData", userId, "userCards");
 
-            // 4. Prepare the data to be saved
             const newCardData = {
-                productId: selectedProduct.id,      // e.g., "metal-premium-001"
-                productName: selectedProduct.name,  // e.g., "Premium Metal Card"
-                customName: customName.trim(),      // The name the user gave it
-                createdAt: serverTimestamp(),       // Firestore server timestamp
-                linkedProfile: userId,              // The user's main profile this card will link to
-                // Add more customization fields here in the future (e.g., color, logoUrl)
+                productId: selectedProduct.id,
+                productName: selectedProduct.name,
+                customName: userName.trim(), // Using the user's name as the card name
+                companyName: companyName.trim(),
+                createdAt: serverTimestamp(),
+                linkedProfile: userId,
+                // --- NEW: Store the final, customized SVG string ---
+                customizedSvg: displaySvg,
             };
 
-            // 5. Add the new document to Firestore
             const newCardDoc = await addDoc(userCardsCollectionRef, newCardData);
-            console.log("✅ New card saved with ID:", newCardDoc.id);
             toast.dismiss(loadingToast);
-            toast.success("Card added! Redirecting to checkout...");
+            toast.success("Card saved! Redirecting to checkout...");
 
-            // 6. Add the new card ID to session storage for the checkout page to use
             sessionStorage.setItem('cartItem', JSON.stringify({ cardId: newCardDoc.id, price: selectedProduct.price }));
 
-            // 7. Redirect to the checkout page
             setTimeout(() => {
                 router.push('/nfc-cards/checkout');
             }, 1500);
@@ -100,56 +113,57 @@ export default function CustomizePage() {
     return (
         <div className="container mx-auto px-4 pt-32 pb-16">
             <Toaster position="bottom-center" />
-            <div className="max-w-3xl mx-auto">
-                {/* Step 1: Choose Card Type */}
-                <div className="mb-12">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Step 1: Choose Your Card</h1>
-                    <p className="text-gray-600">Select the type of card youd like to personalize.</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                        {products.map((product) => (
-                            <div 
-                                key={product.id}
-                                onClick={() => setSelectedProduct(product)}
-                                className={`p-6 bg-white rounded-lg border-2 cursor-pointer transition-all ${selectedProduct?.id === product.id ? 'border-themeGreen shadow-lg scale-105' : 'border-gray-200 hover:border-gray-400'}`}
-                            >
-                                <Image src={product.image} alt={product.name} width={400} height={250} className="rounded-md w-full object-cover mb-4" />
-                                <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
-                                <p className="text-gray-500 text-sm my-2">{product.description}</p>
-                                <p className="text-2xl font-bold text-gray-900">${product.price}</p>
+            <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12">
+                {/* Left Side: Inputs */}
+                <div>
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Step 1: Personalize Your Card</h1>
+                        <p className="text-gray-600">Enter the details you want to appear on the card.</p>
+                        <div className="mt-6 space-y-4">
+                            <div>
+                                <label htmlFor="userName" className="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" id="userName" value={userName} onChange={(e) => setUserName(e.target.value)} className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-themeGreen"/>
                             </div>
-                        ))}
+                            <div>
+                                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">Company / Title</label>
+                                <input type="text" id="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-themeGreen"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Step 2: Choose Card Type</h2>
+                        <p className="text-gray-600">The design will adapt to the card you select.</p>
+                        <div className="space-y-4 mt-6">
+                            {products.map((product) => (
+                                <div key={product.id} onClick={() => setSelectedProduct(product)} className={`p-4 bg-white rounded-lg border-2 flex items-center gap-4 cursor-pointer transition-all ${selectedProduct?.id === product.id ? 'border-themeGreen shadow-md' : 'border-gray-200'}`}>
+                                    <Image src={product.image} alt={product.name} width={100} height={60} className="rounded-md object-cover"/>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-800">{product.name}</h3>
+                                        <p className="text-lg font-bold text-gray-900">${product.price}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Step 2: Personalize (only shows after a card is selected) */}
-                {selectedProduct && (
-                    <div className="bg-white p-8 rounded-lg shadow-md border animate-fade-in">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Step 2: Personalize It</h2>
-                        <p className="text-gray-600 mb-6">Give your <span className="font-semibold">{selectedProduct.name}</span> a unique name.</p>
-                        
-                        <div>
-                            <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 mb-1">
-                                Card Name (e.g., My Work Card)
-                            </label>
-                            <input
-                                type="text"
-                                id="cardName"
-                                value={customName}
-                                onChange={(e) => setCustomName(e.target.value)}
-                                placeholder="Enter a name for your card"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-themeGreen focus:border-themeGreen"
-                            />
-                        </div>
-
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={isSaving || !customName.trim()}
-                            className="w-full mt-8 bg-themeGreen text-white px-8 py-4 rounded-lg font-semibold hover:scale-105 active:scale-95 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        >
-                            {isSaving ? "Saving..." : `Add to Cart & Checkout ($${selectedProduct.price})`}
-                        </button>
-                    </div>
-                )}
+                {/* Right Side: Preview & Checkout */}
+                <div className="sticky top-32 h-fit">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">Live Preview</h2>
+                    {/* --- NEW: SVG Preview using dangerouslySetInnerHTML --- */}
+                    <div
+                        className="w-full aspect-[500/300] bg-gray-100 rounded-lg overflow-hidden shadow-lg"
+                        dangerouslySetInnerHTML={{ __html: displaySvg }}
+                    />
+                    
+                    <button
+                        onClick={handleProceedToCheckout}
+                        disabled={isSaving || !selectedProduct}
+                        className="w-full mt-8 bg-themeGreen text-white px-8 py-4 rounded-lg font-semibold text-lg hover:scale-105 active:scale-95 transition-transform disabled:bg-gray-400"
+                    >
+                        {isSaving ? "Saving..." : `Save & Proceed to Checkout ($${selectedProduct?.price || '0.00'})`}
+                    </button>
+                </div>
             </div>
         </div>
     );
