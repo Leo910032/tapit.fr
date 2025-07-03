@@ -47,7 +47,7 @@ export default function MyCards() {
     }
 
     if (userCards.length === 0) {
-        return <p>You haven't created any custom cards yet.</p>;
+        return <p>You havent created any custom cards yet.</p>;
     }
 
     return (
