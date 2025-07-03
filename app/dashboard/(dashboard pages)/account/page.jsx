@@ -1,9 +1,10 @@
-// app/dashboard/(dashboard pages)/account/page.jsx - VERSION MISE À JOUR
+// app/dashboard/(dashboard pages)/account/page.jsx - FINAL UPDATED VERSION
 "use client"; 
 
 import { useTranslation } from '@/lib/useTranslation';
 import ManageTeamSection from './components/ManageTeamSection';
 import ContactInfoSection from './components/ContactInfoSection';
+import MyCards from './components/MyCards'; // <-- 1. IMPORT THE NEW COMPONENT
 
 export default function AccountPage() {
     const { t } = useTranslation();
@@ -23,6 +24,16 @@ export default function AccountPage() {
                 
                 {/* Contact Information Section */}
                 <ContactInfoSection />
+
+                {/* --- 2. ADD THE "MY CARDS" SECTION HERE --- */}
+                <div>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        My NFC Cards
+                    </h2>
+                    <div className="bg-white p-6 rounded-lg shadow-sm">
+                        <MyCards />
+                    </div>
+                </div>
                 
                 {/* Team Management Section */}
                 <div>
