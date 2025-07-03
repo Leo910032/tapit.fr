@@ -1,15 +1,17 @@
-// app/nfc-cards/customize/page.jsx - FINAL VERSION
+// app/nfc-cards/customize/page.jsx - CORRECTED VERSION
 "use client"
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { fireApp } from "@/important/firebase";
+import { getAuth } from "firebase/auth"; // 👈 1. IMPORT getAuth
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { toast, Toaster } from "react-hot-toast";
 
 import { fetchProducts } from "@/lib/fetch data/fetchProducts";
-import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
+// testForActiveSession is still useful for quick UI checks, but not for security-critical writes
+import { testForActiveSession } from "@/lib/authentication/testForActiveSession"; 
 
 export default function CustomizePage() {
     const router = useRouter();
@@ -34,16 +36,25 @@ export default function CustomizePage() {
     }, []);
 
     const handleAddToCart = async () => {
-        // 1. Check for authentication
-        const userId = testForActiveSession(true); // true = skip redirect
-        if (!userId) {
+        // --- START OF CHANGES ---
+        
+        // 2. Get the official Firebase Auth instance and the current user
+        const auth = getAuth(fireApp);
+        const currentUser = auth.currentUser;
+
+        // 3. Check for authentication using the official source
+        if (!currentUser) {
             toast.error("Please log in to customize a card.");
-            // Redirect to login, passing the current page as the return destination
             router.push(`/login?returnTo=/nfc-cards/customize`);
             return;
         }
+        
+        // 4. Use the correct, official UID for Firestore operations
+        const userId = currentUser.uid;
 
-        // 2. Validate user input
+        // --- END OF CHANGES ---
+
+        // Validate user input
         if (!selectedProduct) {
             toast.error("Please select a card type first.");
             return;
@@ -57,30 +68,24 @@ export default function CustomizePage() {
         const loadingToast = toast.loading("Adding to your account...");
 
         try {
-            // 3. Define the path to the user's sub-collection
-            // This creates a new 'userCards' collection for each user if it doesn't exist
+            // The path is now guaranteed to match the security rules
             const userCardsCollectionRef = collection(fireApp, "AccountData", userId, "userCards");
 
-            // 4. Prepare the data to be saved
             const newCardData = {
-                productId: selectedProduct.id,      // e.g., "metal-premium-001"
-                productName: selectedProduct.name,  // e.g., "Premium Metal Card"
-                customName: customName.trim(),      // The name the user gave it
-                createdAt: serverTimestamp(),       // Firestore server timestamp
-                linkedProfile: userId,              // The user's main profile this card will link to
-                // Add more customization fields here in the future (e.g., color, logoUrl)
+                productId: selectedProduct.id,
+                productName: selectedProduct.name,
+                customName: customName.trim(),
+                createdAt: serverTimestamp(),
+                linkedProfile: userId, // This is now the correct UID
             };
 
-            // 5. Add the new document to Firestore
             const newCardDoc = await addDoc(userCardsCollectionRef, newCardData);
             console.log("✅ New card saved with ID:", newCardDoc.id);
             toast.dismiss(loadingToast);
             toast.success("Card added! Redirecting to checkout...");
 
-            // 6. Add the new card ID to session storage for the checkout page to use
             sessionStorage.setItem('cartItem', JSON.stringify({ cardId: newCardDoc.id, price: selectedProduct.price }));
 
-            // 7. Redirect to the checkout page
             setTimeout(() => {
                 router.push('/nfc-cards/checkout');
             }, 1500);
