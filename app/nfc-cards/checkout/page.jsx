@@ -68,20 +68,20 @@ export default function CheckoutPage() {
                             <h3 className="font-semibold text-gray-800 mb-4">Continue to checkout:</h3>
                             <div className="space-y-3">
                                 <Link 
-                                    href="/login"
+                                    href="/login?returnTo=/nfc-cards/checkout"
                                     className="block w-full bg-themeGreen text-white px-6 py-3 rounded-lg font-semibold hover:scale-105 active:scale-95 transition-transform"
                                 >
                                     Login to Your Account
                                 </Link>
                                 <Link 
-                                    href="/signup"
+                                    href="/signup?returnTo=/nfc-cards/checkout"
                                     className="block w-full border-2 border-themeGreen text-themeGreen px-6 py-3 rounded-lg font-semibold hover:scale-105 active:scale-95 transition-transform hover:bg-themeGreen hover:text-white"
                                 >
                                     Create New Account
                                 </Link>
                             </div>
                             <p className="text-sm text-gray-500 mt-4">
-                                After login/signup, youll be redirected back here to complete your purchase
+                                After login/signup, you'll be redirected back here to complete your purchase
                             </p>
                         </div>
                         
