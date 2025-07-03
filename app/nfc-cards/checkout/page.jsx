@@ -19,24 +19,7 @@ export default function CheckoutPage() {
         return loggedIn;
     };
 
-    useEffect(() => {
-        console.log("📦 Checkout page mounted");
-        checkAuthStatus();
-        
-        // Check for session changes periodically to catch authentication
-        const interval = setInterval(() => {
-            const currentlyLoggedIn = checkAuthStatus();
-            
-            if (currentlyLoggedIn !== isLoggedIn) {
-                console.log("🔄 Auth status changed:", currentlyLoggedIn ? "Now logged in" : "Now logged out");
-                setIsLoggedIn(currentlyLoggedIn);
-            }
-        }, 1000);
-        
-        return () => {
-            clearInterval(interval);
-        };
-    }, []);
+ 
 
     if (isLoading) {
         return (
