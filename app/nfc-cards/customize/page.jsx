@@ -72,14 +72,20 @@ export default function CustomizePage() {
     };
     
     // When a new product is selected, reset the customValues state
-    const handleProductSelect = (product) => {
-        setSelectedProduct(product);
-        const initialValues = {};
-        product.customizableFields?.forEach(field => {
-            initialValues[field.id] = field.defaultValue || '';
-        });
-        setCustomValues(initialValues);
-    };
+   // app/nfc-cards/customize/page.jsx - UPDATED FUNCTION
+
+// When a new product is selected, reset the customValues state
+const handleProductSelect = (product) => {
+    setSelectedProduct(product);
+
+    // ✅ ADD THIS LOGIC HERE
+    // This resets the form fields to the default values of the NEWLY selected product.
+    const initialValues = {};
+    product.customizableFields?.forEach(field => {
+        initialValues[field.id] = field.defaultValue || '';
+    });
+    setCustomValues(initialValues);
+};
     const handleProceedToCheckout = async () => {
         const userId = testForActiveSession(true);
         if (!userId) {
