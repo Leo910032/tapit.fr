@@ -97,7 +97,7 @@ export default function CustomizePage() {
 
         try {
             const userCardsCollectionRef = collection(fireApp, "AccountData", userId, "userCards");
-            const newCardData = {
+          const newCardData = {
             productId: selectedProduct.id,
             productName: selectedProduct.name,
             customizedData: customValues, // Store the object with all custom values
@@ -105,7 +105,6 @@ export default function CustomizePage() {
             linkedProfile: testForActiveSession(true),
             customizedSvg: displaySvg,
         };
-
             const newCardDoc = await addDoc(userCardsCollectionRef, newCardData);
             toast.dismiss(loadingToast);
             toast.success("Card saved! Proceeding to checkout...");
@@ -125,7 +124,7 @@ export default function CustomizePage() {
         return <div className="pt-32 text-center">Loading products...</div>;
     }
 
-  return (
+     return (
         <div className="container mx-auto px-4 pt-32 pb-16">
             <Toaster position="bottom-center" />
             <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12">
