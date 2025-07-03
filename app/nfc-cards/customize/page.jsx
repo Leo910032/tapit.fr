@@ -104,7 +104,7 @@ export default function CustomizePage() {
                 {/* Step 1: Choose Card Type */}
                 <div className="mb-12">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Step 1: Choose Your Card</h1>
-                    <p className="text-gray-600">Select the type of card you'd like to personalize.</p>
+                    <p className="text-gray-600">Select the type of card youd like to personalize.</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         {products.map((product) => (
                             <div 
@@ -129,7 +129,7 @@ export default function CustomizePage() {
                         
                         <div>
                             <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 mb-1">
-                                Card Name (e.g., "My Work Card")
+                                Card Name (e.g., My Work Card)
                             </label>
                             <input
                                 type="text"
