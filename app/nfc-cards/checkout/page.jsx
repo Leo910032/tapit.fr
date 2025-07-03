@@ -81,7 +81,7 @@ export default function CheckoutPage() {
                                 </Link>
                             </div>
                             <p className="text-sm text-gray-500 mt-4">
-                                After login/signup, you'll be redirected back here to complete your purchase
+                                After login/signup, youll be redirected back here to complete your purchase
                             </p>
                         </div>
                         
