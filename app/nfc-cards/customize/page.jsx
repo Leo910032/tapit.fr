@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - CORRECTED DYNAMIC VERSION
+// app/nfc-cards/customize/page.jsx - FINAL VERSION WITH LOGO UPLOAD
 "use client"
 
 import { useState, useEffect } from "react";
@@ -10,20 +10,29 @@ import { toast, Toaster } from "react-hot-toast";
 import { fetchProducts } from "@/lib/fetch data/fetchProducts";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
 
+// Import all components
 import CustomizationForm from "./components/CustomizationForm";
 import LivePreview from "./components/LivePreview";
+import LogoUploader from "./components/LogoUploader";
 
 const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="300" rx="15" fill="#e5e7eb"/><text x="250" y="150" text-anchor="middle" font-family="Arial" font-size="20" fill="#9ca3af">Select a card to begin</text></svg>`;
 
 export default function CustomizePage() {
     const router = useRouter();
     
+    // Page status
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
+    
+    // Customization state
     const [customValues, setCustomValues] = useState({});
     const [displaySvg, setDisplaySvg] = useState(DEFAULT_SVG);
+    const [isUploading, setIsUploading] = useState(false);
+    const [logoUrl, setLogoUrl] = useState(""); // <-- State for the logo URL
+
+    const userId = testForActiveSession(true); // Get user ID once
 
     useEffect(() => {
         const getProducts = async () => {
@@ -39,19 +48,26 @@ export default function CustomizePage() {
         getProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
+    // Effect to update the SVG preview
     useEffect(() => {
         if (!selectedProduct || !selectedProduct.templateSvg) {
             setDisplaySvg(DEFAULT_SVG);
             return;
         }
         let updatedSvg = selectedProduct.templateSvg;
+        
+        // Replace text placeholders
         selectedProduct.customizableFields?.forEach(field => {
             const value = customValues[field.id] || '';
             updatedSvg = updatedSvg.replace(new RegExp(field.placeholderKey, 'g'), value);
         });
+
+        // ✅ Replace the logo placeholder
+        // Fallback to an empty string to prevent the 404 error
+        updatedSvg = updatedSvg.replace(/__LOGO_HREF__/g, logoUrl || "");
+        
         setDisplaySvg(updatedSvg);
-    }, [customValues, selectedProduct]);
+    }, [customValues, selectedProduct, logoUrl]); // Add logoUrl to dependencies
 
     const handleCustomValueChange = (fieldId, value) => {
         setCustomValues(prev => ({ ...prev, [fieldId]: value }));
@@ -84,14 +100,15 @@ export default function CustomizePage() {
 
         try {
             const userCardsCollectionRef = collection(fireApp, "AccountData", userId, "userCards");
-            const newCardData = {
-                productId: selectedProduct.id,
-                productName: selectedProduct.name,
-                customizedData: customValues,
-                createdAt: serverTimestamp(),
-                linkedProfile: userId,
-                customizedSvg: displaySvg,
-            };
+              const newCardData = {
+            productId: selectedProduct.id,
+            productName: selectedProduct.name,
+            customizedData: customValues,
+            logoUrl: logoUrl, // <-- Save the logo URL
+            createdAt: serverTimestamp(),
+            linkedProfile: userId,
+            customizedSvg: displaySvg,
+        };
             const newCardDoc = await addDoc(userCardsCollectionRef, newCardData);
             toast.dismiss(loadingToast);
             toast.success("Card saved! Proceeding to checkout...");
@@ -122,6 +139,20 @@ export default function CustomizePage() {
                     onProductSelect={handleProductSelect}
                     onCustomValueChange={handleCustomValueChange}
                 />
+                   <LogoUploader
+                        userId={userId}
+                        isUploading={isUploading}
+                        onUploadStart={() => setIsUploading(true)}
+                        onUploadComplete={(url) => {
+                            if (url) {
+                                setLogoUrl(url); // Update state with the new URL
+                                toast.success("Logo uploaded!");
+                            } else {
+                                toast.error("Logo upload failed.");
+                            }
+                            setIsUploading(false);
+                        }}
+                    />
                 <LivePreview
                     displaySvg={displaySvg}
                     isSaving={isSaving}
