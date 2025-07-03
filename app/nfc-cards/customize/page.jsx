@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - NEW DYNAMIC VERSION
+// app/nfc-cards/customize/page.jsx - CORRECTED DYNAMIC VERSION
 "use client"
 
 import { useState, useEffect } from "react";
@@ -18,74 +18,55 @@ const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/sv
 export default function CustomizePage() {
     const router = useRouter();
     
-    // Page state
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-
-    // DYNAMIC STATE: A single object to hold all custom field values
     const [customValues, setCustomValues] = useState({});
     const [displaySvg, setDisplaySvg] = useState(DEFAULT_SVG);
 
-    // Fetch products
     useEffect(() => {
         const getProducts = async () => {
             const fetchedProducts = await fetchProducts();
             setProducts(fetchedProducts);
             if (fetchedProducts.length > 0) {
                 const firstProduct = fetchedProducts[0];
-                setSelectedProduct(firstProduct);
-                // Initialize state with default values from the first product
-                const initialValues = {};
-                firstProduct.customizableFields?.forEach(field => {
-                    initialValues[field.id] = field.defaultValue || '';
-                });
-                setCustomValues(initialValues);
+                // Call the handler to properly initialize state for the first product
+                handleProductSelect(firstProduct); 
             }
             setIsLoading(false);
         };
         getProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Effect to update SVG preview - THIS IS NOW DYNAMIC
     useEffect(() => {
         if (!selectedProduct || !selectedProduct.templateSvg) {
             setDisplaySvg(DEFAULT_SVG);
             return;
         }
-
         let updatedSvg = selectedProduct.templateSvg;
-        // Loop through the fields defined in the product data
         selectedProduct.customizableFields?.forEach(field => {
             const value = customValues[field.id] || '';
-            // Use a RegExp with 'g' flag to replace all occurrences
             updatedSvg = updatedSvg.replace(new RegExp(field.placeholderKey, 'g'), value);
         });
-        
         setDisplaySvg(updatedSvg);
     }, [customValues, selectedProduct]);
 
-    // Handle updates from the form component
     const handleCustomValueChange = (fieldId, value) => {
         setCustomValues(prev => ({ ...prev, [fieldId]: value }));
     };
     
-    // When a new product is selected, reset the customValues state
-   // app/nfc-cards/customize/page.jsx - UPDATED FUNCTION
-
-// When a new product is selected, reset the customValues state
-const handleProductSelect = (product) => {
-    setSelectedProduct(product);
-
-    // ✅ ADD THIS LOGIC HERE
-    // This resets the form fields to the default values of the NEWLY selected product.
-    const initialValues = {};
-    product.customizableFields?.forEach(field => {
-        initialValues[field.id] = field.defaultValue || '';
-    });
-    setCustomValues(initialValues);
-};
+    // --- THIS IS THE SINGLE, CORRECTLY PLACED FUNCTION ---
+    const handleProductSelect = (product) => {
+        setSelectedProduct(product);
+        const initialValues = {};
+        product.customizableFields?.forEach(field => {
+            initialValues[field.id] = field.defaultValue || '';
+        });
+        setCustomValues(initialValues);
+    };
+    
     const handleProceedToCheckout = async () => {
         const userId = testForActiveSession(true);
         if (!userId) {
@@ -103,14 +84,14 @@ const handleProductSelect = (product) => {
 
         try {
             const userCardsCollectionRef = collection(fireApp, "AccountData", userId, "userCards");
-          const newCardData = {
-            productId: selectedProduct.id,
-            productName: selectedProduct.name,
-            customizedData: customValues, // Store the object with all custom values
-            createdAt: serverTimestamp(),
-            linkedProfile: testForActiveSession(true),
-            customizedSvg: displaySvg,
-        };
+            const newCardData = {
+                productId: selectedProduct.id,
+                productName: selectedProduct.name,
+                customizedData: customValues,
+                createdAt: serverTimestamp(),
+                linkedProfile: userId,
+                customizedSvg: displaySvg,
+            };
             const newCardDoc = await addDoc(userCardsCollectionRef, newCardData);
             toast.dismiss(loadingToast);
             toast.success("Card saved! Proceeding to checkout...");
@@ -138,7 +119,7 @@ const handleProductSelect = (product) => {
                     products={products}
                     selectedProduct={selectedProduct}
                     customValues={customValues}
-                    onProductSelect={handleProductSelect} // Pass the new handler
+                    onProductSelect={handleProductSelect}
                     onCustomValueChange={handleCustomValueChange}
                 />
                 <LivePreview
