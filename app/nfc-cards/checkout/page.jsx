@@ -1,4 +1,4 @@
-// app/nfc-cards/checkout/page.jsx - SIMPLE SOLUTION
+// app/nfc-cards/checkout/page.jsx - FINAL VERSION
 "use client"
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -10,11 +10,13 @@ export default function CheckoutPage() {
     const [isLoading, setIsLoading] = useState(true);
 
     const checkAuthStatus = () => {
-        const userId = testForActiveSession();
+        // Use skipRedirect=true to prevent automatic redirects
+        const userId = testForActiveSession(true);
         const loggedIn = !!userId;
         setIsLoggedIn(loggedIn);
         setIsLoading(false);
         console.log("🔍 Checkout auth check:", loggedIn ? "✅ Logged in" : "❌ Not logged in");
+        return loggedIn;
     };
 
     useEffect(() => {
@@ -23,8 +25,7 @@ export default function CheckoutPage() {
         
         // Check for session changes periodically to catch authentication
         const interval = setInterval(() => {
-            const userId = testForActiveSession();
-            const currentlyLoggedIn = !!userId;
+            const currentlyLoggedIn = checkAuthStatus();
             
             if (currentlyLoggedIn !== isLoggedIn) {
                 console.log("🔄 Auth status changed:", currentlyLoggedIn ? "Now logged in" : "Now logged out");
@@ -35,7 +36,7 @@ export default function CheckoutPage() {
         return () => {
             clearInterval(interval);
         };
-    }, [isLoggedIn]);
+    }, []);
 
     if (isLoading) {
         return (
@@ -47,7 +48,7 @@ export default function CheckoutPage() {
         );
     }
 
-    // If not logged in, show login instructions with links to regular login/signup
+    // If not logged in, show login instructions
     if (!isLoggedIn) {
         return (
             <div className="min-h-screen bg-gray-50">
@@ -80,7 +81,7 @@ export default function CheckoutPage() {
                                 </Link>
                             </div>
                             <p className="text-sm text-gray-500 mt-4">
-                                After login/signup, youl be redirected to complete your purchase
+                                After login/signup, you'll be redirected back here to complete your purchase
                             </p>
                         </div>
                         
