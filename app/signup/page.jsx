@@ -9,7 +9,7 @@ export const generateMetadata = () => {
     }
 }
 
-export default function LoginPage() {
+export default function SignupPage() {
 
     return (
         <div className="flex h-screen w-screen">
