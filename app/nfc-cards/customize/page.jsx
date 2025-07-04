@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - REFACTORED WITH COMPONENTS
+// app/nfc-cards/customize/page.jsx - ENHANCED WITH STYLE CUSTOMIZATION
 "use client"
 
 import { useState, useEffect } from "react";
@@ -9,6 +9,7 @@ import { Toaster, toast } from "react-hot-toast";
 import CustomizationForm from "./components/CustomizationForm";
 import LivePreview from "./components/LivePreview";
 import QRCodeGenerator from "./components/QRCodeGenerator";
+import StyleCustomizer from "./components/StyleCustomizer";
 import FirebaseService from "./utils/FirebaseService";
 
 const DEFAULT_SVG = `<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg"><rect width="500" height="300" rx="15" fill="#e5e7eb"/><text x="250" y="150" text-anchor="middle" font-family="Arial" font-size="20" fill="#9ca3af">Loading products...</text></svg>`;
@@ -24,13 +25,22 @@ export default function CustomizePage() {
     
     // Customization state
     const [customValues, setCustomValues] = useState({});
-    const [displaySvg, setDisplaySvg] = useState(DEFAULT_SVG);
+    const [frontSvg, setFrontSvg] = useState(DEFAULT_SVG);
+    const [backSvg, setBackSvg] = useState(DEFAULT_SVG);
     const [isUploading, setIsUploading] = useState(false);
     const [logoUrl, setLogoUrl] = useState("");
     const [userId, setUserId] = useState(null);
     const [username, setUsername] = useState(null);
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
-    const [currentView, setCurrentView] = useState("front");
+
+    // ✅ NEW: Style customization state
+    const [styleOptions, setStyleOptions] = useState({
+        backgroundColor: "#667eea",
+        textColor: "#ffffff",
+        textSize: "16",
+        logoSize: "50",
+        qrSize: "60"
+    });
 
     // Initialize Firebase and load data
     useEffect(() => {
@@ -68,50 +78,106 @@ export default function CustomizePage() {
         return () => clearTimeout(timeoutId);
     }, []);
 
-    // Update SVG preview when data changes
+    // ✅ ENHANCED: Update both front and back SVG previews
     useEffect(() => {
         if (!selectedProduct) {
-            setDisplaySvg(DEFAULT_SVG);
+            setFrontSvg(DEFAULT_SVG);
+            setBackSvg(DEFAULT_SVG);
             return;
         }
         
-        const templateSvg = currentView === "front" 
-            ? selectedProduct.templateSvg 
-            : selectedProduct.backTemplateSvg || selectedProduct.templateSvg;
-        
-        if (!templateSvg) {
-            setDisplaySvg(DEFAULT_SVG);
-            return;
-        }
-        
-        let updatedSvg = templateSvg;
-        
-        // Replace text placeholders (only for back side now)
-        if (currentView === "back") {
-            selectedProduct.customizableFields?.forEach(field => {
-                const value = customValues[field.id] || '';
-                updatedSvg = updatedSvg.replace(new RegExp(field.placeholderKey, 'g'), value);
-            });
+        // Generate Front SVG
+        const frontTemplate = selectedProduct.templateSvg;
+        if (frontTemplate) {
+            let updatedFrontSvg = applyStyleCustomization(frontTemplate, "front");
+            updatedFrontSvg = updatedFrontSvg.replace(/__LOGO_HREF__/g, logoUrl || "");
+            setFrontSvg(updatedFrontSvg);
         }
 
-        // Replace logo placeholder (both sides)
-        updatedSvg = updatedSvg.replace(/__LOGO_HREF__/g, logoUrl || "");
+        // Generate Back SVG
+        const backTemplate = selectedProduct.backTemplateSvg || selectedProduct.templateSvg;
+        if (backTemplate) {
+            let updatedBackSvg = applyStyleCustomization(backTemplate, "back");
+            
+            // Replace text placeholders for back side
+            selectedProduct.customizableFields?.forEach(field => {
+                const value = customValues[field.id] || '';
+                updatedBackSvg = updatedBackSvg.replace(new RegExp(field.placeholderKey, 'g'), value);
+            });
+
+            updatedBackSvg = updatedBackSvg.replace(/__LOGO_HREF__/g, logoUrl || "");
+            
+            // Handle QR code
+            if (userId && username && qrCodeDataUrl) {
+                updatedBackSvg = updatedBackSvg.replace(/__QR_CODE_DATA_URL__/g, qrCodeDataUrl);
+                updatedBackSvg = updatedBackSvg.replace(/__QR_FALLBACK_DISPLAY__/g, "none");
+            } else {
+                updatedBackSvg = updatedBackSvg.replace(/__QR_CODE_DATA_URL__/g, "");
+                updatedBackSvg = updatedBackSvg.replace(/__QR_FALLBACK_DISPLAY__/g, "block");
+            }
+            
+            setBackSvg(updatedBackSvg);
+        }
+    }, [customValues, selectedProduct, logoUrl, userId, username, qrCodeDataUrl, styleOptions]);
+
+    // ✅ NEW: Apply style customization to SVG
+    const applyStyleCustomization = (svgTemplate, side) => {
+        let updatedSvg = svgTemplate;
         
-        // Handle QR code replacement
-        if (userId && username && qrCodeDataUrl) {
-            updatedSvg = updatedSvg.replace(/__QR_CODE_DATA_URL__/g, qrCodeDataUrl);
-            updatedSvg = updatedSvg.replace(/__QR_FALLBACK_DISPLAY__/g, "none");
+        // Replace background color
+        updatedSvg = updatedSvg.replace(/#667eea/g, styleOptions.backgroundColor);
+        updatedSvg = updatedSvg.replace(/#764ba2/g, adjustColor(styleOptions.backgroundColor, -20));
+        
+        // Replace text colors
+        updatedSvg = updatedSvg.replace(/fill="#FFFFFF"/g, `fill="${styleOptions.textColor}"`);
+        updatedSvg = updatedSvg.replace(/fill="rgba\(255,255,255,0\.\d+\)"/g, `fill="${styleOptions.textColor}"`);
+        
+        // Adjust text sizes
+        const baseFontSize = parseInt(styleOptions.textSize);
+        updatedSvg = updatedSvg.replace(/font-size="32"/g, `font-size="${baseFontSize + 16}"`); // Name
+        updatedSvg = updatedSvg.replace(/font-size="16"/g, `font-size="${baseFontSize}"`); // Job title
+        updatedSvg = updatedSvg.replace(/font-size="14"/g, `font-size="${baseFontSize - 2}"`); // Company
+        updatedSvg = updatedSvg.replace(/font-size="13"/g, `font-size="${baseFontSize - 3}"`); // Contact
+        
+        // Adjust logo size
+        const logoSize = parseInt(styleOptions.logoSize);
+        if (side === "front") {
+            // Front side - centered logo
+            updatedSvg = updatedSvg.replace(/width="60" height="60"/g, `width="${logoSize}" height="${logoSize}"`);
+            updatedSvg = updatedSvg.replace(/x="220" y="90"/g, `x="${250 - logoSize/2}" y="${120 - logoSize/2}"`);
         } else {
-            updatedSvg = updatedSvg.replace(/__QR_CODE_DATA_URL__/g, "");
-            updatedSvg = updatedSvg.replace(/__QR_FALLBACK_DISPLAY__/g, "block");
+            // Back side - corner logo
+            updatedSvg = updatedSvg.replace(/width="50" height="50"/g, `width="${logoSize}" height="${logoSize}"`);
+            updatedSvg = updatedSvg.replace(/x="35" y="35"/g, `x="${60 - logoSize/2}" y="${60 - logoSize/2}"`);
         }
         
-        setDisplaySvg(updatedSvg);
-    }, [customValues, selectedProduct, logoUrl, userId, username, qrCodeDataUrl, currentView]);
+        // Adjust QR code size
+        const qrSize = parseInt(styleOptions.qrSize);
+        updatedSvg = updatedSvg.replace(/width="70" height="70"/g, `width="${qrSize + 10}" height="${qrSize + 10}"`);
+        updatedSvg = updatedSvg.replace(/width="60" height="60"/g, `width="${qrSize}" height="${qrSize}"`);
+        
+        return updatedSvg;
+    };
+
+    // ✅ NEW: Color adjustment helper
+    const adjustColor = (hex, percent) => {
+        const num = parseInt(hex.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+    };
 
     // Event handlers
     const handleCustomValueChange = (fieldId, value) => {
         setCustomValues(prev => ({ ...prev, [fieldId]: value }));
+    };
+
+    const handleStyleChange = (property, value) => {
+        setStyleOptions(prev => ({ ...prev, [property]: value }));
     };
     
     const handleProductSelect = (product) => {
@@ -149,7 +215,9 @@ export default function CustomizePage() {
                 selectedProduct,
                 customValues,
                 logoUrl,
-                displaySvg
+                styleOptions,
+                frontSvg,
+                backSvg
             });
             
             toast.dismiss(loadingToast);
@@ -205,34 +273,44 @@ export default function CustomizePage() {
             <QRCodeGenerator 
                 userId={userId}
                 username={username}
+                size={parseInt(styleOptions.qrSize)}
                 onQRCodeGenerated={setQrCodeDataUrl}
             />
             
-            <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12">
+            <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
                 
-                {/* Left side: Customization Form */}
-                <CustomizationForm
-                    products={products}
-                    selectedProduct={selectedProduct}
-                    customValues={customValues}
-                    userId={userId}
-                    logoUrl={logoUrl}
-                    isUploading={isUploading}
-                    onProductSelect={handleProductSelect}
-                    onCustomValueChange={handleCustomValueChange}
-                    onLogoUploadStart={() => setIsUploading(true)}
-                    onLogoUploadComplete={handleLogoUpload}
-                />
+                {/* Left: Customization Form */}
+                <div className="lg:col-span-1">
+                    <CustomizationForm
+                        products={products}
+                        selectedProduct={selectedProduct}
+                        customValues={customValues}
+                        userId={userId}
+                        logoUrl={logoUrl}
+                        isUploading={isUploading}
+                        onProductSelect={handleProductSelect}
+                        onCustomValueChange={handleCustomValueChange}
+                        onLogoUploadStart={() => setIsUploading(true)}
+                        onLogoUploadComplete={handleLogoUpload}
+                    />
+
+                    {/* ✅ NEW: Style Customizer */}
+                    <StyleCustomizer
+                        styleOptions={styleOptions}
+                        onStyleChange={handleStyleChange}
+                    />
+                </div>
                 
-                {/* Right side: Live Preview */}
-                <LivePreview
-                    displaySvg={displaySvg}
-                    isSaving={isSaving}
-                    selectedProduct={selectedProduct}
-                    currentView={currentView}
-                    onViewChange={setCurrentView}
-                    onProceedToCheckout={handleProceedToCheckout}
-                />
+                {/* Right: Dual Preview */}
+                <div className="lg:col-span-2">
+                    <LivePreview
+                        frontSvg={frontSvg}
+                        backSvg={backSvg}
+                        isSaving={isSaving}
+                        selectedProduct={selectedProduct}
+                        onProceedToCheckout={handleProceedToCheckout}
+                    />
+                </div>
             </div>
         </div>
     );

@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/utils/FirebaseService.js - NEW UTILITY
+// app/nfc-cards/customize/utils/FirebaseService.js - ENHANCED WITH STYLE OPTIONS
 class FirebaseService {
     static async initializeAuth() {
         const { testForActiveSession } = await import('@/lib/authentication/testForActiveSession');
@@ -57,7 +57,15 @@ class FirebaseService {
         return fetchedProducts;
     }
 
-    static async saveCustomCard({ userId, selectedProduct, customValues, logoUrl, displaySvg }) {
+    static async saveCustomCard({ 
+        userId, 
+        selectedProduct, 
+        customValues, 
+        logoUrl, 
+        styleOptions, 
+        frontSvg, 
+        backSvg 
+    }) {
         const { fireApp } = await import('@/important/firebase');
         
         if (!fireApp) {
@@ -74,9 +82,13 @@ class FirebaseService {
             productName: selectedProduct.name,
             customizedData: customValues,
             logoUrl: logoUrl,
+            styleOptions: styleOptions, // ✅ NEW: Save style customizations
+            frontSvg: frontSvg,         // ✅ NEW: Save front SVG
+            backSvg: backSvg,           // ✅ NEW: Save back SVG
             createdAt: serverTimestamp(),
             linkedProfile: userId,
-            customizedSvg: displaySvg,
+            // Keep legacy field for compatibility
+            customizedSvg: backSvg,
         };
         
         console.log('🔄 Saving card data...');
