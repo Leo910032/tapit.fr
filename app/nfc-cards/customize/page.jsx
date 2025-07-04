@@ -337,7 +337,7 @@ export default function CustomizePage() {
     );
 }
 
-// ✅ FIXED: Logo Uploader Component using your Firebase setup
+    // ✅ ENHANCED: Logo Uploader Component - PER CARD (not per user)
 function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) {
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
@@ -374,7 +374,9 @@ function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) 
             const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
 
             console.log('🔄 Creating storage reference...');
-            const fileName = `logo_${userId}_${Date.now()}.${file.name.split('.').pop()}`;
+            // ✅ ENHANCED: Create unique filename per card design session
+            const uniqueId = `${userId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const fileName = `logo_${uniqueId}.${file.name.split('.').pop()}`;
             const storageRef = ref(appStorage, `nfc-logos/${fileName}`);
             
             console.log('🔄 Uploading file...');
@@ -433,6 +435,24 @@ function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) 
                 >
                     {isUploading ? 'Uploading...' : 'Choose File'}
                 </button>
+                
+                {/* ✅ NEW: Clear logo button */}
+                {preview && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setPreview(null);
+                            onUploadComplete("");
+                            if (fileInputRef.current) {
+                                fileInputRef.current.value = "";
+                            }
+                        }}
+                        disabled={isUploading}
+                        className="px-3 py-2 text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+                    >
+                        Remove
+                    </button>
+                )}
             </div>
             
             <p className="text-xs text-gray-500 mt-2">
