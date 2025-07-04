@@ -58,8 +58,8 @@ export default function CustomizePage() {
 
                 console.log('🔄 Fetching products...');
                 
-                // fireApp is already the Firestore instance, so use it directly
-                const productsRef = collection(fireApp, "NFCProducts");
+                // ✅ FIXED: Use "products" collection (not "NFCProducts")
+                const productsRef = collection(fireApp, "products");
                 const querySnapshot = await getDocs(productsRef);
                 
                 const fetchedProducts = [];
