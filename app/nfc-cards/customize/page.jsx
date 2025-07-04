@@ -23,6 +23,7 @@ export default function CustomizePage() {
     const [isUploading, setIsUploading] = useState(false);
     const [logoUrl, setLogoUrl] = useState("");
     const [userId, setUserId] = useState(null);
+    const [username, setUsername] = useState(null);
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
 
     // ✅ FIXED: Use your existing Firebase exports
@@ -44,6 +45,26 @@ export default function CustomizePage() {
                 const currentUserId = testForActiveSession(true);
                 console.log('👤 User ID:', currentUserId);
                 setUserId(currentUserId);
+
+                // ✅ NEW: Get username from AccountData if user is logged in
+                if (currentUserId) {
+                    try {
+                        const { fireApp } = await import('@/important/firebase');
+                        const { doc, getDoc } = await import('firebase/firestore');
+                        
+                        const userDocRef = doc(fireApp, "AccountData", currentUserId);
+                        const userDocSnap = await getDoc(userDocRef);
+                        
+                        if (userDocSnap.exists()) {
+                            const userData = userDocSnap.data();
+                            const userUsername = userData.username;
+                            console.log('👤 Username:', userUsername);
+                            setUsername(userUsername);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching username:', error);
+                    }
+                }
 
                 // ✅ Use your existing Firebase exports - fireApp is already the Firestore instance
                 const { fireApp } = await import('@/important/firebase');
@@ -118,7 +139,7 @@ export default function CustomizePage() {
         updatedSvg = updatedSvg.replace(/__LOGO_HREF__/g, logoUrl || "");
         
         // ✅ NEW: Handle QR code replacement
-        if (userId && qrCodeDataUrl) {
+        if (userId && username && qrCodeDataUrl) {
             // User is logged in and QR code is available
             updatedSvg = updatedSvg.replace(/__QR_CODE_DATA_URL__/g, qrCodeDataUrl);
             updatedSvg = updatedSvg.replace(/__QR_FALLBACK_DISPLAY__/g, "none");
@@ -129,12 +150,12 @@ export default function CustomizePage() {
         }
         
         setDisplaySvg(updatedSvg);
-    }, [customValues, selectedProduct, logoUrl, userId, qrCodeDataUrl]);
+    }, [customValues, selectedProduct, logoUrl, userId, username, qrCodeDataUrl]);
 
     // ✅ NEW: Generate QR code when user is logged in
     useEffect(() => {
         const generateQRCode = async () => {
-            if (!userId) {
+            if (!userId || !username) {
                 setQrCodeDataUrl("");
                 return;
             }
@@ -154,8 +175,10 @@ export default function CustomizePage() {
                 // Create React root and render QR code
                 const root = createRoot(tempContainer);
                 
-                // Construct the user's profile URL (adjust this to match your app's URL structure)
-                const userProfileUrl = `${window.location.origin}/profile/${userId}`;
+                // ✅ FIXED: Use username instead of userId for the profile URL
+                const userProfileUrl = `${window.location.origin}/${username}`;
+                
+                console.log('🔄 Generating QR code for:', userProfileUrl);
                 
                 // Create a promise to get the canvas data
                 const getQRCodeDataUrl = () => {
@@ -195,6 +218,7 @@ export default function CustomizePage() {
                 };
 
                 const dataUrl = await getQRCodeDataUrl();
+                console.log('✅ QR code generated successfully');
                 setQrCodeDataUrl(dataUrl);
 
                 // Cleanup
@@ -202,13 +226,13 @@ export default function CustomizePage() {
                 document.body.removeChild(tempContainer);
 
             } catch (error) {
-                console.error('Error generating QR code:', error);
+                console.error('❌ Error generating QR code:', error);
                 setQrCodeDataUrl("");
             }
         };
 
         generateQRCode();
-    }, [userId]);
+    }, [userId, username]);
 
     const handleCustomValueChange = (fieldId, value) => {
         setCustomValues(prev => ({ ...prev, [fieldId]: value }));
