@@ -1,4 +1,4 @@
-// app/nfc-cards/customize/page.jsx - FIREBASE IMPORTS FIXED FINAL
+// app/nfc-cards/customize/page.jsx - FIXED TO WORK WITH YOUR FIREBASE CONFIG
 "use client"
 
 import { useState, useEffect, useRef } from "react";
@@ -24,36 +24,42 @@ export default function CustomizePage() {
     const [logoUrl, setLogoUrl] = useState("");
     const [userId, setUserId] = useState(null);
 
-    // ✅ FIX: Import Firebase correctly with proper error handling
+    // ✅ FIXED: Use your existing Firebase exports
     useEffect(() => {
         const initializePage = async () => {
             try {
-                // Check if we're on the client side
-                if (typeof window === 'undefined') return;
-
                 console.log('🔄 Starting Firebase initialization...');
 
-                // ✅ FIXED: Import Firebase app first, then other modules
-                const { fireApp } = await import('@/important/firebase');
-                console.log('✅ Firebase app imported:', !!fireApp);
+                // Check if running on client side
+                if (typeof window === 'undefined') {
+                    console.log('❌ Not on client side, skipping initialization');
+                    return;
+                }
 
-                // ✅ FIXED: Import auth function
+                // ✅ Import authentication first
                 const { testForActiveSession } = await import('@/lib/authentication/testForActiveSession');
                 
-                // Check authentication first
+                // Check authentication
                 const currentUserId = testForActiveSession(true);
                 console.log('👤 User ID:', currentUserId);
                 setUserId(currentUserId);
 
-                // ✅ FIXED: Import Firestore modules separately and initialize properly
-                const { getFirestore, collection, getDocs } = await import('firebase/firestore');
+                // ✅ Use your existing Firebase exports - fireApp is already the Firestore instance
+                const { fireApp } = await import('@/important/firebase');
                 
-                console.log('🔄 Initializing Firestore...');
-                const db = getFirestore(fireApp);
-                console.log('✅ Firestore initialized');
+                if (!fireApp) {
+                    throw new Error('Firestore is not initialized');
+                }
+                
+                console.log('✅ Firestore imported:', !!fireApp);
+
+                // ✅ Import Firestore functions
+                const { collection, getDocs } = await import('firebase/firestore');
 
                 console.log('🔄 Fetching products...');
-                const productsRef = collection(db, "NFCProducts");
+                
+                // fireApp is already the Firestore instance, so use it directly
+                const productsRef = collection(fireApp, "NFCProducts");
                 const querySnapshot = await getDocs(productsRef);
                 
                 const fetchedProducts = [];
@@ -78,14 +84,18 @@ export default function CustomizePage() {
                     stack: error.stack,
                     name: error.name
                 });
-                toast.error(`Failed to load: ${error.message}`);
+                
+                toast.error(`Failed to load products: ${error.message}`);
+                setProducts([]);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        // Add delay to ensure DOM is ready
-        setTimeout(initializePage, 100);
+        // Add small delay to ensure DOM is ready
+        const timeoutId = setTimeout(initializePage, 100);
+        
+        return () => clearTimeout(timeoutId);
     }, []);
 
     // Effect to update the SVG preview
@@ -135,13 +145,18 @@ export default function CustomizePage() {
         try {
             console.log('🔄 Starting save process...');
 
-            // ✅ FIXED: Import Firebase modules properly for saving
+            // ✅ Use your existing Firebase exports
             const { fireApp } = await import('@/important/firebase');
-            const { getFirestore, collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+            
+            if (!fireApp) {
+                throw new Error('Firestore is not available');
+            }
 
-            console.log('🔄 Initializing Firestore for save...');
-            const db = getFirestore(fireApp);
-            const userCardsRef = collection(db, "AccountData", userId, "userCards");
+            const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+
+            console.log('🔄 Creating user cards collection reference...');
+            // fireApp is already the Firestore instance
+            const userCardsRef = collection(fireApp, "AccountData", userId, "userCards");
             
             const newCardData = {
                 productId: selectedProduct.id,
@@ -193,8 +208,14 @@ export default function CustomizePage() {
     if (products.length === 0) {
         return (
             <div className="pt-32 text-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">No products found in Firebase</h1>
-                <p className="text-gray-600">Please add products to the NFCProducts collection</p>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">No products found</h1>
+                <p className="text-gray-600">Please check your Firebase connection or add products to the NFCProducts collection</p>
+                <button 
+                    onClick={() => window.location.reload()} 
+                    className="mt-4 px-4 py-2 bg-themeGreen text-white rounded-lg hover:bg-green-600"
+                >
+                    Retry
+                </button>
             </div>
         );
     }
@@ -316,7 +337,7 @@ export default function CustomizePage() {
     );
 }
 
-// Logo Uploader Component
+// ✅ FIXED: Logo Uploader Component using your Firebase setup
 function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) {
     const [preview, setPreview] = useState(null);
     const fileInputRef = useRef(null);
@@ -343,15 +364,18 @@ function LogoUploader({ userId, onUploadStart, onUploadComplete, isUploading }) 
         try {
             console.log('🔄 Starting logo upload...');
 
-            // ✅ FIXED: Import Firebase Storage properly
-            const { fireApp } = await import('@/important/firebase');
-            const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-
-            console.log('🔄 Initializing Storage...');
-            const storage = getStorage(fireApp);
+            // ✅ Use your existing Firebase Storage export
+            const { appStorage } = await import('@/important/firebase');
             
+            if (!appStorage) {
+                throw new Error('Firebase Storage is not available');
+            }
+
+            const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+
+            console.log('🔄 Creating storage reference...');
             const fileName = `logo_${userId}_${Date.now()}.${file.name.split('.').pop()}`;
-            const storageRef = ref(storage, `nfc-logos/${fileName}`);
+            const storageRef = ref(appStorage, `nfc-logos/${fileName}`);
             
             console.log('🔄 Uploading file...');
             const snapshot = await uploadBytes(storageRef, file);
