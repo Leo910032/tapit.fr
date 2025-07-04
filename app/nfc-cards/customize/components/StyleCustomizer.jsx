@@ -83,16 +83,16 @@ export default function StyleCustomizer({ styleOptions, onStyleChange }) {
                     </label>
                     <input
                         type="range"
-                        min="30"
-                        max="80"
+                        min="40"
+                        max="150"
                         value={styleOptions.logoSize}
                         onChange={(e) => onStyleChange('logoSize', e.target.value)}
                         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     />
                     <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>30px</span>
-                        <span>55px</span>
-                        <span>80px</span>
+                        <span>40px</span>
+                        <span>95px</span>
+                        <span>150px</span>
                     </div>
                 </div>
 
@@ -152,7 +152,7 @@ export default function StyleCustomizer({ styleOptions, onStyleChange }) {
                         onStyleChange('backgroundColor', '#667eea');
                         onStyleChange('textColor', '#ffffff');
                         onStyleChange('textSize', '16');
-                        onStyleChange('logoSize', '50');
+                        onStyleChange('logoSize', '60');
                         onStyleChange('qrSize', '60');
                     }}
                     className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"

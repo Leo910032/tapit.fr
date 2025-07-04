@@ -38,7 +38,7 @@ export default function CustomizePage() {
         backgroundColor: "#667eea",
         textColor: "#ffffff",
         textSize: "16",
-        logoSize: "50",
+        logoSize: "60",
         qrSize: "60"
     });
 
@@ -142,13 +142,16 @@ export default function CustomizePage() {
         // Adjust logo size
         const logoSize = parseInt(styleOptions.logoSize);
         if (side === "front") {
-            // Front side - centered logo
+            // Front side - centered logo (can be much larger)
             updatedSvg = updatedSvg.replace(/width="60" height="60"/g, `width="${logoSize}" height="${logoSize}"`);
             updatedSvg = updatedSvg.replace(/x="220" y="90"/g, `x="${250 - logoSize/2}" y="${120 - logoSize/2}"`);
+            updatedSvg = updatedSvg.replace(/border-radius: 30px/g, `border-radius: ${logoSize/2}px`);
         } else {
-            // Back side - corner logo
-            updatedSvg = updatedSvg.replace(/width="50" height="50"/g, `width="${logoSize}" height="${logoSize}"`);
-            updatedSvg = updatedSvg.replace(/x="35" y="35"/g, `x="${60 - logoSize/2}" y="${60 - logoSize/2}"`);
+            // Back side - corner logo (smaller but still scalable)
+            const backLogoSize = Math.min(logoSize * 0.6, 80); // Max 80px on back, 60% of front size
+            updatedSvg = updatedSvg.replace(/width="40" height="40"/g, `width="${backLogoSize}" height="${backLogoSize}"`);
+            updatedSvg = updatedSvg.replace(/x="40" y="40"/g, `x="${60 - backLogoSize/2}" y="${60 - backLogoSize/2}"`);
+            updatedSvg = updatedSvg.replace(/border-radius: 20px/g, `border-radius: ${backLogoSize/2}px`);
         }
         
         // Adjust QR code size
