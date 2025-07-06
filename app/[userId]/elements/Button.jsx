@@ -1,4 +1,4 @@
-// Fixed Button.jsx - OPTIMIZED VERSION WITH USER ID
+// Fixed Button.jsx - MARIO THEME WITH PROPER FONT SUPPORT
 "use client"
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
@@ -16,7 +16,7 @@ import ButtonText from "./ButtonText";
 import { FaCopy } from "react-icons/fa6";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "@/lib/useTranslation";
-import { recordLinkClickByUserId } from "@/lib/analytics/linkClickTracker"; // ✅ Use the optimized version
+import { recordLinkClickByUserId } from "@/lib/analytics/linkClickTracker";
 
 export default function Button({ url, content, userId, linkId, linkType = "custom" }) {
     const [modifierClass, setModifierClass] = useState("");
@@ -30,7 +30,7 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
     const [accentColor, setAccentColor] = useState([]);
     const [btnFontStyle, setBtnFontStyle] = useState(null);
     const [selectedFontClass, setSelectedFontClass] = useState("");
-    const [currentUserId, setCurrentUserId] = useState(""); // Only store user ID
+    const [currentUserId, setCurrentUserId] = useState("");
     const router = useRouter();
     const { t } = useTranslation();
 
@@ -48,7 +48,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
      * OPTIMIZED link click handler - uses user ID directly
      */
     const handleLinkClick = async (e) => {
-        // Don't prevent default navigation, just track the click
         console.log("🔥 Link clicked:", content);
         console.log("📊 Tracking data:", { userId: currentUserId, linkId, content, url, linkType });
         
@@ -63,7 +62,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
         }
 
         try {
-            // ✅ Use the super fast user ID method - single lookup table read
             recordLinkClickByUserId(currentUserId, {
                 linkId: linkId || `link_${Date.now()}`,
                 linkTitle: content,
@@ -136,17 +134,13 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
 
                 console.log("👤 Current user data:", currentUser);
 
-                // ✅ SIMPLIFIED: Just store the user ID - we don't need username anymore
                 let actualUserId = '';
 
-                // Check if currentUser is a string (user ID) or object (user data)
                 if (typeof currentUser === 'string') {
-                    // currentUser is the user ID
                     actualUserId = currentUser;
                     console.log("🆔 Using user ID directly:", actualUserId);
                     setCurrentUserId(actualUserId);
                     
-                    // Get styling data from AccountData collection
                     const collectionRef = collection(fireApp, "AccountData");
                     const docRef = doc(collectionRef, currentUser);
                     
@@ -155,7 +149,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
                             const accountData = docSnapshot.data();
                             console.log("📋 Account data:", accountData);
                             
-                            // Apply styling data
                             const { btnType, btnShadowColor, btnFontColor, themeFontColor, btnColor, selectedTheme, fontType } = accountData;
                             const fontName = availableFonts_Classic[fontType ? fontType - 1 : 0];
                             setSelectedFontClass(fontName?.class || '');
@@ -168,12 +161,10 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
                         }
                     });
                 } else if (currentUser.userId || currentUser.id) {
-                    // currentUser is an object with user ID
                     actualUserId = currentUser.userId || currentUser.id;
                     console.log("🆔 Extracted user ID from object:", actualUserId);
                     setCurrentUserId(actualUserId);
                 } else {
-                    // Fallback: use the userId parameter as user ID
                     actualUserId = userId;
                     console.log("🆔 Fallback to userId parameter:", actualUserId);
                     setCurrentUserId(actualUserId);
@@ -187,7 +178,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
         fetchInfo();
     }, [router, userId]);
 
-    // Log for debugging
     useEffect(() => {
         console.log("🔍 Button debug info:", {
             currentUserId,
@@ -199,7 +189,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
         });
     }, [currentUserId, linkId, content, url, linkType, userId]);
 
-    // Rest of your styling useEffects remain exactly the same...
     useEffect(() => {
         if (selectedTheme === "3D Blocks") {
             const rootName = getRootNameFromUrl(url);
@@ -278,7 +267,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
             return;
         }
 
-        // Rest of the button styling logic remains the same...
         switch (btnType) {
             case 0:
                 setModifierClass("");
@@ -380,7 +368,6 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
         }
     }, [btnType, selectedTheme, modifierStyles.backgroundColor, url]);
 
-    // Rest of your useEffects for styling...
     useEffect(() => {
         if (selectedTheme === "3D Blocks") {
             return;
@@ -529,7 +516,8 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
                         <IconDiv url={url} unique="Mario" />
                     </div>
                 </div>
-                <ButtonText btnFontStyle={btnFontStyle} content={(<SuperFont text={content} isHovered={isHovered} />)} fontClass={"MariaFont"} />
+                {/* ✅ FIXED: Use selectedFontClass instead of hardcoded MariaFont */}
+                <ButtonText btnFontStyle={btnFontStyle} content={(<SuperFont text={content} isHovered={isHovered} fontClass={selectedFontClass} />)} fontClass={selectedFontClass} />
             </Link>
             <div onClick={() => handleCopy(url)} className="absolute p-2 h-9 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90">
                 <FaCopy className="rotate-10 group-hover:rotate-0" />
@@ -539,11 +527,12 @@ export default function Button({ url, content, userId, linkId, linkType = "custo
     );
 }
 
-const SuperFont = ({ text, isHovered }) => {
+// ✅ FIXED: SuperFont now accepts fontClass prop
+const SuperFont = ({ text, isHovered, fontClass }) => {
     const colors = ['#fff', '#fff', '#fff', '#fff', '#fff'];
 
     const coloredText = text.split('').map((char, index) => (
-        <span className="md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] bg-transparent" key={index} style={{ color: isHovered ? "#3b82f6" : colors[index % colors.length] }}>
+        <span className={`${fontClass} md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] bg-transparent`} key={index} style={{ color: isHovered ? "#3b82f6" : colors[index % colors.length] }}>
             {char}
         </span>
     ));
