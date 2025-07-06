@@ -1,4 +1,4 @@
-// app/[userId]/components/ExchangeButton.jsx - COMPLETE WITH TRANSLATIONS
+// app/[userId]/components/ExchangeButton.jsx - MARIO THEME WITH PROPER FONT SUPPORT
 "use client"
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/useTranslation';
@@ -7,6 +7,7 @@ import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { hexToRgba } from "@/lib/utilities";
+import { availableFonts_Classic } from "@/lib/FontsList";
 
 export default function ExchangeButton({ username, userInfo, fastLookupUsed, userId }) {
     const { t } = useTranslation();
@@ -19,6 +20,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
     const [btnColor, setBtnColor] = useState('');
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
+    const [selectedFontClass, setSelectedFontClass] = useState(""); // ✅ Add font support
 
     useEffect(() => {
         async function fetchThemeData() {
@@ -43,7 +45,8 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                             btnType: data.btnType,
                             btnColor: data.btnColor,
                             btnFontColor: data.btnFontColor,
-                            selectedTheme: data.selectedTheme
+                            selectedTheme: data.selectedTheme,
+                            fontType: data.fontType
                         });
                         
                         setBtnType(data.btnType || 0);
@@ -52,6 +55,10 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                         setBtnColor(data.btnColor || "#fff");
                         setSelectedTheme(data.selectedTheme || '');
                         setThemeTextColour(data.themeFontColor || "");
+                        
+                        // ✅ Set font class - SAME AS Button.jsx
+                        const fontName = availableFonts_Classic[data.fontType ? data.fontType - 1 : 0];
+                        setSelectedFontClass(fontName?.class || '');
                     } else {
                         console.warn("❌ ExchangeButton: Document does not exist");
                     }
@@ -170,7 +177,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             {/* Debug info - remove this after fixing */}
             {process.env.NODE_ENV === 'development' && (
                 <div className="text-xs text-gray-500 mb-1">
-                    ExchangeButton Debug: Type={btnType}, Color={btnColor}, Theme={selectedTheme}, UserId={userId ? '✓' : '✗'}
+                    ExchangeButton Debug: Type={btnType}, Color={btnColor}, Theme={selectedTheme}, UserId={userId ? '✓' : '✗'}, Font={selectedFontClass}
                 </div>
             )}
             
@@ -205,7 +212,7 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             </div>
         </div>
         
-        {/* Button text overlay */}
+        {/* Button text overlay with selected font */}
         <div 
             className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
             onClick={() => setIsModalOpen(true)}
@@ -215,25 +222,28 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                 paddingLeft: '3rem' // Space for the box
             }}
         >
-            {/* Desktop text */}
-            <span className="hidden md:block">
-                {t('exchange.button_text') || 'Exchange Contact'}
-            </span>
-            
-            {/* Mobile text (shorter) */}
-            <span className="block md:hidden text-sm">
-                {t('exchange.button_text_short') || 'Exchange'}
-            </span>
+            {/* ✅ FIXED: Use selectedFontClass instead of hardcoded font */}
+            <div className={selectedFontClass}>
+                {/* Desktop text */}
+                <span className="hidden md:block">
+                    {t('exchange.button_text') || 'Exchange Contact'}
+                </span>
+                
+                {/* Mobile text (shorter) */}
+                <span className="block md:hidden text-sm">
+                    {t('exchange.button_text_short') || 'Exchange'}
+                </span>
+            </div>
         </div>
     </div>
 ) : selectedTheme === "3D Blocks" ? (
     <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
         <button
             onClick={() => setIsModalOpen(true)}
-            className={getButtonClasses()}
+            className={`${getButtonClasses()} ${selectedFontClass}`}
             style={getButtonStyles()}
         >
-            {/* Exchange Icon - NOW ADDED */}
+            {/* Exchange Icon */}
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
@@ -252,10 +262,10 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
 ) : (
     <button
         onClick={() => setIsModalOpen(true)}
-        className={getButtonClasses()}
+        className={`${getButtonClasses()} ${selectedFontClass}`}
         style={getButtonStyles()}
     >
-        {/* Exchange Icon - NOW ADDED */}
+        {/* Exchange Icon */}
         <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
         </svg>
