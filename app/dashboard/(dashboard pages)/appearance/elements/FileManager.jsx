@@ -33,6 +33,15 @@ export default function FileManager() {
     const [fileSize, setFileSize] = useState(0);
     const [fileName, setFileName] = useState('');
     const [customFileName, setCustomFileName] = useState(''); // New state for custom name
+    
+    // ✅ Add theme state for button styling
+    const [themeData, setThemeData] = useState({
+        btnType: 0,
+        btnColor: '#e8edf5',
+        btnFontColor: '#000000',
+        btnShadowColor: '#e8edf5'
+    });
+    
     const inputRef = useRef();
     const formRef = useRef();
 
@@ -71,6 +80,96 @@ export default function FileManager() {
     // Function to get file name without extension
     const getFileNameWithoutExtension = (filename) => {
         return filename.substring(0, filename.lastIndexOf('.')) || filename;
+    };
+
+    // ✅ Function to get button styling based on theme
+    const getButtonStyle = () => {
+        const { btnType, btnColor, btnFontColor, btnShadowColor } = themeData;
+        
+        let baseStyle = {
+            backgroundColor: btnColor,
+            color: btnFontColor,
+            border: `1px solid ${btnColor}`,
+        };
+        
+        let className = "w-full h-12 flex items-center justify-center gap-3 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 font-medium";
+        
+        switch (btnType) {
+            case 0: // Fill - Square
+                className += " rounded-none";
+                break;
+            case 1: // Fill - Rounded
+                className += " rounded-lg";
+                break;
+            case 2: // Fill - Pill
+                className += " rounded-full";
+                break;
+            case 3: // Outline - Square
+                baseStyle.backgroundColor = "transparent";
+                baseStyle.border = `2px solid ${btnColor}`;
+                baseStyle.color = btnColor;
+                className += " rounded-none";
+                break;
+            case 4: // Outline - Rounded
+                baseStyle.backgroundColor = "transparent";
+                baseStyle.border = `2px solid ${btnColor}`;
+                baseStyle.color = btnColor;
+                className += " rounded-lg";
+                break;
+            case 5: // Outline - Pill
+                baseStyle.backgroundColor = "transparent";
+                baseStyle.border = `2px solid ${btnColor}`;
+                baseStyle.color = btnColor;
+                className += " rounded-full";
+                break;
+            case 6: // Hard Shadow - Square
+                baseStyle.backgroundColor = "white";
+                baseStyle.border = `2px solid ${btnColor}`;
+                baseStyle.color = btnColor;
+                baseStyle.filter = `drop-shadow(4px 4px 0px ${btnShadowColor})`;
+                className += " rounded-none";
+                break;
+            case 7: // Hard Shadow - Rounded
+                baseStyle.backgroundColor = "white";
+                baseStyle.border = `2px solid ${btnColor}`;
+                baseStyle.color = btnColor;
+                baseStyle.filter = `drop-shadow(4px 4px 0px ${btnShadowColor})`;
+                className += " rounded-lg";
+                break;
+            case 8: // Hard Shadow - Pill
+                baseStyle.backgroundColor = "white";
+                baseStyle.border = `2px solid ${btnColor}`;
+                baseStyle.color = btnColor;
+                baseStyle.filter = `drop-shadow(4px 4px 0px ${btnShadowColor})`;
+                className += " rounded-full";
+                break;
+            case 9: // Soft Shadow - Square
+                baseStyle.backgroundColor = "white";
+                baseStyle.color = btnColor;
+                baseStyle.boxShadow = "0 4px 4px 0 rgb(0,0,0,0.16)";
+                className += " rounded-none";
+                break;
+            case 10: // Soft Shadow - Rounded
+                baseStyle.backgroundColor = "white";
+                baseStyle.color = btnColor;
+                baseStyle.boxShadow = "0 4px 4px 0 rgb(0,0,0,0.16)";
+                className += " rounded-lg";
+                break;
+            case 11: // Soft Shadow - Pill
+                baseStyle.backgroundColor = "white";
+                baseStyle.color = btnColor;
+                baseStyle.boxShadow = "0 4px 4px 0 rgb(0,0,0,0.16)";
+                className += " rounded-full";
+                break;
+            case 15: // Special Mario theme (from your screenshot)
+                className += " rounded-full";
+                break;
+            default:
+                className += " rounded-lg";
+                break;
+        }
+        
+        return { style: baseStyle, className };
     };
 
     const handleFileChange = (e) => {
@@ -212,8 +311,23 @@ export default function FileManager() {
 
             const unsubscribe = onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    const { profileFile } = docSnap.data();
+                    const { 
+                        profileFile, 
+                        btnType = 0, 
+                        btnColor = '#e8edf5', 
+                        btnFontColor = '#000000', 
+                        btnShadowColor = '#e8edf5' 
+                    } = docSnap.data();
+                    
                     setCurrentFile(profileFile || null);
+                    
+                    // ✅ Update theme data for button styling
+                    setThemeData({
+                        btnType,
+                        btnColor,
+                        btnFontColor,
+                        btnShadowColor
+                    });
                 }
             });
 
@@ -224,52 +338,33 @@ export default function FileManager() {
         return cleanup;
     }, []);
 
+    // ✅ Get the styled button properties
+    const { style: buttonStyle, className: buttonClassName } = getButtonStyle();
+
     return (
         <div className="w-full p-6 border-t">
             <h3 className="text-sm font-semibold text-gray-900 mb-4">
                 {t('file_manager.curriculum_documents') || 'Curriculum / Documents'}
             </h3>
             
-            {/* Current File Display */}
+            {/* ✅ Current File Display - Now with themed download button */}
             {currentFile && (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
-                    <div className="flex items-center justify-between">
+                <div className="mb-4">
+                    <div 
+                        className={buttonClassName}
+                        style={buttonStyle}
+                        onClick={handleDownloadFile}
+                    >
                         <div className="flex items-center gap-3">
-                            <span className="text-2xl">{getFileIcon(currentFile.originalFileName || currentFile.name)}</span>
-                            <div>
-                                <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                                    {currentFile.name}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                    {formatFileSize(currentFile.size)} • {currentFile.type?.toUpperCase()}
-                                </p>
-                                {currentFile.originalFileName && currentFile.originalFileName !== currentFile.name && (
-                                    <p className="text-xs text-gray-400 italic truncate max-w-[200px]">
-                                        Original: {currentFile.originalFileName}
-                                    </p>
-                                )}
+                            <FaDownload className="w-5 h-5" />
+                            <div className="flex flex-col items-start">
+                                <span className="text-sm font-medium">
+                                    Download File
+                                </span>
+                                <span className="text-xs opacity-80">
+                                    {currentFile.name} • {formatFileSize(currentFile.size)}
+                                </span>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={handleDownloadFile}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                title={t('file_manager.download') || 'Download'}
-                            >
-                                <FaDownload className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={handleRemoveFile}
-                                disabled={isRemoving}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                                title={t('file_manager.remove') || 'Remove'}
-                            >
-                                {isRemoving ? (
-                                    <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <FaTrash className="w-4 h-4" />
-                                )}
-                            </button>
                         </div>
                     </div>
                 </div>
