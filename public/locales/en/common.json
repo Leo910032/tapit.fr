@@ -502,11 +502,11 @@
     "invalid_email_format": "Invalid Email format!"
   },
    "account": {
-    "contact_info_desc" : "This information will be available when people save your contact.",
-    "settings_subtitle" : "Manage your profile information and team settings",
-    "settings_title" : "Account Settings",
-    "contact_information" : "Contact Information",
-    "display_name" : "Display Name",
+    "contact_info_desc": "This information will be available when people save your contact.",
+    "settings_subtitle": "Manage your profile information and team settings",
+    "settings_title": "Account Settings",
+    "contact_information": "Contact Information",
+    "display_name": "Display Name",
     "email": "Email",
     "phone": "Phone", 
     "website": "Website",
@@ -516,7 +516,14 @@
     "update_failed": "Failed to update contact information",
     "contact_saveable": "Contact information is ready to be saved by visitors",
     "save_contact_preview": "Visitors to your profile will see a \"Save Contact\" button when you have contact information filled out.",
-    "team_management": "Team Management"
+    "team_management": "Team Management",
+    "my_nfc_cards": "My NFC Cards"
+  },
+    "cards": {
+    "loading": "Loading your saved cards...",
+    "error_load": "Could not load your saved cards.",
+    "no_cards": "You haven't created any custom cards yet.",
+    "my_saved_cards": "My Saved Cards"
   },
  
   "teams": {

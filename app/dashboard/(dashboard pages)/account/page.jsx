@@ -28,7 +28,7 @@ export default function AccountPage() {
                 {/* --- 2. ADD THE "MY CARDS" SECTION HERE --- */}
                 <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                        My NFC Cards
+                      {t('account.my_nfc_cards') || 'My NFC Cards'}
                     </h2>
                     <div className="bg-white p-6 rounded-lg shadow-sm">
                         <MyCards />
