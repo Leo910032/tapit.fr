@@ -13,7 +13,8 @@ export default function ColorPicker({colorFor}) {
     const debounceColor = useDebounce(colorText, 500);
     const [validColor, setValidColor] = useState(1);
     const [colorHasLoaded, setColorHasLoaded] = useState(false);
-    const [isHydrated, setIsHydrated] = useState(false); // ✅ Add hydration state
+    const [isHydrated, setIsHydrated] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false); // ✅ Add updating state
     const colorPickRef = useRef();
 
     // ✅ Fix hydration by ensuring client-side only rendering
@@ -23,52 +24,53 @@ export default function ColorPicker({colorFor}) {
 
     
     const handleUpdateTheme = async(text) => {
-        switch (colorFor) {
-            case 0:
-                await updateThemeBackgroundColor(text);
-                break;
-            case 1:
-                await updateThemeBtnColor(text);
-                break;
-            case 2:
-                await updateThemeBtnFontColor(text);
-                break;
-            case 3:
-                await updateThemeBtnShadowColor(text);
-                break;
-            case 4:
-                await updateThemeTextColour(text);
-                break;
+        // ✅ Prevent multiple simultaneous updates
+        if (isUpdating) return;
+        setIsUpdating(true);
         
-            default:
-                await updateThemeBackgroundColor(text);
-                break;
+        try {
+            switch (colorFor) {
+                case 0:
+                    await updateThemeBackgroundColor(text);
+                    break;
+                case 1:
+                    await updateThemeBtnColor(text);
+                    break;
+                case 2:
+                    await updateThemeBtnFontColor(text);
+                    break;
+                case 3:
+                    await updateThemeBtnShadowColor(text);
+                    break;
+                case 4:
+                    await updateThemeTextColour(text);
+                    break;
+            
+                default:
+                    await updateThemeBackgroundColor(text);
+                    break;
+            }
+        } finally {
+            setIsUpdating(false);
         }
     }
   
+    // ✅ FIXED: Remove the problematic useEffect that was causing infinite loop
     useEffect(() => {
-        if (!colorHasLoaded) {
-            setColorHasLoaded(true);
+        // Only update when debounced color changes and component has loaded
+        if (!colorHasLoaded || isUpdating) {
             return;
         }
 
-        if (colorText !== "") {
-            setValidColor(isValidHexCode(colorText));
-            if (!isValidHexCode(colorText)) {
-                return;
-            }
-    
+        if (colorText !== "" && isValidHexCode(colorText)) {
             handleUpdateTheme(colorText);
         }
-    }, [debounceColor, colorHasLoaded, colorText]);
+        
+        // Update validity state
+        setValidColor(isValidHexCode(colorText));
+    }, [debounceColor]); // ✅ Only depend on debounceColor
 
-    useEffect(() => {
-        if (!validColor) {
-            return;
-        }
-
-        handleUpdateTheme(colorText);
-    }, [validColor, colorText]);
+    // ✅ REMOVED the problematic useEffect that was calling handleUpdateTheme again
 
     useEffect(() => {
         // ✅ Only fetch theme after hydration
@@ -107,7 +109,15 @@ export default function ColorPicker({colorFor}) {
                             break;
                     }
                     
-                    setColorText(newColor);
+                    // ✅ Only update if the color actually changed to prevent loops
+                    if (newColor !== colorText) {
+                        setColorText(newColor);
+                    }
+                    
+                    // ✅ Mark as loaded after first fetch
+                    if (!colorHasLoaded) {
+                        setColorHasLoaded(true);
+                    }
                 }
             }, (error) => {
                 console.error("Error fetching theme:", error);
@@ -120,7 +130,7 @@ export default function ColorPicker({colorFor}) {
         return () => {
             if (unsubscribe) unsubscribe();
         };
-    }, [colorFor, isHydrated]);
+    }, [colorFor, isHydrated]); // ✅ Remove colorText from dependencies to prevent loop
 
     // ✅ Show loading state until hydrated
     if (!isHydrated) {
