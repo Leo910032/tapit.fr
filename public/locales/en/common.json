@@ -499,6 +499,18 @@
     "account_exists": "You already have an account with us!",
     "invalid_email_format": "Invalid Email format!"
   },
+  "account" : {
+    "settings_title" : "Account Settings",
+    "settings_subtitle" :"Manage your profile information and team settings",
+    "contact_information" : "Contact Information",
+    "contact_info_desc" : "This information will be available when people save your contact.",
+    "display_name" : "Display Name"
+  },
+  "common" :{
+    "saving" : "Saving...",
+    "save" : "Save",
+    "edit" : "Edit"
+  },
   "forgot_password": {
     "page_title": "Link Tree | Forgot password",
     "title": "Request password reset link",

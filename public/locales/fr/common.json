@@ -259,7 +259,7 @@
     "lake_black": "Lac Noir"
   },
   "fontsoptions": {
-    "fontsoptions": "Polices"
+    "font": "Polices"
   },
   "appearance": {
     "profile": "Profil",
@@ -581,7 +581,7 @@
     "delete": "Supprimer",
     "delete_forever_question": "Supprimer ceci définitivement ?",
     "cancel": "Annuler",
-    "enter_url_setup": "Entrez l'URL de votre {{urlKind}}, puis configurez votre lien",
+    "enter_url_setup": "Entrez l'URL de votre, puis configurez votre lien",
     "custom": "Personnalisé"
   },
   "socials": {
