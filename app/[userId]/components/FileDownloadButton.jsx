@@ -1,4 +1,4 @@
-// app/[userId]/components/FileDownloadButton.jsx - FULLY THEMED TO MATCH LINK BUTTONS
+// app/[userId]/components/FileDownloadButton.jsx - ENHANCED WITH REFERRER TRACKING
 "use client"
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
@@ -6,7 +6,7 @@ import { collection, doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/useTranslation";
 import { FaDownload, FaFileAlt } from "react-icons/fa6";
-import { recordLinkClick } from "@/lib/analytics/linkClickTracker";
+import { recordLinkClick, SessionManager } from "@/lib/analytics/linkClickTracker";
 import { hexToRgba } from "@/lib/utilities";
 import { availableFonts_Classic } from "@/lib/FontsList";
 import Image from "next/image";
@@ -16,6 +16,7 @@ export default function FileDownloadButton({ userId }) {
     const [profileFile, setProfileFile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [username, setUsername] = useState("");
+    const [sessionData, setSessionData] = useState(null); // ✅ NEW: Track session data
     
     // Theme state - COMPLETE THEME SUPPORT like Button.jsx
     const [btnType, setBtnType] = useState(0);
@@ -26,6 +27,15 @@ export default function FileDownloadButton({ userId }) {
     const [themeTextColour, setThemeTextColour] = useState("");
     const [selectedFontClass, setSelectedFontClass] = useState(""); // ✅ Add font support
     const [isHovered, setIsHovered] = useState(false);
+
+    // ✅ NEW: Initialize session tracking on component mount
+    useEffect(() => {
+        // Get or create session data when component mounts
+        const session = SessionManager.getOrCreateSession();
+        setSessionData(session);
+        
+        console.log("🎯 Session initialized for FileDownloadButton:", session);
+    }, []);
 
     // Get file icon based on file type
     const getFileIcon = (fileName) => {
@@ -222,12 +232,16 @@ export default function FileDownloadButton({ userId }) {
         }
     };
 
+    // ✅ ENHANCED: File download handler with referrer tracking
     const handleDownload = async () => {
         if (!profileFile?.url) return;
 
         try {
-            // Track the file download as a link click
+            // Track the file download as a link click with referrer data
             if (username) {
+                // Get current session data
+                const currentSession = SessionManager.getOrCreateSession();
+                
                 await recordLinkClick(username, {
                     linkId: `file_download_${profileFile.name}`,
                     linkTitle: `Download ${profileFile.name}`,
@@ -236,8 +250,16 @@ export default function FileDownloadButton({ userId }) {
                 }, {
                     userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
                     referrer: typeof window !== 'undefined' ? document.referrer : '',
-                    recordDetailed: false
+                    recordDetailed: true, // ✅ ENHANCED: Enable detailed logging with referrer data
+                    // ✅ NEW: Include current page info
+                    currentUrl: typeof window !== 'undefined' ? window.location.href : '',
+                    timestamp: new Date().toISOString(),
+                    fileSize: profileFile.size,
+                    fileType: profileFile.name?.split('.').pop()?.toLowerCase()
                 });
+
+                console.log("✅ File download tracked with referrer data:", profileFile.name);
+                console.log("🎯 Traffic source:", currentSession?.trafficSource);
             }
 
             // Open file in new tab for download
@@ -359,6 +381,13 @@ export default function FileDownloadButton({ userId }) {
                         <div onClick={() => navigator.clipboard.writeText(profileFile.url)} className="absolute p-2 h-9 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90">
                             <FaDownload className="rotate-10 group-hover:rotate-0" />
                         </div>
+
+                        {/* ✅ NEW: Optional referrer indicator for Mario theme (for debugging) */}
+                        {process.env.NODE_ENV === 'development' && sessionData && (
+                            <div className="absolute -top-8 left-0 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded opacity-75 z-50">
+                                📁 {sessionData.trafficSource.source}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -404,6 +433,13 @@ export default function FileDownloadButton({ userId }) {
                     <div onClick={() => navigator.clipboard.writeText(profileFile.url)} className="absolute p-2 h-9 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90">
                         <FaDownload className="rotate-10 group-hover:rotate-0" />
                     </div>
+
+                    {/* ✅ NEW: Optional referrer indicator (for debugging) */}
+                    {process.env.NODE_ENV === 'development' && sessionData && (
+                        <div className="absolute -top-8 left-0 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded opacity-75">
+                            📁 {sessionData.trafficSource.source}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,3 +1,4 @@
+// app/dashboard/(dashboard pages)/analytics/page.jsx - ENHANCED WITH TRAFFIC SOURCES
 "use client"
 import React, { useEffect, useState } from "react";
 import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
@@ -14,7 +15,7 @@ import OverviewCards from "./components/OverviewCards";
 import PerformanceChart from "./components/PerformanceChart";
 import LinkTypeDistribution from "./components/LinkTypeDistribution";
 import LinkAnalyticsChart from "./components/LinkAnalyticsChart";
-import TrafficSourceChart from "./components/TrafficSourceChart"; // ✅ NEW: Import Traffic Source Chart
+import TrafficSourcesChart from "./components/TrafficSourcesChart"; // ✅ NEW COMPONENT
 
 export default function AnalyticsPage() {
     const { t } = useTranslation();
@@ -31,18 +32,19 @@ export default function AnalyticsPage() {
         const weekNumber = Math.ceil(((now - yearStart) / 86400000 + yearStart.getDay() + 1) / 7); 
         return `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`; 
     };
-    
     const getMonthKey = () => { 
         const now = new Date(); 
         return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`; 
     };
 
+    // ✅ ENHANCED: Process analytics data including traffic sources
     const processAnalyticsData = (data) => {
         const today = new Date().toISOString().split('T')[0];
         const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
         const weekKey = getWeekKey();
         const monthKey = getMonthKey();
 
+        // Process link clicks
         const topLinks = Object.entries(data.linkClicks || {})
             .map(([linkId, linkData]) => ({
                 linkId,
@@ -55,10 +57,58 @@ export default function AnalyticsPage() {
                 monthClicks: data.monthlyClicks?.[monthKey] || 0,
                 createdAt: linkData.createdAt || new Date().toISOString(),
                 lastClicked: linkData.lastClicked,
-                // ✅ NEW: Include traffic source data for each link
-                trafficSources: linkData.trafficSources || {}
+                // ✅ NEW: Include referrer data for links
+                referrerData: linkData.referrerData || {}
             }))
+            .filter(link => link.totalClicks > 0)
             .sort((a, b) => (b.totalClicks || 0) - (a.totalClicks || 0));
+
+        // ✅ NEW: Process traffic sources data
+        const trafficSources = data.trafficSources || {};
+        
+        // Calculate traffic source totals and trends
+        const trafficSourceStats = {
+            totalSources: Object.keys(trafficSources).length,
+            topSource: null,
+            socialTraffic: 0,
+            searchTraffic: 0,
+            directTraffic: 0,
+            referralTraffic: 0
+        };
+
+        if (Object.keys(trafficSources).length > 0) {
+            // Find top traffic source
+            const sortedSources = Object.entries(trafficSources)
+                .sort(([,a], [,b]) => (b.clicks || 0) - (a.clicks || 0));
+            
+            if (sortedSources.length > 0) {
+                trafficSourceStats.topSource = {
+                    name: sortedSources[0][0],
+                    clicks: sortedSources[0][1].clicks || 0,
+                    medium: sortedSources[0][1].medium || 'unknown'
+                };
+            }
+
+            // Calculate traffic by medium
+            Object.entries(trafficSources).forEach(([source, sourceData]) => {
+                const clicks = sourceData.clicks || 0;
+                switch (sourceData.medium) {
+                    case 'social':
+                        trafficSourceStats.socialTraffic += clicks;
+                        break;
+                    case 'search':
+                    case 'organic':
+                        trafficSourceStats.searchTraffic += clicks;
+                        break;
+                    case 'direct':
+                        trafficSourceStats.directTraffic += clicks;
+                        break;
+                    case 'referral':
+                        trafficSourceStats.referralTraffic += clicks;
+                        break;
+                }
+            });
+        }
 
         return {
             totalViews: data.totalViews || 0,
@@ -74,8 +124,13 @@ export default function AnalyticsPage() {
             dailyViews: data.dailyViews || {},
             dailyClicks: data.dailyClicks || {},
             topLinks,
-            // ✅ NEW: Include global traffic source data
-            globalTrafficSources: data.globalTrafficSources || {}
+            // ✅ NEW: Include traffic sources data
+            trafficSources: trafficSources,
+            trafficSourceStats: trafficSourceStats,
+            // ✅ NEW: UTM campaign data
+            campaigns: data.campaigns || {},
+            // ✅ NEW: Referrer breakdown
+            referrerBreakdown: data.referrerBreakdown || {}
         };
     };
 
@@ -98,6 +153,7 @@ export default function AnalyticsPage() {
                     const data = docSnapshot.exists() ? docSnapshot.data() : {};
                     const processed = processAnalyticsData(data);
                     
+                    console.log("📊 Processed analytics with traffic sources:", processed);
                     setAnalytics(processed);
                     setLoading(false);
                 }, (err) => {
@@ -152,7 +208,7 @@ export default function AnalyticsPage() {
                         <div className="flex items-center text-xs">
                             <div className={`w-2 h-2 rounded-full mr-2 ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
                             <span className={isConnected ? 'text-green-600' : 'text-red-600'}>
-                                {isConnected ? t('analytics.live_updates_enabled') : 'contacts.offline_updates_enabled'}
+                                {isConnected ? t('analytics.live_updates_enabled') : 'Offline'}
                             </span>
                         </div>
                     </div>
@@ -163,9 +219,9 @@ export default function AnalyticsPage() {
                     <div className="grid grid-cols-4 gap-1">
                         {[
                             { id: 'today', label: 'Today' },
-                            { id: 'week', label: 'week' },
-                            { id: 'month', label: 'month' },
-                            { id: 'all', label: 'all' }
+                            { id: 'week', label: 'Week' },
+                            { id: 'month', label: 'Month' },
+                            { id: 'all', label: 'All' }
                         ].map((period) => (
                             <button
                                 key={period.id}
@@ -189,11 +245,6 @@ export default function AnalyticsPage() {
                     isConnected={isConnected}
                 />
 
-                {/* ✅ NEW: Traffic Source Chart - Added before Performance Chart for better visibility */}
-                <div className="bg-white rounded-lg border p-4">
-                    <TrafficSourceChart analytics={analytics} isConnected={isConnected} />
-                </div>
-
                 {/* Full Width Performance Chart */}
                 <div className="bg-white rounded-lg border p-4">
                     <div className="h-64 w-full">
@@ -201,7 +252,72 @@ export default function AnalyticsPage() {
                     </div>
                 </div>
 
-                {/* Compact Statistics Grid (inlined) */}
+                {/* ✅ NEW: Traffic Sources Chart */}
+                {analytics?.trafficSources && Object.keys(analytics.trafficSources).length > 0 && (
+                    <TrafficSourcesChart analytics={analytics} />
+                )}
+
+                {/* Traffic Sources Quick Stats (if no detailed data) */}
+                {analytics?.trafficSourceStats && (
+                    <div className="bg-white rounded-lg border p-4">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                            {t('analytics.traffic_overview') || 'Traffic Overview'}
+                        </h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                            <div className="text-center">
+                                <div className="text-lg font-bold text-purple-600">
+                                    {analytics.trafficSourceStats.socialTraffic}
+                                </div>
+                                <div className="text-gray-600">
+                                    {t('analytics.social_traffic') || 'Social'} 📱
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-lg font-bold text-green-600">
+                                    {analytics.trafficSourceStats.searchTraffic}
+                                </div>
+                                <div className="text-gray-600">
+                                    {t('analytics.search_traffic') || 'Search'} 🔍
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-lg font-bold text-gray-600">
+                                    {analytics.trafficSourceStats.directTraffic}
+                                </div>
+                                <div className="text-gray-600">
+                                    {t('analytics.direct_traffic') || 'Direct'} 🔗
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-lg font-bold text-pink-600">
+                                    {analytics.trafficSourceStats.referralTraffic}
+                                </div>
+                                <div className="text-gray-600">
+                                    {t('analytics.referral_traffic') || 'Referral'} 🌐
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Top Traffic Source */}
+                        {analytics.trafficSourceStats.topSource && (
+                            <div className="mt-4 pt-4 border-t border-gray-100">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs text-gray-600">
+                                        {t('analytics.top_source') || 'Top Source'}:
+                                    </span>
+                                    <span className="text-xs font-medium text-gray-900 capitalize">
+                                        {getSourceIcon(analytics.trafficSourceStats.topSource.name)} {analytics.trafficSourceStats.topSource.name}
+                                        <span className="text-blue-600 ml-1">
+                                            ({analytics.trafficSourceStats.topSource.clicks} clicks)
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Compact Statistics Grid */}
                 <div className="bg-white rounded-lg border p-4">
                     <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('analytics.quick_stats')}</h3>
                     <div className="grid grid-cols-2 gap-4 text-xs">
@@ -214,10 +330,10 @@ export default function AnalyticsPage() {
                                 <span className="text-gray-600">{t('analytics.active_links')}</span>
                                 <span className="font-medium">{analytics?.topLinks?.filter(link => link.totalClicks > 0).length || 0}</span>
                             </div>
-                            {/* ✅ NEW: Add traffic source stats */}
+                            {/* ✅ NEW: Traffic source count */}
                             <div className="flex justify-between">
-                                <span className="text-gray-600">{t('analytics.traffic_sources') || 'Traffic Sources'}</span>
-                                <span className="font-medium">{Object.keys(analytics?.globalTrafficSources || {}).length}</span>
+                                <span className="text-gray-600">{t('analytics.traffic_sources') || 'Sources'}</span>
+                                <span className="font-medium">{analytics?.trafficSourceStats?.totalSources || 0}</span>
                             </div>
                         </div>
                         <div className="space-y-2">
@@ -237,17 +353,15 @@ export default function AnalyticsPage() {
                                     }
                                 </span>
                             </div>
-                            {/* ✅ NEW: Show top traffic source */}
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">{t('analytics.top_source') || 'Top Source'}</span>
-                                <span className="font-medium capitalize">
-                                    {analytics?.globalTrafficSources ? 
-                                        Object.entries(analytics.globalTrafficSources)
-                                            .sort(([,a], [,b]) => (b.totalClicks || 0) - (a.totalClicks || 0))[0]?.[0] || 'None'
-                                        : 'None'
-                                    }
-                                </span>
-                            </div>
+                            {/* ✅ NEW: Conversion by top source */}
+                            {analytics?.trafficSourceStats?.topSource && (
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">{t('analytics.top_converter') || 'Top Conv.'}</span>
+                                    <span className="font-medium capitalize">
+                                        {analytics.trafficSourceStats.topSource.name}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -259,7 +373,7 @@ export default function AnalyticsPage() {
                     </div>
                 </div>
 
-                {/* Performance Summary (inlined) */}
+                {/* Performance Summary with referrer insights */}
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border p-4">
                     <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('analytics.Performance_summary')}</h3>
                     <div className="space-y-2 text-xs">
@@ -284,22 +398,35 @@ export default function AnalyticsPage() {
                                 {(analytics?.todayViews || 0) > (analytics?.yesterdayViews || 0) ? t('analytics.Growing') : t('analytics.Declining')}
                             </span>
                         </div>
-                        {/* ✅ NEW: Add traffic source performance summary */}
-                        <div className="flex justify-between items-center">
-                            <span className="text-gray-600">{t('analytics.social_traffic') || 'Social Traffic'}</span>
-                            <span className="font-medium text-blue-600">
-                                {analytics?.globalTrafficSources ? 
-                                    Object.entries(analytics.globalTrafficSources)
-                                        .filter(([, data]) => data.type === 'social')
-                                        .reduce((sum, [, data]) => sum + (data.totalClicks || 0), 0)
-                                    : 0
-                                }
-                            </span>
-                        </div>
+                        {/* ✅ NEW: Traffic source insights */}
+                        {analytics?.trafficSourceStats?.totalSources > 0 && (
+                            <div className="flex justify-between items-center pt-2 border-t border-purple-200">
+                                <span className="text-gray-600">{t('analytics.traffic_diversity') || 'Traffic Mix'}</span>
+                                <span className="font-medium text-blue-600">
+                                    {analytics.trafficSourceStats.totalSources} {t('analytics.sources') || 'sources'}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
             <div className="h-10"></div> {/* Spacer at the bottom */}
         </div>
     );
+}
+
+// ✅ Helper function for source icons
+function getSourceIcon(source) {
+    const icons = {
+        'instagram': '📸',
+        'tiktok': '🎵',
+        'twitter': '🐦',
+        'facebook': '👤',
+        'linkedin': '💼',
+        'youtube': '📺',
+        'google': '🔍',
+        'direct': '🔗',
+        'email': '📧'
+    };
+    return icons[source] || '🌐';
 }
