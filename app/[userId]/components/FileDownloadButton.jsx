@@ -8,6 +8,7 @@ import { useTranslation } from "@/lib/useTranslation";
 import { FaDownload, FaFileAlt } from "react-icons/fa6";
 import { recordLinkClick } from "@/lib/analytics/linkClickTracker";
 import { hexToRgba } from "@/lib/utilities";
+import { availableFonts_Classic } from "@/lib/FontsList";
 import Image from "next/image";
 
 export default function FileDownloadButton({ userId }) {
@@ -23,6 +24,7 @@ export default function FileDownloadButton({ userId }) {
     const [btnColor, setBtnColor] = useState('');
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
+    const [selectedFontClass, setSelectedFontClass] = useState(""); // ✅ Add font support
     const [isHovered, setIsHovered] = useState(false);
 
     // Get file icon based on file type
@@ -274,6 +276,10 @@ export default function FileDownloadButton({ userId }) {
                         setSelectedTheme(data.selectedTheme || '');
                         setThemeTextColour(data.themeFontColor || "");
                         
+                        // ✅ Set font class - SAME AS Button.jsx
+                        const fontName = availableFonts_Classic[data.fontType ? data.fontType - 1 : 0];
+                        setSelectedFontClass(fontName?.class || '');
+                        
                         // Set file data
                         setProfileFile(data.profileFile || null);
                     } else {
@@ -335,7 +341,7 @@ export default function FileDownloadButton({ userId }) {
                             </div>
                             
                             <div className="flex-1" style={fontStyle}>
-                                <div className={`md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] bg-transparent ${isHovered ? "text-blue-500" : "text-white"}`}>
+                                <div className={`${selectedFontClass} md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] bg-transparent ${isHovered ? "text-blue-500" : "text-white"}`}>
                                     <div className="flex items-center gap-2">
                                         <FaDownload className="w-4 h-4" />
                                         <span className="text-sm font-semibold">
@@ -380,8 +386,8 @@ export default function FileDownloadButton({ userId }) {
                             </div>
                         </div>
                         
-                        {/* File details - same structure as ButtonText */}
-                        <div className="flex-1" style={fontStyle}>
+                        {/* File details - same structure as ButtonText with font support */}
+                        <div className={`${selectedFontClass} flex-1`} style={fontStyle}>
                             <div className="flex items-center gap-2">
                                 <FaDownload className="w-4 h-4" />
                                 <span className="font-semibold truncate max-w-[90%]">
