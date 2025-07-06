@@ -35,16 +35,16 @@ export const TeamHeader = ({ teamData, onShowInviteModal, onShowSettings }) => {
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">{teamData.teamName}</h2>
                     <p className="text-gray-600">{teamData.description || 'No description'}</p>
-                    
+                
                     {/* ✅ ENHANCED: Better real-time indicator */}
                     {teamData.teamStats?.lastUpdated && (
                         <div className="flex items-center gap-2 mt-2">
                             <div className="flex items-center">
                                 <span className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></span>
-                                <span className="text-xs text-green-600 font-medium">Live Updates</span>
+                                <span className="text-xs text-green-600 font-medium">{t("contacts.live_updates")}</span>
                             </div>
                             <span className="text-xs text-gray-500">
-                                • Last updated: {formatLastUpdated(teamData.teamStats.lastUpdated)}
+                                • {t("analytics.last_updated")}: {formatLastUpdated(teamData.teamStats.lastUpdated)}
                             </span>
                         </div>
                     )}
@@ -127,7 +127,7 @@ export const TeamHeader = ({ teamData, onShowInviteModal, onShowSettings }) => {
                     <div className="bg-green-100 border border-green-200 rounded-full px-3 py-1 flex items-center gap-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                         <span className="text-xs text-green-700 font-medium">
-                            Auto-syncing team statistics in real-time
+                            {t('teams.Auto')}
                         </span>
                     </div>
                 </div>

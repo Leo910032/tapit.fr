@@ -527,6 +527,8 @@
   },
  
   "teams": {
+    "Auto" : "Auto-syncing team statistics in real-time",
+    "click_to_copy" : "Click to copy",
      "team_members": "Team Members",
     "hide_details": "Hide Details",
     "show_details": "Show Details",
