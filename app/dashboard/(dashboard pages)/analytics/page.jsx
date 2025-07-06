@@ -14,6 +14,7 @@ import OverviewCards from "./components/OverviewCards";
 import PerformanceChart from "./components/PerformanceChart";
 import LinkTypeDistribution from "./components/LinkTypeDistribution";
 import LinkAnalyticsChart from "./components/LinkAnalyticsChart";
+import TrafficSourceChart from "./components/TrafficSourceChart"; // ✅ NEW: Import Traffic Source Chart
 
 export default function AnalyticsPage() {
     const { t } = useTranslation();
@@ -23,11 +24,6 @@ export default function AnalyticsPage() {
     const [username, setUsername] = useState("");
     const [isConnected, setIsConnected] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('all');
-    
-    // analyticsData state is no longer needed here, as OverviewCards will calculate dynamically
-    // based on the full 'analytics' object. Removed it for clarity in the explanation,
-    // but the actual code doesn't strictly need its removal if you prefer to keep it.
-    // However, it will not be used by OverviewCards anymore.
 
     const getWeekKey = () => { 
         const now = new Date(); 
@@ -35,6 +31,7 @@ export default function AnalyticsPage() {
         const weekNumber = Math.ceil(((now - yearStart) / 86400000 + yearStart.getDay() + 1) / 7); 
         return `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`; 
     };
+    
     const getMonthKey = () => { 
         const now = new Date(); 
         return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`; 
@@ -53,13 +50,13 @@ export default function AnalyticsPage() {
                 url: linkData.url || '',
                 type: linkData.type || 'custom',
                 totalClicks: linkData.totalClicks || 0,
-                // These 'todayClicks', 'weekClicks', 'monthClicks' are based on the CURRENT period keys,
-                // not historical aggregation for the charts.
                 todayClicks: linkData.dailyClicks?.[today] || 0,
                 weekClicks: data.weeklyClicks?.[weekKey] || 0,
                 monthClicks: data.monthlyClicks?.[monthKey] || 0,
                 createdAt: linkData.createdAt || new Date().toISOString(),
                 lastClicked: linkData.lastClicked,
+                // ✅ NEW: Include traffic source data for each link
+                trafficSources: linkData.trafficSources || {}
             }))
             .sort((a, b) => (b.totalClicks || 0) - (a.totalClicks || 0));
 
@@ -74,9 +71,11 @@ export default function AnalyticsPage() {
             yesterdayClicks: data.dailyClicks?.[yesterday] || 0,
             thisWeekClicks: data.weeklyClicks?.[weekKey] || 0,
             thisMonthClicks: data.monthlyClicks?.[monthKey] || 0,
-            dailyViews: data.dailyViews || {}, // Pass full daily data
-            dailyClicks: data.dailyClicks || {}, // Pass full daily data
+            dailyViews: data.dailyViews || {},
+            dailyClicks: data.dailyClicks || {},
             topLinks,
+            // ✅ NEW: Include global traffic source data
+            globalTrafficSources: data.globalTrafficSources || {}
         };
     };
 
@@ -100,7 +99,6 @@ export default function AnalyticsPage() {
                     const processed = processAnalyticsData(data);
                     
                     setAnalytics(processed);
-                    // analyticsData state is no longer set here, as OverviewCards will derive directly from 'analytics'
                     setLoading(false);
                 }, (err) => {
                     console.error("Firebase listener error:", err);
@@ -185,19 +183,23 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Compact Overview Cards */}
-                {/* ✅ FIX: Pass the full 'analytics' object instead of 'analyticsData' */}
                 <OverviewCards
-                    analytics={analytics} // Now passing the full processed analytics object
+                    analytics={analytics}
                     selectedPeriod={selectedPeriod}
                     isConnected={isConnected}
                 />
 
-{/* Full Width Performance Chart */}
-<div className="bg-white rounded-lg border p-4">
-    <div className="h-64 w-full">
-        <PerformanceChart analytics={analytics} />
-    </div>
-</div>
+                {/* ✅ NEW: Traffic Source Chart - Added before Performance Chart for better visibility */}
+                <div className="bg-white rounded-lg border p-4">
+                    <TrafficSourceChart analytics={analytics} isConnected={isConnected} />
+                </div>
+
+                {/* Full Width Performance Chart */}
+                <div className="bg-white rounded-lg border p-4">
+                    <div className="h-64 w-full">
+                        <PerformanceChart analytics={analytics} />
+                    </div>
+                </div>
 
                 {/* Compact Statistics Grid (inlined) */}
                 <div className="bg-white rounded-lg border p-4">
@@ -211,6 +213,11 @@ export default function AnalyticsPage() {
                             <div className="flex justify-between">
                                 <span className="text-gray-600">{t('analytics.active_links')}</span>
                                 <span className="font-medium">{analytics?.topLinks?.filter(link => link.totalClicks > 0).length || 0}</span>
+                            </div>
+                            {/* ✅ NEW: Add traffic source stats */}
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">{t('analytics.traffic_sources') || 'Traffic Sources'}</span>
+                                <span className="font-medium">{Object.keys(analytics?.globalTrafficSources || {}).length}</span>
                             </div>
                         </div>
                         <div className="space-y-2">
@@ -230,11 +237,21 @@ export default function AnalyticsPage() {
                                     }
                                 </span>
                             </div>
+                            {/* ✅ NEW: Show top traffic source */}
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">{t('analytics.top_source') || 'Top Source'}</span>
+                                <span className="font-medium capitalize">
+                                    {analytics?.globalTrafficSources ? 
+                                        Object.entries(analytics.globalTrafficSources)
+                                            .sort(([,a], [,b]) => (b.totalClicks || 0) - (a.totalClicks || 0))[0]?.[0] || 'None'
+                                        : 'None'
+                                    }
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-         
                 {/* Main Link Analytics Chart */}
                 <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm">
                     <div className="h-81"> 
@@ -267,8 +284,19 @@ export default function AnalyticsPage() {
                                 {(analytics?.todayViews || 0) > (analytics?.yesterdayViews || 0) ? t('analytics.Growing') : t('analytics.Declining')}
                             </span>
                         </div>
+                        {/* ✅ NEW: Add traffic source performance summary */}
+                        <div className="flex justify-between items-center">
+                            <span className="text-gray-600">{t('analytics.social_traffic') || 'Social Traffic'}</span>
+                            <span className="font-medium text-blue-600">
+                                {analytics?.globalTrafficSources ? 
+                                    Object.entries(analytics.globalTrafficSources)
+                                        .filter(([, data]) => data.type === 'social')
+                                        .reduce((sum, [, data]) => sum + (data.totalClicks || 0), 0)
+                                    : 0
+                                }
+                            </span>
+                        </div>
                     </div>
-                    
                 </div>
             </div>
             <div className="h-10"></div> {/* Spacer at the bottom */}
