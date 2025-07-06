@@ -527,6 +527,9 @@
   },
  
   "teams": {
+     "team_members": "Team Members",
+    "hide_details": "Hide Details",
+    "show_details": "Show Details",
     "create_success": "Team created successfully!",
     "team_code": "Team Code:",
     "code_copied": "Team code copied to clipboard!",
@@ -580,7 +583,6 @@
     "processing": "Processing...",
     "approve": "Approve",
     "reject": "Reject",
-    "team_members": "Team Members",
     "joined": "Joined",
     "remove_member": "Remove from team",
     "invite_member": "Invite Member",

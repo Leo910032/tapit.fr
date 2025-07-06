@@ -16,8 +16,10 @@ export const TeamMembersList = ({ members, onRemoveMember }) => {
                     onClick={() => setShowMemberDetails(!showMemberDetails)}
                     className="text-sm text-gray-600 hover:text-gray-800 underline"
                 >
-                    {showMemberDetails ? 'Hide Details' : 'Show Details'}
-                </button>
+ {showMemberDetails 
+        ? (t('teams.hide_details') || 'Hide Details')
+        : (t('teams.show_details') || 'Show Details')
+    }                </button>
             </div>
             <div className="space-y-4">
                 {members.map((member) => (
