@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import Normal from '../general elements/draggables/Normal';
 import Special from '../general elements/draggables/Special';
-import System from '../general elements/draggables/System'; // New system component
+import System from '../general elements/draggables/System.jsx'; // New system component
 import { ManageLinksContent } from './ManageLinks';
 
 const DraggableList = ({ array }) => {
