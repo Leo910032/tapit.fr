@@ -317,10 +317,42 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
             </div>
         ) : selectedTheme === "3D Blocks" ? (
             <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
-                <button
+                <div
                     onClick={() => setIsModalOpen(true)}
                     className={getButtonClasses()}
                     style={{...getButtonStyles(), borderColor: selectedTheme === "Matrix" ? `${themeTextColour}` : ""}}
+                >
+                    <div className="cursor-pointer flex gap-3 items-center min-h-10 py-3 px-3 flex-1">
+                        {specialElements}
+                        
+                        {/* Exchange Icon */}
+                        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        
+                        {/* ✅ FIXED: Use selectedFontClass and fontStyle */}
+                        <div className={`${selectedFontClass} font-semibold truncate max-w-[90%] flex-1`} style={fontStyle}>
+                            {/* Desktop text */}
+                            <span className="hidden md:block">
+                                {t('exchange.button_text') || 'Exchange Contact'}
+                            </span>
+                            
+                            {/* Mobile text (shorter) */}
+                            <span className="block md:hidden text-sm">
+                                {t('exchange.button_text_short') || 'Exchange'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ) : (
+            <div
+                className={getButtonClasses()}
+                style={{...getButtonStyles(), borderColor: selectedTheme === "Matrix" ? `${themeTextColour}` : ""}}
+            >
+                <div
+                    onClick={() => setIsModalOpen(true)}
+                    className="cursor-pointer flex gap-3 items-center min-h-10 py-3 px-3 flex-1"
                 >
                     {specialElements}
                     
@@ -330,45 +362,19 @@ export default function ExchangeButton({ username, userInfo, fastLookupUsed, use
                     </svg>
                     
                     {/* ✅ FIXED: Use selectedFontClass and fontStyle */}
-                    <div className={`${selectedFontClass} flex-1 text-left`} style={fontStyle}>
+                    <div className={`${selectedFontClass} font-semibold truncate max-w-[90%] flex-1`} style={fontStyle}>
                         {/* Desktop text */}
-                        <span className="hidden md:block font-semibold">
+                        <span className="hidden md:block">
                             {t('exchange.button_text') || 'Exchange Contact'}
                         </span>
                         
                         {/* Mobile text (shorter) */}
-                        <span className="block md:hidden text-sm font-semibold">
+                        <span className="block md:hidden text-sm">
                             {t('exchange.button_text_short') || 'Exchange'}
                         </span>
                     </div>
-                </button>
-            </div>
-        ) : (
-            <button
-                onClick={() => setIsModalOpen(true)}
-                className={getButtonClasses()}
-                style={{...getButtonStyles(), borderColor: selectedTheme === "Matrix" ? `${themeTextColour}` : ""}}
-            >
-                {specialElements}
-                
-                {/* Exchange Icon */}
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                
-                {/* ✅ FIXED: Use selectedFontClass and fontStyle */}
-                <div className={`${selectedFontClass} flex-1 text-left`} style={fontStyle}>
-                    {/* Desktop text */}
-                    <span className="hidden md:block font-semibold">
-                        {t('exchange.button_text') || 'Exchange Contact'}
-                    </span>
-                    
-                    {/* Mobile text (shorter) */}
-                    <span className="block md:hidden text-sm font-semibold">
-                        {t('exchange.button_text_short') || 'Exchange'}
-                    </span>
                 </div>
-            </button>
+            </div>
         )}
             
             <ExchangeModal 
