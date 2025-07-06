@@ -1,13 +1,12 @@
-// app/[userId]/page.jsx - Enhanced with Session Tracking
+// app/[userId]/page.jsx - Enhanced with Fast Lookup
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
-import { fastUserLookup } from "@/lib/userLookup";
+import { fastUserLookup } from "@/lib/userLookup"; // ✅ Import fast lookup
 import { fireApp } from "@/important/firebase";
 import { collection, doc, getDoc } from "firebase/firestore";
 import House from "./House";
 import Filter from "bad-words"
 import { Toaster } from "react-hot-toast";
 import { notFound } from 'next/navigation';
-import SessionTracker from "../dashboard/(dashboard pages)/analytics/components/TrafficSourceChart.jsx"; // ✅ New component for session tracking
 
 export async function generateMetadata({ params: { userId } }) {
     try {
@@ -96,8 +95,6 @@ export default function UserLinksPage({ params: { userId } }) {
     return (
         <div className="w-screen h-screen flex flex-col">
             <Toaster />
-            {/* ✅ Add session tracking component */}
-            <SessionTracker userId={userId} />
             <House userId={userId} />
         </div>
     );
