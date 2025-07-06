@@ -107,3 +107,4 @@ export default function MyLinks({ userId, hasSensitiveContent }) {
             {socialPosition === 1 && socialArray.length > 0 && <Socials themeFontColor={themeFontColor} socialArray={socialArray} userId={userId} />}
         </div>
     )
+}
