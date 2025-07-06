@@ -1,15 +1,17 @@
+// app/dashboard/general components/Drag.jsx - Updated with System Button Support
 "use client"
 import React, { useContext, useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import Normal from '../general elements/draggables/Normal';
 import Special from '../general elements/draggables/Special';
+import System from '../general elements/draggables/System'; // New system component
 import { ManageLinksContent } from './ManageLinks';
 
 const DraggableList = ({ array }) => {
-    const { setData }= useContext(ManageLinksContent);
+    const { setData } = useContext(ManageLinksContent);
     const [items, setItems] = useState([]);
 
-    useEffect(()=>{
+    useEffect(() => {
         setItems([...array]); 
     }, [array]);
 
@@ -23,18 +25,26 @@ const DraggableList = ({ array }) => {
         setData(newItems);
     };
 
+    const renderDraggableItem = (item, index) => {
+        // Handle system buttons
+        if (item.type === 'system' || item.isSystem) {
+            return <System item={item} index={index} key={item.id} />;
+        }
+        
+        // Handle regular links
+        if (item.type === 0) {
+            return <Normal item={item} index={index} key={item.id} />;
+        } else {
+            return <Special item={item} index={index} key={item.id} />;
+        }
+    };
+
     return (
         <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="draggable-list" mode='virtual'>
                 {(provided) => (
                     <div ref={provided.innerRef} {...provided.droppableProps} className='flex flex-col gap-8'>
-                        {items.map((item, index) => {
-                            if (item.type === 0) {
-                                return <Normal item={item} index={index} key={index+Math.random()} />
-                            }else{
-                                return <Special item={item} index={index} key={index+Math.random()} />
-                            }
-                        })}
+                        {items.map((item, index) => renderDraggableItem(item, index))}
                         {provided.placeholder}
                     </div>
                 )}
