@@ -1,4 +1,4 @@
-// app/[userId]/components/FileDownloadButton.jsx - COMPLETE WITH THEME SUPPORT
+// app/[userId]/components/FileDownloadButton.jsx - FULLY THEMED TO MATCH LINK BUTTONS
 "use client"
 import { fireApp } from "@/important/firebase";
 import { fetchUserData } from "@/lib/fetch data/fetchUserData";
@@ -8,6 +8,7 @@ import { useTranslation } from "@/lib/useTranslation";
 import { FaDownload, FaFileAlt } from "react-icons/fa6";
 import { recordLinkClick } from "@/lib/analytics/linkClickTracker";
 import { hexToRgba } from "@/lib/utilities";
+import Image from "next/image";
 
 export default function FileDownloadButton({ userId }) {
     const { t } = useTranslation();
@@ -15,13 +16,14 @@ export default function FileDownloadButton({ userId }) {
     const [isLoading, setIsLoading] = useState(true);
     const [username, setUsername] = useState("");
     
-    // Theme state
+    // Theme state - COMPLETE THEME SUPPORT like Button.jsx
     const [btnType, setBtnType] = useState(0);
     const [btnShadowColor, setBtnShadowColor] = useState('');
     const [btnFontColor, setBtnFontColor] = useState('');
     const [btnColor, setBtnColor] = useState('');
     const [selectedTheme, setSelectedTheme] = useState('');
     const [themeTextColour, setThemeTextColour] = useState("");
+    const [isHovered, setIsHovered] = useState(false);
 
     // Get file icon based on file type
     const getFileIcon = (fileName) => {
@@ -53,15 +55,16 @@ export default function FileDownloadButton({ userId }) {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
+    // ✅ COMPLETE BUTTON STYLING - SAME AS Button.jsx
     const getButtonClasses = () => {
-        let baseClasses = "w-full font-semibold py-3 px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3";
+        let baseClasses = "userBtn relative justify-between items-center flex hover:scale-[1.025] md:w-[35rem] sm:w-[30rem] w-clamp";
         
         if (selectedTheme === "3D Blocks") {
             return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
         if (selectedTheme === "New Mario") {
-            return `${baseClasses} relative overflow-hidden h-16 mario-button`;
+            return "userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 md:w-[35rem] sm:w-[30rem] w-clamp";
         }
         
         switch (btnType) {
@@ -89,15 +92,23 @@ export default function FileDownloadButton({ userId }) {
                 return `${baseClasses} bg-white rounded-lg`;
             case 11: 
                 return `${baseClasses} bg-white rounded-3xl`;
+            case 12:
+                return `${baseClasses} relative border border-black bg-black`;
+            case 13:
+                return `${baseClasses} relative border border-black bg-black`;
+            case 14:
+                return `${baseClasses} border border-black relative after:-translate-y-1/2 after:-translate-x-1/2 after:top-1/2 after:left-1/2 after:h-[88%] after:w-[104%] after:absolute after:border after:border-black after:mix-blend-difference`;
             case 15: 
                 return `${baseClasses} border border-black bg-black rounded-3xl`;
+            case 16:
+                return `${baseClasses} relative border border-black bg-black`;
             default:
                 return baseClasses;
         }
     };
 
+    // ✅ COMPLETE BUTTON STYLING - SAME AS Button.jsx
     const getButtonStyles = () => {
-        // Special handling for 3D Blocks theme
         if (selectedTheme === "3D Blocks") {
             return {
                 color: "#fff",
@@ -135,15 +146,9 @@ export default function FileDownloadButton({ userId }) {
             case 12:
             case 13:
             case 15:
+            case 16:
                 styles.color = "#fff";
-                styles.backgroundColor = "#000";
-                break;
-            default:
-                // Default gradient for file download if no theme styles
-                if (!btnColor || btnColor === "#fff") {
-                    styles.background = "linear-gradient(135deg, #10B981 0%, #3B82F6 100%)";
-                    styles.color = "#fff";
-                }
+                styles.backgroundColor = btnColor || "#000";
                 break;
         }
 
@@ -153,6 +158,66 @@ export default function FileDownloadButton({ userId }) {
         }
 
         return styles;
+    };
+
+    // ✅ GET SPECIAL ELEMENTS - SAME AS Button.jsx
+    const getSpecialElements = () => {
+        switch (btnType) {
+            case 12:
+                return (
+                    <>
+                        <span className="w-full absolute left-0 bottom-0 translate-y-[6px]">
+                            <Image src={"https://linktree.sirv.com/Images/svg%20element/torn.svg"} alt="ele" width={1000} height={100} priority className="w-full scale-[-1]" />
+                        </span>
+                        <span className="w-full absolute left-0 top-0 -translate-y-[6px]">
+                            <Image src={"https://linktree.sirv.com/Images/svg%20element/torn.svg"} alt="ele" width={1000} height={1000} priority className="w-full" />
+                        </span>
+                    </>
+                );
+            case 13:
+                return (
+                    <>
+                        <span className="w-full absolute left-0 bottom-0 translate-y-[4px]">
+                            <Image src={"https://linktree.sirv.com/Images/svg%20element/jiggy.svg"} alt="ele" width={1000} height={8} priority className="w-full" />
+                        </span>
+                        <span className="w-full absolute left-0 top-0 -translate-y-[3px]">
+                            <Image src={"https://linktree.sirv.com/Images/svg%20element/jiggy.svg"} alt="ele" width={1000} height={8} priority className="w-full scale-[-1]" />
+                        </span>
+                    </>
+                );
+            case 16:
+                return (
+                    <>
+                        <div className={"h-2 w-2 border border-black bg-white absolute -top-1 -left-1"}></div>
+                        <div className={"h-2 w-2 border border-black bg-white absolute -top-1 -right-1"}></div>
+                        <div className={"h-2 w-2 border border-black bg-white absolute -bottom-1 -left-1"}></div>
+                        <div className={"h-2 w-2 border border-black bg-white absolute -bottom-1 -right-1"}></div>
+                    </>
+                );
+            default:
+                return null;
+        }
+    };
+
+    // ✅ GET FONT STYLE - SAME AS Button.jsx
+    const getFontStyle = () => {
+        if (selectedTheme === "3D Blocks") {
+            return { color: "#fff" };
+        }
+        
+        if (selectedTheme === "New Mario") {
+            return { color: "#fff" };
+        }
+        
+        switch (btnType) {
+            case 12:
+            case 13:
+            case 15:
+            case 16:
+                return { color: "#fff" };
+            default:
+                return { color: btnFontColor || "#000" };
+        }
     };
 
     const handleDownload = async () => {
@@ -201,7 +266,7 @@ export default function FileDownloadButton({ userId }) {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         
-                        // Set theme data
+                        // Set theme data - COMPLETE THEME SUPPORT
                         setBtnType(data.btnType || 0);
                         setBtnShadowColor(data.btnShadowColor || "#000");
                         setBtnFontColor(data.btnFontColor || "#000");
@@ -232,99 +297,94 @@ export default function FileDownloadButton({ userId }) {
         return null;
     }
 
-    return (
-        <div className="w-full px-5 mb-4">
-            <div className="md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)] mx-auto"> {/* FIXED: Added proper centering container */}
-                {selectedTheme === "New Mario" ? (
-                    <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
-                        {/* Mario brick background - 9 bricks for full width file button */}
+    const specialElements = getSpecialElements();
+    const fontStyle = getFontStyle();
+
+    // ✅ MARIO THEME RENDERING - SAME AS Button.jsx
+    if (selectedTheme === "New Mario") {
+        return (
+            <div className="w-full px-5 mb-4">
+                <div className="md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)] mx-auto">
+                    <div className={getButtonClasses()}>
                         {Array(9).fill("").map((_, brick_index) => (
-                            <img
+                            <Image
                                 key={brick_index}
-                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                                src={"https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"}
                                 alt="Mario Brick"
+                                width={650}
+                                height={660}
                                 onClick={handleDownload}
-                                className="h-full w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
+                                onMouseEnter={() => setIsHovered(true)}
+                                onMouseLeave={() => setIsHovered(false)}
+                                className="h-16 w-auto object-contain hover:-translate-y-2 cursor-pointer"
                             />
                         ))}
                         
-                        {/* Mario box with file icon */}
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
-                            <div className="relative">
-                                <img
-                                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                        <div className="absolute top-0 left-0 z-30 pointer-events-none cursor-pointer flex gap-3 items-center min-h-10 py-3 px-3 flex-1">
+                            <div className="grid place-items-center">
+                                <Image
+                                    src={"https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"}
                                     alt="Mario Box"
-                                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
-                                    onClick={handleDownload}
+                                    width={650}
+                                    height={660}
+                                    className={`h-12 w-auto object-contain hover:-translate-y-2 ${isHovered ? "rotate-2" : ""}`}
                                 />
-                                {/* File icon inside the box */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                                <div className={`${isHovered ? "rotate-2" : ""} absolute text-2xl`}>
+                                    {getFileIcon(profileFile.name)}
                                 </div>
                             </div>
-                        </div>
-                        
-                        {/* Button text overlay */}
-                        <div 
-                            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
-                            onClick={handleDownload}
-                            style={{ 
-                                textShadow: '4px 4px 0px rgba(0,0,0,1)',
-                                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
-                                paddingLeft: '4rem' // Space for the box
-                            }}
-                        >
-                            <div className="flex flex-col items-center">
-                                <span className="text-sm font-semibold">
-                                    {t('file_download.download_file') || 'Download File'}
-                                </span>
-                                <div className="text-xs opacity-90 truncate">
-                                    {profileFile.name} • {formatFileSize(profileFile.size)}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        {/* Download icon */}
-                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 z-30">
-                            <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
-                        </div>
-                    </div>
-                ) : selectedTheme === "3D Blocks" ? (
-                    <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
-                        <button
-                            onClick={handleDownload}
-                            className={getButtonClasses()}
-                            style={getButtonStyles()}
-                        >
-                            {/* File icon */}
-                            <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
                             
-                            <div className="flex-1 text-left">
-                                <div className="flex items-center gap-2">
-                                    <FaDownload className="w-4 h-4" />
-                                    <span className="text-sm font-semibold">
-                                        {t('file_download.download_file') || 'Download File'}
-                                    </span>
-                                </div>
-                                <div className="text-xs opacity-90 truncate">
-                                    {profileFile.name} • {formatFileSize(profileFile.size)}
+                            <div className="flex-1" style={fontStyle}>
+                                <div className={`md:text-2xl sm:text-xl text-lg drop-shadow-[4px_4px_0px_rgba(0,0,0,1)] bg-transparent ${isHovered ? "text-blue-500" : "text-white"}`}>
+                                    <div className="flex items-center gap-2">
+                                        <FaDownload className="w-4 h-4" />
+                                        <span className="text-sm font-semibold">
+                                            {t('file_download.download_file') || 'Download File'}
+                                        </span>
+                                    </div>
+                                    <div className="text-xs opacity-90 truncate">
+                                        {profileFile.name} • {formatFileSize(profileFile.size)}
+                                    </div>
                                 </div>
                             </div>
-                        </button>
-                    </div>
-                ) : (
-                    <button
-                        onClick={handleDownload}
-                        className={getButtonClasses()}
-                        style={getButtonStyles()}
-                    >
-                        {/* File icon */}
-                        <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                        </div>
                         
-                        <div className="flex-1 text-left">
+                        {/* Copy button */}
+                        <div onClick={() => navigator.clipboard.writeText(profileFile.url)} className="absolute p-2 h-9 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90">
+                            <FaDownload className="rotate-10 group-hover:rotate-0" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // ✅ STANDARD THEMES RENDERING - SAME AS Button.jsx
+    return (
+        <div className="w-full px-5 mb-4">
+            <div className="md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)] mx-auto">
+                <div
+                    className={getButtonClasses()}
+                    style={{...getButtonStyles(), borderColor: selectedTheme === "Matrix" ? `${themeTextColour}` : ""}}
+                >
+                    <div
+                        className="cursor-pointer flex gap-3 items-center min-h-10 py-3 px-3 flex-1"
+                        onClick={handleDownload}
+                    >
+                        {specialElements}
+                        
+                        {/* File icon - same as IconDiv but for files */}
+                        <div className="h-[2rem] w-fit rounded-lg p-[2px] bg-white aspect-square">
+                            <div className="h-full w-full flex items-center justify-center text-xl">
+                                {getFileIcon(profileFile.name)}
+                            </div>
+                        </div>
+                        
+                        {/* File details - same structure as ButtonText */}
+                        <div className="flex-1" style={fontStyle}>
                             <div className="flex items-center gap-2">
                                 <FaDownload className="w-4 h-4" />
-                                <span className="text-sm font-semibold">
+                                <span className="font-semibold truncate max-w-[90%]">
                                     {t('file_download.download_file') || 'Download File'}
                                 </span>
                             </div>
@@ -332,8 +392,13 @@ export default function FileDownloadButton({ userId }) {
                                 {profileFile.name} • {formatFileSize(profileFile.size)}
                             </div>
                         </div>
-                    </button>
-                )}
+                    </div>
+                    
+                    {/* Copy button - same as Button.jsx */}
+                    <div onClick={() => navigator.clipboard.writeText(profileFile.url)} className="absolute p-2 h-9 right-3 grid place-items-center aspect-square rounded-full border border-white group cursor-pointer bg-black text-white hover:scale-105 active:scale-90">
+                        <FaDownload className="rotate-10 group-hover:rotate-0" />
+                    </div>
+                </div>
             </div>
         </div>
     );
