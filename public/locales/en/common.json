@@ -206,6 +206,8 @@
     "map_with_count": "Map ({count})"
   },
   "common": {
+    "enabled": "Enabled",
+    "disabled": "Disabled",
     "login": "Log in",
     "signup": "Sign up",
     "submit": "Submit",
@@ -500,6 +502,9 @@
     "invalid_email_format": "Invalid Email format!"
   },
    "account": {
+    "settings_title" : "Account Settings",
+    "contact_information" : "Contact Information",
+    "display_name" : "Display Name",
     "email": "Email",
     "phone": "Phone", 
     "website": "Website",
@@ -511,12 +516,7 @@
     "save_contact_preview": "Visitors to your profile will see a \"Save Contact\" button when you have contact information filled out.",
     "team_management": "Team Management"
   },
-  "common": {
-    "cancel": "Cancel",
-    "close": "Close",
-    "enabled": "Enabled",
-    "disabled": "Disabled"
-  },
+ 
   "teams": {
     "create_success": "Team created successfully!",
     "team_code": "Team Code:",
