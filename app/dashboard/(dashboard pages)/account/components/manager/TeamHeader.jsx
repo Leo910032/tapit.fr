@@ -117,7 +117,7 @@ export const TeamHeader = ({ teamData, onShowInviteModal, onShowSettings }) => {
                         {teamData.teamCode}
                     </div>
                     <div className="text-sm text-gray-600">{t('teams.join_code') || 'Join Code'}</div>
-                    <div className="text-xs text-gray-400 mt-1">Click to copy</div>
+                    <div className="text-xs text-gray-400 mt-1">{t('teams.click_to_copy')}</div>
                 </div>
             </div>
 
