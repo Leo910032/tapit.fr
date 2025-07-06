@@ -7,7 +7,7 @@ import House from "./House";
 import Filter from "bad-words"
 import { Toaster } from "react-hot-toast";
 import { notFound } from 'next/navigation';
-import SessionTracker from "../components/TrafficSourceChart.jsx"; // ✅ New component for session tracking
+import SessionTracker from "../dashboard/(dashboard pages)/analytics/components/TrafficSourceChart.jsx"; // ✅ New component for session tracking
 
 export async function generateMetadata({ params: { userId } }) {
     try {

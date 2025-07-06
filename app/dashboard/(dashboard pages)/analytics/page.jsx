@@ -15,7 +15,7 @@ import OverviewCards from "./components/OverviewCards";
 import PerformanceChart from "./components/PerformanceChart";
 import LinkTypeDistribution from "./components/LinkTypeDistribution";
 import LinkAnalyticsChart from "./components/LinkAnalyticsChart";
-import TrafficSourcesChart from "./components/TrafficSourcesChart"; // ✅ NEW COMPONENT
+import TrafficSourcesChart from "./components/TrafficSourceChart.jsx"; // ✅ 
 
 export default function AnalyticsPage() {
     const { t } = useTranslation();
