@@ -1,175 +1,340 @@
+// app/[userId]/components/FileDownloadButton.jsx - COMPLETE WITH THEME SUPPORT
 "use client"
-
-import { useDebounce } from "@/LocalHooks/useDebounce";
 import { fireApp } from "@/important/firebase";
-import { testForActiveSession } from "@/lib/authentication/testForActiveSession";
-import { updateThemeBackgroundColor, updateThemeBtnColor, updateThemeBtnFontColor, updateThemeBtnShadowColor, updateThemeTextColour } from "@/lib/update data/updateTheme";
-import { isValidHexCode } from "@/lib/utilities";
+import { fetchUserData } from "@/lib/fetch data/fetchUserData";
 import { collection, doc, onSnapshot } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "@/lib/useTranslation";
+import { FaDownload, FaFileAlt } from "react-icons/fa6";
+import { recordLinkClick } from "@/lib/analytics/linkClickTracker";
+import { hexToRgba } from "@/lib/utilities";
 
-export default function ColorPicker({colorFor}) {
-    const [colorText, setColorText] = useState(colorFor === 4 ? "#000000" : "#e8edf5");
-    const debounceColor = useDebounce(colorText, 500);
-    const [validColor, setValidColor] = useState(1);
-    const [colorHasLoaded, setColorHasLoaded] = useState(false);
-    const [isHydrated, setIsHydrated] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false); // ✅ Add updating state
-    const colorPickRef = useRef();
-
-    // ✅ Fix hydration by ensuring client-side only rendering
-    useEffect(() => {
-        setIsHydrated(true);
-    }, []);
-
+export default function FileDownloadButton({ userId }) {
+    const { t } = useTranslation();
+    const [profileFile, setProfileFile] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [username, setUsername] = useState("");
     
-    const handleUpdateTheme = async(text) => {
-        // ✅ Prevent multiple simultaneous updates
-        if (isUpdating) return;
-        setIsUpdating(true);
-        
-        try {
-            switch (colorFor) {
-                case 0:
-                    await updateThemeBackgroundColor(text);
-                    break;
-                case 1:
-                    await updateThemeBtnColor(text);
-                    break;
-                case 2:
-                    await updateThemeBtnFontColor(text);
-                    break;
-                case 3:
-                    await updateThemeBtnShadowColor(text);
-                    break;
-                case 4:
-                    await updateThemeTextColour(text);
-                    break;
-            
-                default:
-                    await updateThemeBackgroundColor(text);
-                    break;
-            }
-        } finally {
-            setIsUpdating(false);
-        }
-    }
-  
-    // ✅ FIXED: Remove the problematic useEffect that was causing infinite loop
-    useEffect(() => {
-        // Only update when debounced color changes and component has loaded
-        if (!colorHasLoaded || isUpdating) {
-            return;
-        }
+    // Theme state
+    const [btnType, setBtnType] = useState(0);
+    const [btnShadowColor, setBtnShadowColor] = useState('');
+    const [btnFontColor, setBtnFontColor] = useState('');
+    const [btnColor, setBtnColor] = useState('');
+    const [selectedTheme, setSelectedTheme] = useState('');
+    const [themeTextColour, setThemeTextColour] = useState("");
 
-        if (colorText !== "" && isValidHexCode(colorText)) {
-            handleUpdateTheme(colorText);
+    // Get file icon based on file type
+    const getFileIcon = (fileName) => {
+        const extension = fileName?.split('.').pop()?.toLowerCase();
+        switch (extension) {
+            case 'pdf':
+                return '📄';
+            case 'doc':
+            case 'docx':
+                return '📝';
+            case 'xls':
+            case 'xlsx':
+                return '📊';
+            case 'ppt':
+            case 'pptx':
+                return '📽️';
+            case 'txt':
+                return '📃';
+            default:
+                return '📎';
+        }
+    };
+
+    const formatFileSize = (bytes) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const getButtonClasses = () => {
+        let baseClasses = "w-full font-semibold py-3 px-6 transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3";
+        
+        if (selectedTheme === "3D Blocks") {
+            return `${baseClasses} relative after:absolute after:h-2 after:w-[100.5%] after:bg-black bg-white after:-bottom-2 after:left-[1px] after:skew-x-[57deg] after:ml-[2px] before:absolute before:h-[107%] before:w-3 before:bg-[currentColor] before:top-[1px] before:border-2 before:border-black before:-right-3 before:skew-y-[30deg] before:grid before:grid-rows-2 border-2 border-black inset-2 ml-[-20px] btn`;
         }
         
-        // Update validity state
-        setValidColor(isValidHexCode(colorText));
-    }, [debounceColor]); // ✅ Only depend on debounceColor
-
-    // ✅ REMOVED the problematic useEffect that was calling handleUpdateTheme again
-
-    useEffect(() => {
-        // ✅ Only fetch theme after hydration
-        if (!isHydrated) return;
-        
-        function fetchTheme() {
-            const currentUser = testForActiveSession();
-            if (!currentUser) return;
-            
-            const collectionRef = collection(fireApp, "AccountData");
-            const docRef = doc(collectionRef, `${currentUser}`);
-        
-            const unsubscribe = onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const { backgroundColor, btnShadowColor, btnFontColor, btnColor, themeTextColour } = docSnap.data();
-                    let newColor;
-                    
-                    switch (colorFor) {
-                        case 0:
-                            newColor = backgroundColor || "#e8edf5";
-                            break;
-                        case 1:
-                            newColor = btnColor || "#e8edf5";
-                            break;
-                        case 2:
-                            newColor = btnFontColor || "#e8edf5";
-                            break;
-                        case 3:
-                            newColor = btnShadowColor || "#e8edf5";
-                            break;
-                        case 4:
-                            newColor = themeTextColour || "#000000";
-                            break;
-                        default:
-                            newColor = backgroundColor || "#e8edf5";
-                            break;
-                    }
-                    
-                    // ✅ Only update if the color actually changed to prevent loops
-                    if (newColor !== colorText) {
-                        setColorText(newColor);
-                    }
-                    
-                    // ✅ Mark as loaded after first fetch
-                    if (!colorHasLoaded) {
-                        setColorHasLoaded(true);
-                    }
-                }
-            }, (error) => {
-                console.error("Error fetching theme:", error);
-            });
-            
-            return unsubscribe;
+        if (selectedTheme === "New Mario") {
+            return `${baseClasses} relative overflow-hidden h-16 mario-button`;
         }
         
-        const unsubscribe = fetchTheme();
-        return () => {
-            if (unsubscribe) unsubscribe();
+        switch (btnType) {
+            case 0: 
+                return `${baseClasses}`;
+            case 1: 
+                return `${baseClasses} rounded-lg`;
+            case 2: 
+                return `${baseClasses} rounded-3xl`;
+            case 3: 
+                return `${baseClasses} border border-black bg-opacity-0`;
+            case 4: 
+                return `${baseClasses} border border-black rounded-lg bg-opacity-0`;
+            case 5: 
+                return `${baseClasses} border border-black rounded-3xl bg-opacity-0`;
+            case 6: 
+                return `${baseClasses} bg-white border border-black`;
+            case 7: 
+                return `${baseClasses} bg-white border border-black rounded-lg`;
+            case 8: 
+                return `${baseClasses} bg-white border border-black rounded-3xl`;
+            case 9: 
+                return `${baseClasses} bg-white`;
+            case 10: 
+                return `${baseClasses} bg-white rounded-lg`;
+            case 11: 
+                return `${baseClasses} bg-white rounded-3xl`;
+            case 15: 
+                return `${baseClasses} border border-black bg-black rounded-3xl`;
+            default:
+                return baseClasses;
+        }
+    };
+
+    const getButtonStyles = () => {
+        // Special handling for 3D Blocks theme
+        if (selectedTheme === "3D Blocks") {
+            return {
+                color: "#fff",
+                backgroundColor: "#3B82F6" // Blue color for file download button
+            };
+        }
+        
+        if (selectedTheme === "New Mario") {
+            return {
+                color: "#fff",
+                backgroundColor: "transparent",
+                backgroundImage: `url('https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png')`,
+                backgroundSize: "cover",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center"
+            };
+        }
+        
+        let styles = {
+            color: btnFontColor || "#000",
+            backgroundColor: btnColor || "#fff"
         };
-    }, [colorFor, isHydrated]); // ✅ Remove colorText from dependencies to prevent loop
 
-    // ✅ Show loading state until hydrated
-    if (!isHydrated) {
-        return (
-            <div className="pt-6 flex items-center">
-                <div className="h-12 w-12 mr-4 rounded-lg bg-gray-200 animate-pulse"></div>
-                <div className="w-auto relative pt-2 flex items-center hover:border rounded-lg bg-black bg-opacity-[0.05] border-transparent border">
-                    <div className="sm:flex-1 sm:w-auto w-[200px] px-4 py-2 bg-gray-100 animate-pulse h-10 rounded"></div>
-                </div>
-            </div>
-        );
+        switch (btnType) {
+            case 6:
+            case 7:
+            case 8:
+                styles.boxShadow = `4px 4px 0 0 ${hexToRgba(btnShadowColor)}`;
+                break;
+            case 9:
+            case 10:
+            case 11:
+                styles.boxShadow = `0 4px 4px 0 ${hexToRgba(btnShadowColor, 0.16)}`;
+                break;
+            case 12:
+            case 13:
+            case 15:
+                styles.color = "#fff";
+                styles.backgroundColor = "#000";
+                break;
+            default:
+                // Default gradient for file download if no theme styles
+                if (!btnColor || btnColor === "#fff") {
+                    styles.background = "linear-gradient(135deg, #10B981 0%, #3B82F6 100%)";
+                    styles.color = "#fff";
+                }
+                break;
+        }
+
+        // Matrix theme override
+        if (selectedTheme === "Matrix") {
+            styles.borderColor = themeTextColour;
+        }
+
+        return styles;
+    };
+
+    const handleDownload = async () => {
+        if (!profileFile?.url) return;
+
+        try {
+            // Track the file download as a link click
+            if (username) {
+                await recordLinkClick(username, {
+                    linkId: `file_download_${profileFile.name}`,
+                    linkTitle: `Download ${profileFile.name}`,
+                    linkUrl: profileFile.url,
+                    linkType: "file_download"
+                }, {
+                    userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
+                    referrer: typeof window !== 'undefined' ? document.referrer : '',
+                    recordDetailed: false
+                });
+            }
+
+            // Open file in new tab for download
+            window.open(profileFile.url, '_blank');
+        } catch (error) {
+            console.error('❌ Failed to track file download:', error);
+            // Still allow the download even if tracking fails
+            window.open(profileFile.url, '_blank');
+        }
+    };
+
+    useEffect(() => {
+        async function fetchThemeAndFileData() {
+            try {
+                const currentUser = await fetchUserData(userId);
+                if (!currentUser) {
+                    setIsLoading(false);
+                    return;
+                }
+
+                // Get username for analytics
+                setUsername(currentUser.username || userId);
+
+                const collectionRef = collection(fireApp, "AccountData");
+                const docRef = doc(collectionRef, currentUser);
+
+                const unsubscribe = onSnapshot(docRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        
+                        // Set theme data
+                        setBtnType(data.btnType || 0);
+                        setBtnShadowColor(data.btnShadowColor || "#000");
+                        setBtnFontColor(data.btnFontColor || "#000");
+                        setBtnColor(data.btnColor || "#fff");
+                        setSelectedTheme(data.selectedTheme || '');
+                        setThemeTextColour(data.themeFontColor || "");
+                        
+                        // Set file data
+                        setProfileFile(data.profileFile || null);
+                    } else {
+                        setProfileFile(null);
+                    }
+                    setIsLoading(false);
+                });
+
+                return () => unsubscribe();
+            } catch (error) {
+                console.error("Error fetching profile file:", error);
+                setIsLoading(false);
+            }
+        }
+
+        fetchThemeAndFileData();
+    }, [userId]);
+
+    // Don't render anything if no file or still loading
+    if (isLoading || !profileFile) {
+        return null;
     }
-    
+
     return (
-        <div className="pt-6 flex items-center">
-            <input 
-                type="color" 
-                className="relative h-0 w-0 overflow-hidden"
-                value={colorText}
-                ref={colorPickRef}
-                onChange={(e) => setColorText(e.target.value)} 
-            />
-            <div 
-                className="h-12 w-12 mr-4 rounded-lg cursor-pointer hover:scale-[1.05] active:scale-90 transition-transform" 
-                style={{ background: colorText }} 
-                onClick={() => colorPickRef.current?.click()}
-            ></div>
-            <div className={`w-auto relative pt-2 flex items-center hover:border rounded-lg bg-black bg-opacity-[0.05] ${validColor ? "focus-within:border-black border-transparent": "border-red-500" } focus-within:border-2 border`}>
-                <input 
-                    type="text"
-                    className="sm:flex-1 sm:w-auto w-[200px] px-4 placeholder-shown:px-3 py-2 text-base font-semibold outline-none opacity-100 bg-transparent peer appearance-none"
-                    placeholder=" "
-                    value={colorText}
-                    onChange={(e) => setColorText(e.target.value)}
-                />
-                <label className="absolute px-3 pointer-events-none top-[.25rem] left-1 text-xs text-main-green peer-placeholder-shown:top-2/4 peer-placeholder-shown:pt-2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:bg-transparent peer-placeholder-shown:text-slate-500 peer-placeholder-shown:left-0 opacity-70 transition duration-[250] ease-linear">
-                    Colour
-                </label>
+        <div className="w-full px-5 mb-4">
+            <div className="md:w-[35rem] sm:w-[30rem] w-full max-w-[calc(100vw-2.5rem)] mx-auto"> {/* FIXED: Added proper centering container */}
+                {selectedTheme === "New Mario" ? (
+                    <div className="userBtn relative overflow-x-hidden overflow-y-hidden flex justify-between items-center h-16 w-full">         
+                        {/* Mario brick background - 9 bricks for full width file button */}
+                        {Array(9).fill("").map((_, brick_index) => (
+                            <img
+                                key={brick_index}
+                                src="https://linktree.sirv.com/Images/Scene/Mario/mario-brick.png"
+                                alt="Mario Brick"
+                                onClick={handleDownload}
+                                className="h-full w-auto object-contain hover:-translate-y-2 cursor-pointer transition-transform"
+                            />
+                        ))}
+                        
+                        {/* Mario box with file icon */}
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-30">
+                            <div className="relative">
+                                <img
+                                    src="https://linktree.sirv.com/Images/Scene/Mario/mario-box.png"
+                                    alt="Mario Box"
+                                    className="h-12 w-auto object-contain hover:-translate-y-2 hover:rotate-2 transition-all cursor-pointer"
+                                    onClick={handleDownload}
+                                />
+                                {/* File icon inside the box */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Button text overlay */}
+                        <div 
+                            className="absolute top-0 left-0 z-20 w-full h-full flex items-center justify-center cursor-pointer text-white font-bold"
+                            onClick={handleDownload}
+                            style={{ 
+                                textShadow: '4px 4px 0px rgba(0,0,0,1)',
+                                fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)',
+                                paddingLeft: '4rem' // Space for the box
+                            }}
+                        >
+                            <div className="flex flex-col items-center">
+                                <span className="text-sm font-semibold">
+                                    {t('file_download.download_file') || 'Download File'}
+                                </span>
+                                <div className="text-xs opacity-90 truncate">
+                                    {profileFile.name} • {formatFileSize(profileFile.size)}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Download icon */}
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 z-30">
+                            <FaDownload className="w-5 h-5 text-white drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]" />
+                        </div>
+                    </div>
+                ) : selectedTheme === "3D Blocks" ? (
+                    <div className="userBtn relative justify-between items-center flex hover:scale-[1.025] w-full">
+                        <button
+                            onClick={handleDownload}
+                            className={getButtonClasses()}
+                            style={getButtonStyles()}
+                        >
+                            {/* File icon */}
+                            <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                            
+                            <div className="flex-1 text-left">
+                                <div className="flex items-center gap-2">
+                                    <FaDownload className="w-4 h-4" />
+                                    <span className="text-sm font-semibold">
+                                        {t('file_download.download_file') || 'Download File'}
+                                    </span>
+                                </div>
+                                <div className="text-xs opacity-90 truncate">
+                                    {profileFile.name} • {formatFileSize(profileFile.size)}
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                ) : (
+                    <button
+                        onClick={handleDownload}
+                        className={getButtonClasses()}
+                        style={getButtonStyles()}
+                    >
+                        {/* File icon */}
+                        <span className="text-2xl">{getFileIcon(profileFile.name)}</span>
+                        
+                        <div className="flex-1 text-left">
+                            <div className="flex items-center gap-2">
+                                <FaDownload className="w-4 h-4" />
+                                <span className="text-sm font-semibold">
+                                    {t('file_download.download_file') || 'Download File'}
+                                </span>
+                            </div>
+                            <div className="text-xs opacity-90 truncate">
+                                {profileFile.name} • {formatFileSize(profileFile.size)}
+                            </div>
+                        </div>
+                    </button>
+                )}
             </div>
         </div>
-    )
+    );
 }
