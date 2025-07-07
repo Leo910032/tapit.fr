@@ -316,15 +316,7 @@ export default function MyCards() {
                                     >
                                         {t('common.close') || 'Close'}
                                     </button>
-                                    <button
-                                        onClick={() => {
-                                            // Future: Add edit functionality
-                                            console.log('Edit card:', selectedCard.id);
-                                        }}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                                    >
-                                        {t('cards.edit_card') || 'Edit Card'}
-                                    </button>
+                                    
                                 </div>
                             </div>
                         </div>
