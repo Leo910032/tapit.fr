@@ -42,52 +42,7 @@
     "profile_not_found": "Profile not found. Please try again.",
     "validation_error": "Please check your information and try again."
   },
-"cards": {
-    "my_saved_cards": "My Saved Cards",
-    "loading": "Loading your saved cards...",
-    "error_load": "Could not load your saved cards.",
-    "no_cards": "You haven't created any custom cards yet.",
-    "visit_nfc_section": "Visit the NFC Cards section to create your first card",
-    
-    "front": "Front",
-    "back": "Back", 
-    "created": "Created",
-    "unknown_date": "Unknown date",
-    "click_to_view_both_sides": "Click to view both sides",
-    
-    "front_side": "Front Side",
-    "back_side": "Back Side",
-    "card_details": "Card Details",
-    "custom_information": "Custom Information", 
-    "style_customizations": "Style Customizations",
-    "not_specified": "Not specified",
-    
-    "background_color": "Background Color",
-    "text_color": "Text Color",
-    "text_size": "Text Size",
-    
-    "no_front_design": "No front design available",
-    "no_back_design": "No back design available",
-    "card_id": "Card ID",
-    
-    "edit_card": "Edit Card",
-    "duplicate_card": "Duplicate Card",
-    "delete_card": "Delete Card",
-    "download_card": "Download Card",
-    "share_card": "Share Card",
-    
-    "product_name": "Product Name",
-    "creation_date": "Creation Date",
-    "last_modified": "Last Modified",
-    "card_status": "Status",
-    "active": "Active",
-    "inactive": "Inactive",
-    
-  
-    "total_cards": "Total Cards",
-    "active_cards": "Active Cards",
-    "recent_cards": "Recent Cards"
-  },
+
   "save_contact": {
     "button_text": "Save ",
     "download_contact": "Contact",
@@ -603,10 +558,49 @@
     "my_nfc_cards": "My NFC Cards"
   },
     "cards": {
+    "my_saved_cards": "My Saved Cards",
     "loading": "Loading your saved cards...",
     "error_load": "Could not load your saved cards.",
     "no_cards": "You haven't created any custom cards yet.",
-    "my_saved_cards": "My Saved Cards"
+    "visit_nfc_section": "Visit the NFC Cards section to create your first card",
+    
+    "front": "Front",
+    "back": "Back", 
+    "created": "Created",
+    "unknown_date": "Unknown date",
+    "click_to_view_both_sides": "Click to view both sides",
+    
+    "front_side": "Front Side",
+    "back_side": "Back Side",
+    "card_details": "Card Details",
+    "custom_information": "Custom Information", 
+    "style_customizations": "Style Customizations",
+    "not_specified": "Not specified",
+    
+    "background_color": "Background Color",
+    "text_color": "Text Color",
+    "text_size": "Text Size",
+    
+    "no_front_design": "No front design available",
+    "no_back_design": "No back design available",
+    "card_id": "Card ID",
+    
+    "edit_card": "Edit Card",
+    "duplicate_card": "Duplicate Card",
+    "delete_card": "Delete Card",
+    "download_card": "Download Card",
+    "share_card": "Share Card",
+    
+    "product_name": "Product Name",
+    "creation_date": "Creation Date",
+    "last_modified": "Last Modified",
+    "card_status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    
+    "total_cards": "Total Cards",
+    "active_cards": "Active Cards",
+    "recent_cards": "Recent Cards"
   },
  
   "teams": {

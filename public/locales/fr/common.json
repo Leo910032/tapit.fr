@@ -586,12 +586,52 @@
     "team_management": "Gestion d'équipe",
     "my_nfc_cards": "Mes cartes NFC"
   },
-  "cards": {
+   "cards": {
+    "my_saved_cards": "Mes cartes enregistrées",
     "loading": "Chargement de vos cartes enregistrées...",
     "error_load": "Impossible de charger vos cartes enregistrées.",
     "no_cards": "Vous n'avez pas encore créé de cartes personnalisées.",
-    "my_saved_cards": "Mes cartes enregistrées"
+    "visit_nfc_section": "Visitez la section Cartes NFC pour créer votre première carte.",
+    
+    "front": "Recto",
+    "back": "Verso", 
+    "created": "Créée le",
+    "unknown_date": "Date inconnue",
+    "click_to_view_both_sides": "Cliquez pour voir les deux côtés",
+    
+    "front_side": "Recto",
+    "back_side": "Verso",
+    "card_details": "Détails de la carte",
+    "custom_information": "Informations personnalisées", 
+    "style_customizations": "Personnalisations du style",
+    "not_specified": "Non spécifié",
+    
+    "background_color": "Couleur de fond",
+    "text_color": "Couleur du texte",
+    "text_size": "Taille du texte",
+    
+    "no_front_design": "Aucun design disponible pour le recto",
+    "no_back_design": "Aucun design disponible pour le verso",
+    "card_id": "ID de la carte",
+    
+    "edit_card": "Modifier la carte",
+    "duplicate_card": "Dupliquer la carte",
+    "delete_card": "Supprimer la carte",
+    "download_card": "Télécharger la carte",
+    "share_card": "Partager la carte",
+    
+    "product_name": "Nom du produit",
+    "creation_date": "Date de création",
+    "last_modified": "Dernière modification",
+    "card_status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif",
+    
+    "total_cards": "Total des cartes",
+    "active_cards": "Cartes actives",
+    "recent_cards": "Cartes récentes"
   },
+
   "teams": {
     "Auto": "Synchronisation automatique des statistiques de l'équipe en temps réel",
     "click_to_copy": "Cliquez pour copier",
