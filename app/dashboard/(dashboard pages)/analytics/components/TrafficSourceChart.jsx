@@ -1,21 +1,31 @@
-// app/dashboard/(dashboard pages)/analytics/components/TrafficSourcesChart.jsx - NEW COMPONENT
+// app/dashboard/(dashboard pages)/analytics/components/TrafficSourcesChart.jsx - ENHANCED WITH INFO MODAL
 "use client"
 import { useTranslation } from "@/lib/useTranslation";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { useState } from 'react';
 
 export default function TrafficSourcesChart({ analytics }) {
     const { t } = useTranslation();
+    const [showInfoModal, setShowInfoModal] = useState(false);
 
     // Guard clause if analytics data is not yet available
     if (!analytics || !analytics.trafficSources) {
         return (
             <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    {t('analytics.traffic_sources') || 'Traffic Sources'}
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            {t('analytics.traffic_sources') || 'Traffic Sources'}
+                        </h2>
+                        <InfoIcon onClick={() => setShowInfoModal(true)} />
+                    </div>
+                </div>
                 <div className="h-48 flex items-center justify-center text-gray-500 text-sm">
                     {t('analytics.no_traffic_data') || 'No traffic source data available yet.'}
                 </div>
+                {showInfoModal && (
+                    <InfoModal onClose={() => setShowInfoModal(false)} />
+                )}
             </div>
         );
     }
@@ -35,12 +45,20 @@ export default function TrafficSourcesChart({ analytics }) {
     if (trafficData.length === 0 || trafficData.every(item => item.clicks === 0 && item.views === 0)) {
         return (
             <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                    {t('analytics.traffic_sources') || 'Traffic Sources'}
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            {t('analytics.traffic_sources') || 'Traffic Sources'}
+                        </h2>
+                        <InfoIcon onClick={() => setShowInfoModal(true)} />
+                    </div>
+                </div>
                 <div className="h-48 flex items-center justify-center text-gray-500 text-sm">
                     {t('analytics.no_traffic_data') || 'No traffic source data available yet.'}
                 </div>
+                {showInfoModal && (
+                    <InfoModal onClose={() => setShowInfoModal(false)} />
+                )}
             </div>
         );
     }
@@ -84,9 +102,14 @@ export default function TrafficSourcesChart({ analytics }) {
 
     return (
         <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                {t('analytics.traffic_sources') || 'Traffic Sources'}
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-semibold text-gray-900">
+                        {t('analytics.traffic_sources') || 'Traffic Sources'}
+                    </h2>
+                    <InfoIcon onClick={() => setShowInfoModal(true)} />
+                </div>
+            </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Pie Chart */}
@@ -202,9 +225,209 @@ export default function TrafficSourcesChart({ analytics }) {
                     </table>
                 </div>
             </div>
+
+            {/* Info Modal */}
+            {showInfoModal && (
+                <InfoModal onClose={() => setShowInfoModal(false)} />
+            )}
         </div>
     );
 }
+
+// ✅ NEW: Info Icon Component
+const InfoIcon = ({ onClick }) => {
+    const { t } = useTranslation();
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+        <div className="relative">
+            <button
+                onClick={onClick}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors duration-200 flex items-center justify-center text-xs font-bold cursor-pointer"
+                title={t('analytics.info.click_for_more') || 'Click for more info'}
+            >
+                i
+            </button>
+            
+            {/* Hover Tooltip */}
+            {isHovered && (
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                    {t('analytics.info.click_for_more') || 'Click for more info'}
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-800"></div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ✅ NEW: Info Modal Component
+const InfoModal = ({ onClose }) => {
+    const { t } = useTranslation();
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                        {t('analytics.info.traffic_sources_explained') || 'How Traffic Sources Work'}
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-6">
+                    {/* Introduction */}
+                    <div>
+                        <h4 className="text-lg font-medium text-gray-900 mb-2">
+                            {t('analytics.info.what_are_traffic_sources') || 'What are Traffic Sources?'}
+                        </h4>
+                        <p className="text-gray-600 text-sm leading-relaxed">
+                            {t('analytics.info.traffic_sources_description') || 
+                            'Traffic sources show you where your visitors are coming from when they visit your profile. This helps you understand which platforms drive the most engagement and optimize your content strategy.'}
+                        </p>
+                    </div>
+
+                    {/* Source Types */}
+                    <div className="space-y-4">
+                        <h4 className="text-lg font-medium text-gray-900">
+                            {t('analytics.info.source_types') || 'Types of Traffic Sources'}
+                        </h4>
+
+                        {/* Social Media */}
+                        <div className="bg-purple-50 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-lg">📱</span>
+                                <h5 className="font-medium text-gray-900">
+                                    {t('analytics.info.social_media') || 'Social Media'}
+                                </h5>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">
+                                {t('analytics.info.social_description') || 
+                                'When visitors click your link from social media platforms like Instagram, TikTok, or Twitter.'}
+                            </p>
+                            <div className="text-xs text-gray-500">
+                                {t('analytics.info.social_examples') || 'Examples: Instagram bio, TikTok profile, Twitter posts'}
+                            </div>
+                        </div>
+
+                        {/* Direct Traffic */}
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-lg">🔗</span>
+                                <h5 className="font-medium text-gray-900">
+                                    {t('analytics.info.direct_traffic') || 'Direct Traffic'}
+                                </h5>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">
+                                {t('analytics.info.direct_description') || 
+                                'When visitors type your URL directly or use bookmarks. This often indicates strong brand recognition.'}
+                            </p>
+                            <div className="text-xs text-gray-500">
+                                {t('analytics.info.direct_examples') || 'Examples: Typing tapit.fr/yourname, clicking bookmarks, some mobile apps'}
+                            </div>
+                        </div>
+
+                        {/* Search Engines */}
+                        <div className="bg-green-50 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-lg">🔍</span>
+                                <h5 className="font-medium text-gray-900">
+                                    {t('analytics.info.search_engines') || 'Search Engines'}
+                                </h5>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">
+                                {t('analytics.info.search_description') || 
+                                'When visitors find your profile through Google, Bing, or other search engines.'}
+                            </p>
+                            <div className="text-xs text-gray-500">
+                                {t('analytics.info.search_examples') || 'Examples: Google search results, Bing, Yahoo search'}
+                            </div>
+                        </div>
+
+                        {/* Email */}
+                        <div className="bg-yellow-50 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-lg">📧</span>
+                                <h5 className="font-medium text-gray-900">
+                                    {t('analytics.info.email_traffic') || 'Email'}
+                                </h5>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">
+                                {t('analytics.info.email_description') || 
+                                'When visitors click your link from email newsletters, campaigns, or signatures.'}
+                            </p>
+                            <div className="text-xs text-gray-500">
+                                {t('analytics.info.email_examples') || 'Examples: Email newsletters, signature links, promotional emails'}
+                            </div>
+                        </div>
+
+                        {/* UTM Campaigns */}
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="text-lg">🎯</span>
+                                <h5 className="font-medium text-gray-900">
+                                    {t('analytics.info.utm_campaigns') || 'UTM Campaigns'}
+                                </h5>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">
+                                {t('analytics.info.utm_description') || 
+                                'Special tracking links with UTM parameters that let you track specific campaigns or collaborations.'}
+                            </p>
+                            <div className="text-xs text-gray-500 font-mono bg-white p-2 rounded border">
+                                tapit.fr/yourname?utm_source=email&utm_campaign=newsletter
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* How to Use This Data */}
+                    <div>
+                        <h4 className="text-lg font-medium text-gray-900 mb-3">
+                            {t('analytics.info.how_to_use') || 'How to Use This Data'}
+                        </h4>
+                        <div className="space-y-2 text-sm text-gray-600">
+                            <div className="flex items-start gap-2">
+                                <span className="text-green-600 mt-1">✓</span>
+                                <span>{t('analytics.info.tip_1') || 'Focus your content on platforms that drive the most engagement'}</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <span className="text-green-600 mt-1">✓</span>
+                                <span>{t('analytics.info.tip_2') || 'Track the success of collaborations and campaigns with UTM links'}</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <span className="text-green-600 mt-1">✓</span>
+                                <span>{t('analytics.info.tip_3') || 'Optimize your bio links on platforms with high conversion rates'}</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                                <span className="text-green-600 mt-1">✓</span>
+                                <span>{t('analytics.info.tip_4') || 'High direct traffic shows strong brand recognition'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                    <button
+                        onClick={onClose}
+                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+                    >
+                        {t('common.close') || 'Close'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 // Helper functions
 function getSourceDisplayName(source) {

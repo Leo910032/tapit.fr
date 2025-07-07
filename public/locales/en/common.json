@@ -1383,6 +1383,41 @@
     "file_not_available": "File not available"
   },
   "analytics": {
+     "info": {
+      "click_for_more": "Click for more info",
+      "traffic_sources_explained": "How Traffic Sources Work",
+      "what_are_traffic_sources": "What are Traffic Sources?",
+      "traffic_sources_description": "Traffic sources show you where your visitors are coming from when they visit your profile. This helps you understand which platforms drive the most engagement and optimize your content strategy.",
+      
+      "source_types": "Types of Traffic Sources",
+      
+      "social_media": "Social Media",
+      "social_description": "When visitors click your link from social media platforms like Instagram, TikTok, or Twitter.",
+      "social_examples": "Examples: Instagram bio, TikTok profile, Twitter posts",
+      
+      "direct_traffic": "Direct Traffic",
+      "direct_description": "When visitors type your URL directly or use bookmarks. This often indicates strong brand recognition.",
+      "direct_examples": "Examples: Typing tapit.fr/yourname, clicking bookmarks, some mobile apps",
+      
+      "search_engines": "Search Engines", 
+      "search_description": "When visitors find your profile through Google, Bing, or other search engines.",
+      "search_examples": "Examples: Google search results, Bing, Yahoo search",
+      
+      "email_traffic": "Email",
+      "email_description": "When visitors click your link from email newsletters, campaigns, or signatures.",
+      "email_examples": "Examples: Email newsletters, signature links, promotional emails",
+      
+     
+      "utm_campaigns": "UTM Campaigns",
+      "utm_description": "Special tracking links with UTM parameters that let you track specific campaigns or collaborations.",
+      
+   
+      "how_to_use": "How to Use This Data",
+      "tip_1": "Focus your content on platforms that drive the most engagement",
+      "tip_2": "Track the success of collaborations and campaigns with UTM links", 
+      "tip_3": "Optimize your bio links on platforms with high conversion rates",
+      "tip_4": "High direct traffic shows strong brand recognition"
+    },
     "no_traffic_data": "No traffic source data available yet.",
     "no_data_available": "No data available",
     "social_traffic": "Social Media",
