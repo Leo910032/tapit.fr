@@ -40,6 +40,41 @@
     "profile_not_found": "Profil non trouvé. Veuillez réessayer.",
     "validation_error": "Veuillez vérifier vos informations et réessayer."
   },
+  
+  "info": {
+      "click_for_more": "En savoir plus",
+      "traffic_sources_explained": "Fonctionnement des sources de trafic",
+      "what_are_traffic_sources": "Qu'est-ce que les sources de trafic ?",
+      "traffic_sources_description": "Les sources de trafic vous indiquent d'où proviennent vos visiteurs lorsqu'ils consultent votre profil. Cela vous aide à comprendre quelles plateformes génèrent le plus d'engagement et à optimiser votre stratégie de contenu.",
+      
+      "source_types": "Types de sources de trafic",
+      
+      "social_media": "Réseaux sociaux",
+      "social_description": "Lorsque les visiteurs cliquent sur votre lien depuis des plateformes de réseaux sociaux comme Instagram, TikTok ou Twitter.",
+      "social_examples": "Exemples : Bio Instagram, profil TikTok, publications Twitter",
+      
+      "direct_traffic": "Trafic direct",
+      "direct_description": "Lorsque les visiteurs saisissent directement votre URL ou utilisent des favoris. Cela indique souvent une forte notoriété de marque.",
+      "direct_examples": "Exemples : Saisie de tapit.fr/votrenom, clic sur les favoris, certaines applications mobiles",
+      
+      "search_engines": "Moteurs de recherche", 
+      "search_description": "Lorsque les visiteurs trouvent votre profil via Google, Bing ou d'autres moteurs de recherche.",
+      "search_examples": "Exemples : Résultats de recherche Google, Bing, recherche Yahoo",
+      
+      "email_traffic": "E-mail",
+      "email_description": "Lorsque les visiteurs cliquent sur votre lien depuis des newsletters, des campagnes e-mail ou des signatures.",
+      "email_examples": "Exemples : Newsletters, liens en signature, e-mails promotionnels",
+      
+      "utm_campaigns": "Campagnes UTM",
+      "utm_description": "Liens de suivi spéciaux avec des paramètres UTM qui vous permettent de suivre des campagnes ou des collaborations spécifiques.",
+      
+      "how_to_use": "Comment utiliser ces données",
+      "tip_1": "Concentrez votre contenu sur les plateformes qui génèrent le plus d'engagement.",
+      "tip_2": "Suivez le succès de vos collaborations et campagnes avec les liens UTM.",
+      "tip_3": "Optimisez les liens dans votre bio sur les plateformes à fort taux de conversion.",
+      "tip_4": "Un trafic direct élevé témoigne d'une forte notoriété de marque."
+    },
+
   "save_contact": {
     "button_text": "Enregistrer",
     "download_contact": "Contact",

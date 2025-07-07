@@ -85,6 +85,9 @@ export default function MyCards() {
                         ))}
                     </div>
                 </div>
+                <div className="text-center mt-4 text-gray-500">
+                    {t('cards.loading') || 'Loading your saved cards...'}
+                </div>
             </div>
         );
     }
@@ -111,7 +114,7 @@ export default function MyCards() {
                         {t('cards.no_cards') || "You haven't created any custom cards yet."}
                     </p>
                     <p className="text-sm text-gray-500">
-                        Visit the NFC Cards section to create your first card
+                        {t('cards.visit_nfc_section') || 'Visit the NFC Cards section to create your first card'}
                     </p>
                 </div>
             </div>
@@ -143,14 +146,14 @@ export default function MyCards() {
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                     <div className="bg-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                                        Click to view both sides
+                                        {t('cards.click_to_view_both_sides') || 'Click to view both sides'}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Front/Back Indicator */}
                             <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                                Front
+                                {t('cards.front') || 'Front'}
                             </div>
                         </div>
 
@@ -163,7 +166,7 @@ export default function MyCards() {
                                 {card.productName}
                             </p>
                             <p className="text-xs text-gray-400 mt-1">
-                                Created: {card.createdAt?.toDate?.()?.toLocaleDateString() || 'Unknown date'}
+                                {t('cards.created') || 'Created'}: {card.createdAt?.toDate?.()?.toLocaleDateString() || t('cards.unknown_date') || 'Unknown date'}
                             </p>
                         </div>
                     </div>
@@ -201,13 +204,13 @@ export default function MyCards() {
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
                                         <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                        <h4 className="font-medium text-gray-900">Front Side</h4>
+                                        <h4 className="font-medium text-gray-900">{t('cards.front_side') || 'Front Side'}</h4>
                                     </div>
                                     <div className="w-full aspect-[500/300] bg-gray-100 rounded-lg overflow-hidden shadow-md">
                                         <div
                                             className="w-full h-full"
                                             dangerouslySetInnerHTML={{ 
-                                                __html: selectedCard.frontSvg || selectedCard.customizedSvg || '<div class="flex items-center justify-center h-full text-gray-500">No front design available</div>' 
+                                                __html: selectedCard.frontSvg || selectedCard.customizedSvg || `<div class="flex items-center justify-center h-full text-gray-500">${t('cards.no_front_design') || 'No front design available'}</div>` 
                                             }}
                                         />
                                     </div>
@@ -217,13 +220,13 @@ export default function MyCards() {
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
                                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                        <h4 className="font-medium text-gray-900">Back Side</h4>
+                                        <h4 className="font-medium text-gray-900">{t('cards.back_side') || 'Back Side'}</h4>
                                     </div>
                                     <div className="w-full aspect-[500/300] bg-gray-100 rounded-lg overflow-hidden shadow-md">
                                         <div
                                             className="w-full h-full"
                                             dangerouslySetInnerHTML={{ 
-                                                __html: selectedCard.backSvg || selectedCard.customizedSvg || '<div class="flex items-center justify-center h-full text-gray-500">No back design available</div>' 
+                                                __html: selectedCard.backSvg || selectedCard.customizedSvg || `<div class="flex items-center justify-center h-full text-gray-500">${t('cards.no_back_design') || 'No back design available'}</div>` 
                                             }}
                                         />
                                     </div>
@@ -232,12 +235,12 @@ export default function MyCards() {
 
                             {/* Card Details */}
                             <div className="mt-8 pt-6 border-t border-gray-200">
-                                <h4 className="font-medium text-gray-900 mb-4">Card Details</h4>
+                                <h4 className="font-medium text-gray-900 mb-4">{t('cards.card_details') || 'Card Details'}</h4>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     {/* Customized Data */}
                                     {selectedCard.customizedData && (
                                         <div>
-                                            <h5 className="font-medium text-gray-700 mb-2">Custom Information</h5>
+                                            <h5 className="font-medium text-gray-700 mb-2">{t('cards.custom_information') || 'Custom Information'}</h5>
                                             <div className="space-y-2">
                                                 {Object.entries(selectedCard.customizedData).map(([key, value]) => (
                                                     <div key={key} className="flex justify-between text-sm">
@@ -245,7 +248,7 @@ export default function MyCards() {
                                                             {key.replace(/([A-Z])/g, ' $1').trim()}:
                                                         </span>
                                                         <span className="text-gray-900 font-medium">
-                                                            {value || 'Not specified'}
+                                                            {value || t('cards.not_specified') || 'Not specified'}
                                                         </span>
                                                     </div>
                                                 ))}
@@ -256,10 +259,10 @@ export default function MyCards() {
                                     {/* Style Options */}
                                     {selectedCard.styleOptions && (
                                         <div>
-                                            <h5 className="font-medium text-gray-700 mb-2">Style Customizations</h5>
+                                            <h5 className="font-medium text-gray-700 mb-2">{t('cards.style_customizations') || 'Style Customizations'}</h5>
                                             <div className="space-y-2">
                                                 <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-600">Background Color:</span>
+                                                    <span className="text-gray-600">{t('cards.background_color') || 'Background Color'}:</span>
                                                     <div className="flex items-center gap-2">
                                                         <div 
                                                             className="w-4 h-4 rounded border border-gray-300"
@@ -271,7 +274,7 @@ export default function MyCards() {
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-600">Text Color:</span>
+                                                    <span className="text-gray-600">{t('cards.text_color') || 'Text Color'}:</span>
                                                     <div className="flex items-center gap-2">
                                                         <div 
                                                             className="w-4 h-4 rounded border border-gray-300"
@@ -283,7 +286,7 @@ export default function MyCards() {
                                                     </div>
                                                 </div>
                                                 <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-600">Text Size:</span>
+                                                    <span className="text-gray-600">{t('cards.text_size') || 'Text Size'}:</span>
                                                     <span className="text-gray-900">{selectedCard.styleOptions.textSize}px</span>
                                                 </div>
                                             </div>
@@ -294,7 +297,7 @@ export default function MyCards() {
                                 {/* Created Date */}
                                 <div className="mt-4 pt-4 border-t border-gray-100">
                                     <p className="text-sm text-gray-500">
-                                        Created: {selectedCard.createdAt?.toDate?.()?.toLocaleString() || 'Unknown date'}
+                                        {t('cards.created') || 'Created'}: {selectedCard.createdAt?.toDate?.()?.toLocaleString() || t('cards.unknown_date') || 'Unknown date'}
                                     </p>
                                 </div>
                             </div>
@@ -304,14 +307,14 @@ export default function MyCards() {
                         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
                             <div className="flex justify-between items-center">
                                 <div className="text-sm text-gray-500">
-                                    Card ID: {selectedCard.id}
+                                    {t('cards.card_id') || 'Card ID'}: {selectedCard.id}
                                 </div>
                                 <div className="flex gap-3">
                                     <button
                                         onClick={closeModal}
                                         className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
                                     >
-                                        Close
+                                        {t('common.close') || 'Close'}
                                     </button>
                                     <button
                                         onClick={() => {
@@ -320,7 +323,7 @@ export default function MyCards() {
                                         }}
                                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                                     >
-                                        Edit Card
+                                        {t('cards.edit_card') || 'Edit Card'}
                                     </button>
                                 </div>
                             </div>
